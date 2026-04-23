@@ -2,14 +2,18 @@ package com.github.dsbezerra.cashflow.domain.usecase.dashboard
 
 import com.github.dsbezerra.cashflow.domain.model.Account
 import com.github.dsbezerra.cashflow.domain.model.DashboardSummary
+import com.github.dsbezerra.cashflow.domain.model.MonthlyAmount
 import com.github.dsbezerra.cashflow.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.domain.repository.AccountRepository
 import com.github.dsbezerra.cashflow.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlin.time.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 class GetDashboardSummaryUseCase(
     private val accountRepository: AccountRepository,
@@ -20,8 +24,9 @@ class GetDashboardSummaryUseCase(
             accountRepository.getAll(),
             transactionRepository.getAll(),
         ) { accounts, transactions ->
+            val tz = TimeZone.currentSystemDefault()
             val now = Clock.System.now()
-            val localNow = now.toLocalDateTime(TimeZone.currentSystemDefault())
+            val localNow = now.toLocalDateTime(tz)
             val currentMonth = localNow.month
             val currentYear = localNow.year
 
@@ -39,9 +44,10 @@ class GetDashboardSummaryUseCase(
 
             val totalBalance = accountBalances.sumOf { it.second }
 
+            val today = localNow.date
+
             val monthlyTxs = transactions.filter { tx ->
-                val local = kotlinx.datetime.Instant.fromEpochMilliseconds(tx.date)
-                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                val local = Instant.fromEpochMilliseconds(tx.date).toLocalDateTime(tz)
                 local.month == currentMonth && local.year == currentYear
             }
 
@@ -52,7 +58,26 @@ class GetDashboardSummaryUseCase(
                 .filter { it.type == TransactionType.EXPENSE }
                 .sumOf { it.amount }
 
-            val recentTransactions = transactions.take(10)
+            val recentTransactions = transactions
+                .sortedByDescending { it.date }
+                .take(10)
+
+            // Last 6 months breakdown (oldest first)
+            val last6MonthsBreakdown = (5 downTo 0).map { offset ->
+                val targetDate = today.minus(DatePeriod(months = offset))
+                val targetYear = targetDate.year
+                val targetMonth = targetDate.month
+                val monthTxs = transactions.filter { tx ->
+                    val local = Instant.fromEpochMilliseconds(tx.date).toLocalDateTime(tz)
+                    local.year == targetYear && local.month == targetMonth
+                }
+                MonthlyAmount(
+                    year = targetYear,
+                    month = targetMonth,
+                    income = monthTxs.filter { it.type == TransactionType.INCOME }.sumOf { it.amount },
+                    expenses = monthTxs.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amount },
+                )
+            }
 
             DashboardSummary(
                 accountBalances = accountBalances,
@@ -61,6 +86,7 @@ class GetDashboardSummaryUseCase(
                 monthlyExpenses = monthlyExpenses,
                 netBalance = monthlyIncome - monthlyExpenses,
                 recentTransactions = recentTransactions,
+                last6MonthsBreakdown = last6MonthsBreakdown,
             )
         }
 }

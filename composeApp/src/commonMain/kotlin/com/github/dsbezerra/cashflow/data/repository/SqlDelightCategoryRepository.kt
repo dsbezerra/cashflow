@@ -42,6 +42,7 @@ class SqlDelightCategoryRepository(
                 parentId = category.parentId,
                 isDefault = category.isDefault,
                 isArchived = category.isArchived,
+                dreClassification = category.dreClassification,
                 id = category.id,
             )
         }

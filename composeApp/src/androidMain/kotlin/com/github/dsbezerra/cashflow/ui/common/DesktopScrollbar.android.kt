@@ -6,6 +6,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 
 @Composable
-expect fun BoxScope.DesktopVerticalScrollbar(scrollState: ScrollState)
+actual fun BoxScope.DesktopVerticalScrollbar(scrollState: ScrollState) {
+    // No-op
+}
+
 @Composable
-expect fun BoxScope.DesktopVerticalScrollbar(lazyListState: LazyListState)
+actual fun BoxScope.DesktopVerticalScrollbar(lazyListState: LazyListState) {
+    // No-op
+}

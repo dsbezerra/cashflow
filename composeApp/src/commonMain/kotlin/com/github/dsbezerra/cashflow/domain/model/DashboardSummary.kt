@@ -7,4 +7,5 @@ data class DashboardSummary(
     val monthlyExpenses: Double,
     val netBalance: Double,
     val recentTransactions: List<Transaction>,
+    val last6MonthsBreakdown: List<MonthlyAmount>,
 )

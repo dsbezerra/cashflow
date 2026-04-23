@@ -3,6 +3,7 @@ package com.github.dsbezerra.cashflow.ui.categories
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.dsbezerra.cashflow.domain.model.Category
+import com.github.dsbezerra.cashflow.domain.model.DreClassification
 import com.github.dsbezerra.cashflow.domain.repository.CategoryRepository
 import com.github.dsbezerra.cashflow.util.generateId
 import kotlinx.coroutines.channels.Channel
@@ -43,6 +44,7 @@ class CategoryFormViewModel(
                     categoryId = category.id,
                     name = category.name,
                     type = category.type,
+                    dreClassification = category.dreClassification,
                     icon = category.icon,
                     color = category.color,
                     parentId = category.parentId,
@@ -59,6 +61,7 @@ class CategoryFormViewModel(
         when (action) {
             is CategoryFormAction.NameChanged -> _state.update { it.copy(name = action.name, nameError = null) }
             is CategoryFormAction.TypeChanged -> _state.update { it.copy(type = action.type, parentId = null) }
+            is CategoryFormAction.DreClassificationChanged -> _state.update { it.copy(dreClassification = action.dreClassification) }
             is CategoryFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
             is CategoryFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
             is CategoryFormAction.ParentChanged -> _state.update { it.copy(parentId = action.parentId) }
@@ -85,6 +88,7 @@ class CategoryFormViewModel(
                         existing.copy(
                             name = s.name,
                             type = s.type,
+                            dreClassification = s.dreClassification,
                             icon = s.icon,
                             color = s.color,
                             parentId = s.parentId,
@@ -97,6 +101,7 @@ class CategoryFormViewModel(
                             id = generateId(),
                             name = s.name,
                             type = s.type,
+                            dreClassification = s.dreClassification,
                             icon = s.icon,
                             color = s.color,
                             parentId = s.parentId,

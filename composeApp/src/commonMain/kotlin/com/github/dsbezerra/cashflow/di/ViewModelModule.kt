@@ -6,6 +6,7 @@ import com.github.dsbezerra.cashflow.ui.accounts.AccountListViewModel
 import com.github.dsbezerra.cashflow.ui.categories.CategoryFormViewModel
 import com.github.dsbezerra.cashflow.ui.categories.CategoryListViewModel
 import com.github.dsbezerra.cashflow.ui.dashboard.DashboardViewModel
+import com.github.dsbezerra.cashflow.ui.reports.ReportViewModel
 import com.github.dsbezerra.cashflow.ui.transactions.TransactionDetailViewModel
 import com.github.dsbezerra.cashflow.ui.transactions.TransactionListViewModel
 import org.koin.core.module.dsl.viewModel
@@ -20,4 +21,5 @@ val viewModelModule = module {
     viewModel { AccountFormViewModel(get()) }
     viewModel { CategoryListViewModel(get()) }
     viewModel { CategoryFormViewModel(get()) }
+    viewModel { ReportViewModel(get(), get()) }
 }

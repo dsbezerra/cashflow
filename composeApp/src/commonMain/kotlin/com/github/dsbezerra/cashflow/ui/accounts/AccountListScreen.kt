@@ -75,7 +75,7 @@ fun AccountListScreen(
                     HorizontalDivider()
                 }
             }
-            DesktopVerticalScrollbar(rememberScrollbarAdapter(listState))
+            DesktopVerticalScrollbar(listState)
         }
 
         SnackbarHost(

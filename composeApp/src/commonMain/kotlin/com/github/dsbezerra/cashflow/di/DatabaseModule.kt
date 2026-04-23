@@ -11,6 +11,7 @@ import com.github.dsbezerra.cashflow.db.RecurringRule
 import com.github.dsbezerra.cashflow.domain.model.AccountType
 import com.github.dsbezerra.cashflow.domain.model.BudgetPeriod
 import com.github.dsbezerra.cashflow.domain.model.CategoryType
+import com.github.dsbezerra.cashflow.domain.model.DreClassification
 import com.github.dsbezerra.cashflow.domain.model.Frequency
 import com.github.dsbezerra.cashflow.data.db.DriverFactory
 import com.github.dsbezerra.cashflow.domain.model.TransactionType
@@ -29,6 +30,7 @@ val databaseModule = module {
             ),
             CategoryAdapter = Category.Adapter(
                 typeAdapter = enumColumnAdapter(CategoryType::valueOf),
+                dreClassificationAdapter = enumColumnAdapter(DreClassification::valueOf),
             ),
             RecurringRuleAdapter = RecurringRule.Adapter(
                 typeAdapter = enumColumnAdapter(TransactionType::valueOf),

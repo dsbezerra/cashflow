@@ -1,12 +1,15 @@
 package com.github.dsbezerra.cashflow.ui.shell
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
@@ -18,9 +21,19 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -28,13 +41,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.dsbezerra.cashflow.isDesktop
 import com.github.dsbezerra.cashflow.navigation.Accounts
 import com.github.dsbezerra.cashflow.navigation.Dashboard
+import com.github.dsbezerra.cashflow.navigation.Reports
 import com.github.dsbezerra.cashflow.navigation.Settings
+import com.github.dsbezerra.cashflow.navigation.TransactionDetail
 import com.github.dsbezerra.cashflow.navigation.TransactionList
 
 private val navItems = listOf(
     NavItem("Painel", Icons.Default.Dashboard, Dashboard),
     NavItem("Transações", Icons.Default.List, TransactionList),
     NavItem("Contas", Icons.Default.AccountBalance, Accounts),
+    NavItem("Relatórios", Icons.Default.BarChart, Reports),
     NavItem("Configurações", Icons.Default.Settings, Settings),
 )
 
@@ -48,7 +64,24 @@ fun AppShell(
     val currentDestination = backStackEntry?.destination
 
     if (isDesktop) {
-        Row(modifier = Modifier.fillMaxSize()) {
+        val focusRequester = remember { FocusRequester() }
+        LaunchedEffect(Unit) { focusRequester.requestFocus() }
+
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .focusRequester(focusRequester)
+                .focusable()
+                .onKeyEvent { event ->
+                    if (event.isCtrlPressed &&
+                        event.key == Key.N &&
+                        event.type == KeyEventType.KeyDown
+                    ) {
+                        navController.navigate(TransactionDetail())
+                        true
+                    } else false
+                },
+        ) {
             NavigationRail {
                 navItems.forEach { item ->
                     val selected = currentDestination?.hasRoute(item.route::class) == true
@@ -71,7 +104,12 @@ fun AppShell(
                 }
             }
             Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                content(Modifier.fillMaxSize())
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.TopCenter,
+                ) {
+                    content(Modifier.widthIn(max = 800.dp).fillMaxHeight())
+                }
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)

@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
+import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -78,6 +81,7 @@ fun CategoryListScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
+        val listState = rememberLazyListState()
         if (state.isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
@@ -103,40 +107,40 @@ fun CategoryListScreen(
             val grouped = state.active.groupBy { it.type }
             val typeOrder = listOf(CategoryType.INCOME, CategoryType.EXPENSE, CategoryType.BOTH)
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentPadding = PaddingValues(
-                    bottom = 56.dp
-                )
-            ) {
-                typeOrder.forEach { type ->
-                    val items = grouped[type] ?: return@forEach
-                    item(key = "header-${type.name}") {
-                        TypeSectionHeader(type)
+            Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 56.dp),
+                ) {
+                    typeOrder.forEach { type ->
+                        val items = grouped[type] ?: return@forEach
+                        item(key = "header-${type.name}") {
+                            TypeSectionHeader(type)
+                        }
+                        items(items, key = { it.id }) { category ->
+                            CategoryRow(
+                                category = category,
+                                onClick = { onNavigateToForm(category.id) },
+                            )
+                            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+                        }
                     }
-                    items(items, key = { it.id }) { category ->
-                        CategoryRow(
-                            category = category,
-                            onClick = { onNavigateToForm(category.id) },
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
-                    }
-                }
 
-                if (state.archived.isNotEmpty()) {
-                    item(key = "header-archived") {
-                        TypeSectionHeader(null)
-                    }
-                    items(state.archived, key = { "archived-${it.id}" }) { category ->
-                        CategoryRow(
-                            category = category,
-                            onClick = { onNavigateToForm(category.id) },
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+                    if (state.archived.isNotEmpty()) {
+                        item(key = "header-archived") {
+                            TypeSectionHeader(null)
+                        }
+                        items(state.archived, key = { "archived-${it.id}" }) { category ->
+                            CategoryRow(
+                                category = category,
+                                onClick = { onNavigateToForm(category.id) },
+                            )
+                            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+                        }
                     }
                 }
+                DesktopVerticalScrollbar(listState)
             }
         }
     }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
 import androidx.compose.material.icons.Icons
@@ -176,7 +177,7 @@ fun AccountDetailScreen(
 
                     item { Spacer(Modifier.height(88.dp)) }
                 }
-                DesktopVerticalScrollbar(rememberScrollbarAdapter(listState))
+                DesktopVerticalScrollbar(listState)
             }
         }
     }

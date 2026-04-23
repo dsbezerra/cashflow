@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,11 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.dsbezerra.cashflow.domain.model.Category
 import com.github.dsbezerra.cashflow.domain.model.DashboardSummary
+import com.github.dsbezerra.cashflow.domain.model.MonthlyAmount
 import com.github.dsbezerra.cashflow.domain.model.Transaction
 import com.github.dsbezerra.cashflow.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.ui.common.AmountText
+import com.github.dsbezerra.cashflow.util.namePtBr
 import ir.ehsannarmani.compose_charts.ColumnChart
-import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.Bars
@@ -107,7 +107,7 @@ private fun DashboardContent(
                 ExpenseDonutChart(summary, state.categories)
             }
             item {
-                IncomeExpenseBarChart(summary)
+                IncomeExpenseBarChart(summary.last6MonthsBreakdown)
             }
             item {
                 RecentTransactions(
@@ -116,7 +116,7 @@ private fun DashboardContent(
                 )
             }
         }
-        DesktopVerticalScrollbar(rememberScrollbarAdapter(listState))
+        DesktopVerticalScrollbar(listState)
     }
 }
 
@@ -250,43 +250,46 @@ private fun ExpenseDonutChart(
 }
 
 @Composable
-private fun IncomeExpenseBarChart(summary: DashboardSummary) {
+private fun IncomeExpenseBarChart(breakdown: List<MonthlyAmount>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Receita vs Despesas",
+            text = "Receita vs Despesas (últimos 6 meses)",
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp),
         )
-        ColumnChart(
-            data = listOf(
-                Bars(
-                    label = "Receita",
-                    values = listOf(
-                        Bars.Data(
-                            value = summary.monthlyIncome,
-                            color = SolidColor(incomeColor),
+        if (breakdown.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxWidth().height(120.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "Sem dados nos últimos 6 meses",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        } else {
+            ColumnChart(
+                data = breakdown.map { month ->
+                    Bars(
+                        label = month.month.namePtBr().take(3)
+                            .replaceFirstChar { it.uppercase() },
+                        values = listOf(
+                            Bars.Data(value = month.income, color = SolidColor(incomeColor)),
+                            Bars.Data(value = month.expenses, color = SolidColor(expenseColor)),
                         ),
-                    ),
+                    )
+                },
+                barProperties = BarProperties(
+                    thickness = 16.dp,
+                    spacing = 4.dp,
                 ),
-                Bars(
-                    label = "Despesas",
-                    values = listOf(
-                        Bars.Data(
-                            value = summary.monthlyExpenses,
-                            color = SolidColor(expenseColor),
-                        ),
-                    ),
-                ),
-            ),
-            barProperties = BarProperties(
-                thickness = 48.dp,
-                spacing = 4.dp,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp),
-        )
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+            )
+        }
     }
 }
 

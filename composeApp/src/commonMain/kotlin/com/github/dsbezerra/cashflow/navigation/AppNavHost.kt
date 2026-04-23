@@ -12,6 +12,7 @@ import com.github.dsbezerra.cashflow.ui.accounts.AccountListScreen
 import com.github.dsbezerra.cashflow.ui.categories.CategoryFormScreen
 import com.github.dsbezerra.cashflow.ui.categories.CategoryListScreen
 import com.github.dsbezerra.cashflow.ui.dashboard.DashboardScreen
+import com.github.dsbezerra.cashflow.ui.reports.ReportScreen
 import com.github.dsbezerra.cashflow.ui.settings.SettingsScreen
 import com.github.dsbezerra.cashflow.ui.transactions.TransactionDetailScreen
 import com.github.dsbezerra.cashflow.ui.transactions.TransactionListScreen
@@ -102,6 +103,9 @@ fun AppNavHost(
                 categoryId = route.categoryId,
                 onNavigateBack = { navController.popBackStack() },
             )
+        }
+        composable<Reports> {
+            ReportScreen()
         }
     }
 }

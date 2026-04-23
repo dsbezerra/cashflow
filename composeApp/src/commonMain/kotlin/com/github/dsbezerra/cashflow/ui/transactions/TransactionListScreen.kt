@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -90,7 +88,7 @@ fun TransactionListScreen(
                     }
                 }
             }
-            DesktopVerticalScrollbar(rememberScrollbarAdapter(listState))
+            DesktopVerticalScrollbar(listState)
         }
 
         SnackbarHost(

@@ -32,3 +32,6 @@ data object CategoryList
 
 @Serializable
 data class CategoryForm(val categoryId: String? = null)
+
+@Serializable
+data object Reports

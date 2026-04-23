@@ -1,6 +1,6 @@
 # CashFlow — Product Requirements Document
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Date:** April 2026  
 **Stack:** Kotlin Multiplatform (KMP) + Compose Multiplatform  
 **Package:** `com.github.dsbezerra.cashflow`  
@@ -135,11 +135,27 @@ updatedAt: Long
 id: String
 name: String
 type: CategoryType      // INCOME, EXPENSE, BOTH
+dreClassification: DreClassification  // GROSS_REVENUE, DEDUCTION, COST, EXPENSE, NONE
 icon: String
 color: String
 parentId: String?       // subcategory support (1 level deep)
 isDefault: Boolean
 isArchived: Boolean
+```
+
+> `dreClassification` drives the DRE report. Each category is mapped to exactly
+> one DRE line. Default categories are pre-classified. Users can change the
+> classification when creating or editing a custom category.
+
+#### `DreClassification` (enum)
+```kotlin
+enum class DreClassification {
+    GROSS_REVENUE,   // Receita Bruta
+    DEDUCTION,       // Deduções (taxes, returns, discounts)
+    COST,            // Custos (COGS — cost of goods/services sold)
+    EXPENSE,         // Despesas Operacionais
+    NONE             // Not part of DRE (e.g. transfers, savings)
+}
 ```
 
 #### `RecurringRule`
@@ -198,10 +214,11 @@ isActive: Boolean
 
 ### 5.3 Categories
 
-- [ ] Default categories pre-seeded (pt-BR): Alimentação, Transporte, Saúde, Lazer, Moradia, Salário, Freelance, Investimentos, etc.
+- [ ] Default categories pre-seeded (pt-BR) with pre-assigned `DreClassification`
 - [ ] Create, edit, and archive custom categories
 - [ ] Subcategories (1 level deep)
 - [ ] Customizable icon and color per category
+- [ ] `DreClassification` field: assignable per category (GROSS_REVENUE, DEDUCTION, COST, EXPENSE, NONE)
 
 ### 5.4 Dashboard
 
@@ -215,12 +232,36 @@ isActive: Boolean
 
 ### 5.5 Reports
 
+Reports are displayed as tabs inside the Reports section:
+
+#### Tab 1 — By Period
 - [ ] Filters by: period, account, category, transaction type
 - [ ] Monthly, quarterly, and yearly views
 - [ ] Balance evolution over time (line chart)
-- [ ] Spending by category (horizontal bar chart)
 - [ ] Month-over-month comparison
+
+#### Tab 2 — By Category
+- [ ] Spending by category (horizontal bar chart)
 - [ ] Summary stats: highest expense, most used category, average daily spending
+
+#### Tab 3 — DRE (Demonstração do Resultado do Exercício)
+- [ ] Period: monthly (month + year selector)
+- [ ] Structured statement with the following lines:
+
+```
+(+) Receita Bruta          — sum of GROSS_REVENUE categories
+(-) Deduções               — sum of DEDUCTION categories
+(=) Receita Líquida        — Receita Bruta − Deduções
+(-) Custos                 — sum of COST categories
+(=) Lucro Bruto            — Receita Líquida − Custos
+(-) Despesas Operacionais  — sum of EXPENSE categories
+(=) Lucro / Prejuízo       — Lucro Bruto − Despesas Operacionais
+```
+
+- [ ] Each line expandable to show the contributing categories and their amounts
+- [ ] Color coding: positive result = green, negative = red
+- [ ] Exportable as PDF and CSV (reuses the existing export infrastructure)
+- [ ] Comparison column: current month vs. previous month (optional toggle)
 
 ### 5.6 Budgets & Goals
 
@@ -234,6 +275,7 @@ isActive: Boolean
 - [ ] Export statement as **CSV** (compatible with Excel / Google Sheets)
 - [ ] Export statement as **PDF** (formatted, with period header)
 - [ ] Export filters: period, account, category
+- [ ] DRE exportable as PDF and CSV
 - [ ] Desktop: save to file via system file picker (`java.awt.FileDialog`)
 - [ ] Android: share via Android share sheet (`Intent.ACTION_SEND`)
 - [ ] iOS: share via native share sheet (deferred to iOS phase)
@@ -262,16 +304,21 @@ sealed interface Route {
     @Serializable object TransactionList : Route
     @Serializable data class TransactionDetail(val id: String? = null) : Route  // null = create
 
-    @Serializable object ReportByPeriod : Route
-    @Serializable object ReportByCategory : Route
+    @Serializable object Reports : Route   // hosts DRE, ByPeriod, ByCategory tabs
 
     @Serializable object AccountList : Route
     @Serializable data class AccountDetail(val id: String) : Route
     @Serializable data class AccountForm(val id: String? = null) : Route        // null = create
 
     @Serializable object CategoryList : Route
+    @Serializable data class CategoryForm(val id: String? = null) : Route       // null = create
+
     @Serializable object BudgetList : Route
+    @Serializable data class BudgetForm(val id: String? = null) : Route
+
     @Serializable object RecurringRuleList : Route
+    @Serializable data class RecurringRuleForm(val id: String? = null) : Route
+
     @Serializable object Export : Route
     @Serializable object About : Route
 }
@@ -284,14 +331,16 @@ NavHost (root)
 ├── Dashboard
 ├── TransactionList
 │   └── → TransactionDetail(id?)
-├── ReportByPeriod
-├── ReportByCategory
+├── Reports                          ← tab host: ByPeriod | ByCategory | DRE
 ├── AccountList
 │   ├── → AccountDetail(id)
 │   └── → AccountForm(id?)
 ├── CategoryList
+│   └── → CategoryForm(id?)
 ├── BudgetList
+│   └── → BudgetForm(id?)
 ├── RecurringRuleList
+│   └── → RecurringRuleForm(id?)
 ├── Export
 └── About
 ```
@@ -318,7 +367,7 @@ The FAB (new transaction) is rendered in `AppShell` and always navigates to `Tra
 commonMain/sqldelight/com/github/dsbezerra/cashflow/db/
 ├── Account.sq
 ├── Transaction.sq
-├── Category.sq
+├── Category.sq           ← includes dre_classification column
 ├── RecurringRule.sq
 ├── Budget.sq
 └── migrations/
@@ -328,7 +377,26 @@ commonMain/sqldelight/com/github/dsbezerra/cashflow/db/
 Generated code package: `com.github.dsbezerra.cashflow.db`  
 Database name: `CashFlowDatabase`
 
-### 7.2 Driver Factory (expect/actual)
+### 7.2 DRE Query Example
+
+```sql
+-- Category.sq
+selectDreSummary:
+SELECT
+    c.dre_classification,
+    c.id         AS category_id,
+    c.name       AS category_name,
+    SUM(t.amount) AS total
+FROM transactions t
+JOIN categories c ON t.category_id = c.id
+WHERE t.date >= :startMillis
+  AND t.date <  :endMillis
+  AND c.dre_classification != 'NONE'
+GROUP BY c.dre_classification, c.id
+ORDER BY c.dre_classification, c.name;
+```
+
+### 7.3 Driver Factory (expect/actual)
 
 ```kotlin
 // commonMain
@@ -359,15 +427,23 @@ actual class DriverFactory {
 }
 ```
 
-### 7.3 Reactive Queries
+### 7.4 Reactive Queries
 
 All list queries return `Flow<List<T>>` via SQLDelight's coroutines extension, enabling automatic UI recomposition when data changes.
 
-### 7.4 Data Seeding
+### 7.5 Data Seeding
 
-On first launch (`PRAGMA user_version = 0`), populate default pt-BR categories with icons and colors. No sample transactions — real data from day one.
+On first launch (`PRAGMA user_version = 0`), populate default pt-BR categories with icons, colors, and pre-assigned `DreClassification`:
 
-### 7.5 Sync Readiness (Future)
+| Category | DreClassification |
+|---|---|
+| Salário, Freelance, Receita de Vendas | GROSS_REVENUE |
+| Impostos, Devoluções, Descontos | DEDUCTION |
+| Custo de Mercadoria, Matéria-Prima | COST |
+| Alimentação, Transporte, Saúde, Lazer, Moradia, Utilities | EXPENSE |
+| Transferência, Investimentos | NONE |
+
+### 7.6 Sync Readiness (Future)
 
 - All IDs are UUID strings generated locally in `commonMain`
 - `createdAt` / `updatedAt` on every entity
@@ -412,8 +488,9 @@ startKoin {
 
 - Material 3 design system (`compose.material3`) — already in `commonMain.dependencies`
 - Light and dark mode via `MaterialTheme` (follows system preference)
-- Green for income, red for expenses, gray for transfers
+- Green for income / profit, red for expenses / loss, gray for transfers
 - Consistent color tokens per account and category
+- DRE lines use indentation and typography weight to convey hierarchy
 
 ### 9.2 Desktop Specifics
 
@@ -434,6 +511,7 @@ startKoin {
 - Automatic currency formatting (R$ 1.234,56) while typing
 - Pull-to-refresh on transaction list (Android)
 - Lazy pagination for large transaction lists
+- DRE lines are collapsible/expandable to show category breakdown
 
 ---
 
@@ -443,7 +521,7 @@ startKoin {
 |---|---|---|
 | Unit tests | Use cases, repositories, domain logic | `kotlin.test` |
 | Flow tests | All ViewModels | Turbine |
-| UI tests | Critical flows: create transaction, transfer | Compose UI Testing |
+| UI tests | Critical flows: create transaction, transfer, DRE render | Compose UI Testing |
 
 ---
 
@@ -465,6 +543,7 @@ startKoin {
 - Push notifications
 - iOS phase (requires macOS + Xcode)
 - Home screen / desktop widgets
+- Multi-currency DRE consolidation
 
 ---
 
@@ -472,7 +551,7 @@ startKoin {
 
 | Phase | Target | Deliverable |
 |---|---|---|
-| **v1.0** | Desktop (JVM) | Full CRUD, dashboard, reports, CSV/PDF export |
+| **v1.0** | Desktop (JVM) | Full CRUD, dashboard, reports (incl. DRE), CSV/PDF export |
 | **v1.1** | Desktop + Android | Android parity, budgets, recurring transactions |
 | **v1.2** | All (except iOS) | UX polish, performance, full test coverage |
 | **v2.0** | + iOS | Requires macOS build machine; reuses all `commonMain` |

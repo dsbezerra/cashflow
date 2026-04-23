@@ -4,6 +4,7 @@ CREATE TABLE Category (
     id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     type TEXT AS com.github.dsbezerra.cashflow.domain.model.CategoryType NOT NULL,
+    dreClassification TEXT AS com.github.dsbezerra.cashflow.domain.model.DreClassification NOT NULL DEFAULT 'NONE',
     icon TEXT NOT NULL,
     color TEXT NOT NULL,
     parentId TEXT,
@@ -24,6 +25,7 @@ update:
 UPDATE Category SET
     name = :name,
     type = :type,
+    dreClassification = :dreClassification,
     icon = :icon,
     color = :color,
     parentId = :parentId,

@@ -6,6 +6,8 @@ import com.github.dsbezerra.cashflow.domain.usecase.dashboard.GetDashboardSummar
 import com.github.dsbezerra.cashflow.domain.usecase.recurring.GenerateRecurringTransactionsUseCase
 import com.github.dsbezerra.cashflow.domain.usecase.transaction.CreateTransactionUseCase
 import com.github.dsbezerra.cashflow.domain.usecase.transaction.CreateTransferUseCase
+import com.github.dsbezerra.cashflow.domain.usecase.report.GetDreReportUseCase
+import com.github.dsbezerra.cashflow.domain.usecase.report.GetReportUseCase
 import com.github.dsbezerra.cashflow.domain.usecase.transaction.DeleteTransactionUseCase
 import org.koin.dsl.module
 
@@ -17,4 +19,6 @@ val useCaseModule = module {
     factory { GetDashboardSummaryUseCase(get(), get()) }
     factory { CheckBudgetThresholdUseCase() }
     factory { GenerateRecurringTransactionsUseCase(get(), get()) }
+    factory { GetReportUseCase(get(), get()) }
+    factory { GetDreReportUseCase(get(), get()) }
 }
