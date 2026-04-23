@@ -1,49 +1,41 @@
 package com.github.dsbezerra.cashflow
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import cashflow.composeapp.generated.resources.Res
-import cashflow.composeapp.generated.resources.compose_multiplatform
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.github.dsbezerra.cashflow.navigation.AppNavHost
+import com.github.dsbezerra.cashflow.navigation.TransactionDetail
+import com.github.dsbezerra.cashflow.navigation.TransactionList
+import com.github.dsbezerra.cashflow.ui.shell.AppShell
 
 @Composable
-@Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+        val navController = rememberNavController()
+        val backStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = backStackEntry?.destination
+        val isOnTransactions = currentDestination?.hasRoute(TransactionList::class) == true
+
+        AppShell(
+            navController = navController,
+            floatingActionButton = {
+                if (isOnTransactions) {
+                    FloatingActionButton(onClick = {
+                        navController.navigate(TransactionDetail())
+                    }) {
+                        Icon(Icons.Default.Add, contentDescription = "Nova Transação")
+                    }
                 }
-            }
+            },
+        ) { contentModifier ->
+            AppNavHost(navController = navController, modifier = contentModifier)
         }
     }
 }

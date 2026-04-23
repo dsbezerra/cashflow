@@ -3,7 +3,17 @@
     "allow": [
       "Read(//mnt/c/Users/Diego/AndroidStudioProjects/**)",
       "Bash(./gradlew :composeApp:generateCommonMainCashFlowDatabaseInterface --info)",
-      "Bash(./gradlew :composeApp:generateCommonMainCashFlowDatabaseInterface)"
+      "Bash(./gradlew :composeApp:generateCommonMainCashFlowDatabaseInterface)",
+      "Bash(./gradlew :composeApp:compileKotlinJvm)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Android/Android Studio/jbr\" PATH=\"$JAVA_HOME/bin:$PATH\" ./gradlew :composeApp:compileKotlinJvm)",
+      "Bash(ls /c/Users/Diego/AppData/Local/Programs/Python/*/python.exe)",
+      "Bash(ls /c/Python*/python.exe)",
+      "Bash(ls /c/Users/Diego/AppData/Local/Microsoft/WindowsApps/python*.exe)",
+      "Bash(find /c/Users/Diego/.gradle/caches/modules-2/files-2.1/app.cash.sqldelight/sqlite-driver -name *.kt)",
+      "Bash(find /c/Users/Diego/.gradle/caches -name sqlite-driver*sources*)",
+      "Read(//c/tmp/**)",
+      "Bash(jar xf:*)",
+      "Bash(unzip -p \"/c/Users/Diego/.gradle/caches/modules-2/files-2.1/app.cash.sqldelight/sqlite-driver/2.3.2/d4751d9376b1691730e6d9fec7af5d88d83dd56d/sqlite-driver-2.3.2-sources.jar\" \"app/cash/sqldelight/driver/jdbc/sqlite/JdbcSqliteDriver.kt\")"
     ]
   }
 }
