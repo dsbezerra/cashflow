@@ -55,6 +55,7 @@ kotlin {
             implementation(libs.androidx.navigation.compose)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.compose.charts)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

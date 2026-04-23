@@ -1,0 +1,50 @@
+import kotlin.Boolean;
+
+-- Table named CashTransaction to avoid conflict with the SQL reserved word TRANSACTION.
+CREATE TABLE CashTransaction (
+    id TEXT NOT NULL PRIMARY KEY,
+    accountId TEXT NOT NULL,
+    categoryId TEXT NOT NULL,
+    type TEXT AS com.github.dsbezerra.cashflow.domain.model.TransactionType NOT NULL,
+    amount REAL NOT NULL,
+    description TEXT NOT NULL,
+    date INTEGER NOT NULL,
+    notes TEXT,
+    attachmentPath TEXT,
+    isRecurring INTEGER AS Boolean NOT NULL DEFAULT 0,
+    recurringId TEXT,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL,
+    FOREIGN KEY (accountId) REFERENCES Account(id),
+    FOREIGN KEY (categoryId) REFERENCES Category(id)
+);
+
+selectAll:
+SELECT * FROM CashTransaction ORDER BY date DESC;
+
+selectByAccount:
+SELECT * FROM CashTransaction WHERE accountId = ? ORDER BY date DESC;
+
+selectById:
+SELECT * FROM CashTransaction WHERE id = ?;
+
+insert:
+INSERT OR REPLACE INTO CashTransaction VALUES ?;
+
+update:
+UPDATE CashTransaction SET
+    accountId = :accountId,
+    categoryId = :categoryId,
+    type = :type,
+    amount = :amount,
+    description = :description,
+    date = :date,
+    notes = :notes,
+    attachmentPath = :attachmentPath,
+    isRecurring = :isRecurring,
+    recurringId = :recurringId,
+    updatedAt = :updatedAt
+WHERE id = :id;
+
+delete:
+DELETE FROM CashTransaction WHERE id = ?;

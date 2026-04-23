@@ -1,0 +1,35 @@
+import kotlin.Boolean;
+
+CREATE TABLE Category (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT AS com.github.dsbezerra.cashflow.domain.model.CategoryType NOT NULL,
+    icon TEXT NOT NULL,
+    color TEXT NOT NULL,
+    parentId TEXT,
+    isDefault INTEGER AS Boolean NOT NULL DEFAULT 0,
+    isArchived INTEGER AS Boolean NOT NULL DEFAULT 0
+);
+
+selectAll:
+SELECT * FROM Category WHERE isArchived = 0 ORDER BY name ASC;
+
+selectById:
+SELECT * FROM Category WHERE id = ?;
+
+insert:
+INSERT OR REPLACE INTO Category VALUES ?;
+
+update:
+UPDATE Category SET
+    name = :name,
+    type = :type,
+    icon = :icon,
+    color = :color,
+    parentId = :parentId,
+    isDefault = :isDefault,
+    isArchived = :isArchived
+WHERE id = :id;
+
+delete:
+DELETE FROM Category WHERE id = ?;

@@ -1,0 +1,45 @@
+import kotlin.Boolean;
+
+CREATE TABLE RecurringRule (
+    id TEXT NOT NULL PRIMARY KEY,
+    accountId TEXT NOT NULL,
+    categoryId TEXT NOT NULL,
+    type TEXT AS com.github.dsbezerra.cashflow.domain.model.TransactionType NOT NULL,
+    amount REAL NOT NULL,
+    description TEXT NOT NULL,
+    frequency TEXT AS com.github.dsbezerra.cashflow.domain.model.Frequency NOT NULL,
+    interval INTEGER NOT NULL DEFAULT 1,
+    startDate INTEGER NOT NULL,
+    endDate INTEGER,
+    nextOccurrence INTEGER NOT NULL,
+    isActive INTEGER AS Boolean NOT NULL DEFAULT 1,
+    FOREIGN KEY (accountId) REFERENCES Account(id),
+    FOREIGN KEY (categoryId) REFERENCES Category(id)
+);
+
+selectAll:
+SELECT * FROM RecurringRule ORDER BY nextOccurrence ASC;
+
+selectById:
+SELECT * FROM RecurringRule WHERE id = ?;
+
+insert:
+INSERT OR REPLACE INTO RecurringRule VALUES ?;
+
+update:
+UPDATE RecurringRule SET
+    accountId = :accountId,
+    categoryId = :categoryId,
+    type = :type,
+    amount = :amount,
+    description = :description,
+    frequency = :frequency,
+    interval = :interval,
+    startDate = :startDate,
+    endDate = :endDate,
+    nextOccurrence = :nextOccurrence,
+    isActive = :isActive
+WHERE id = :id;
+
+delete:
+DELETE FROM RecurringRule WHERE id = ?;

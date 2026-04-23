@@ -1,0 +1,36 @@
+import kotlin.Boolean;
+
+CREATE TABLE Account (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT AS com.github.dsbezerra.cashflow.domain.model.AccountType NOT NULL,
+    currency TEXT NOT NULL,
+    initialBalance REAL NOT NULL,
+    color TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    isArchived INTEGER AS Boolean NOT NULL DEFAULT 0,
+    createdAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM Account WHERE isArchived = 0 ORDER BY createdAt DESC;
+
+selectById:
+SELECT * FROM Account WHERE id = ?;
+
+insert:
+INSERT OR REPLACE INTO Account VALUES ?;
+
+update:
+UPDATE Account SET
+    name = :name,
+    type = :type,
+    currency = :currency,
+    initialBalance = :initialBalance,
+    color = :color,
+    icon = :icon,
+    isArchived = :isArchived
+WHERE id = :id;
+
+delete:
+DELETE FROM Account WHERE id = ?;

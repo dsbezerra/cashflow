@@ -10,6 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.github.dsbezerra.cashflow.navigation.AccountForm
+import com.github.dsbezerra.cashflow.navigation.Accounts
 import com.github.dsbezerra.cashflow.navigation.AppNavHost
 import com.github.dsbezerra.cashflow.navigation.TransactionDetail
 import com.github.dsbezerra.cashflow.navigation.TransactionList
@@ -22,15 +24,25 @@ fun App() {
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = backStackEntry?.destination
         val isOnTransactions = currentDestination?.hasRoute(TransactionList::class) == true
+        val isOnAccounts = currentDestination?.hasRoute(Accounts::class) == true
 
         AppShell(
             navController = navController,
             floatingActionButton = {
-                if (isOnTransactions) {
-                    FloatingActionButton(onClick = {
-                        navController.navigate(TransactionDetail())
-                    }) {
-                        Icon(Icons.Default.Add, contentDescription = "Nova Transação")
+                when {
+                    isOnTransactions -> {
+                        FloatingActionButton(onClick = {
+                            navController.navigate(TransactionDetail())
+                        }) {
+                            Icon(Icons.Default.Add, contentDescription = "Nova Transação")
+                        }
+                    }
+                    isOnAccounts -> {
+                        FloatingActionButton(onClick = {
+                            navController.navigate(AccountForm())
+                        }) {
+                            Icon(Icons.Default.Add, contentDescription = "Nova Conta")
+                        }
                     }
                 }
             },
