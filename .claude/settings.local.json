@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//mnt/c/Users/Diego/AndroidStudioProjects/**)",
+      "Bash(./gradlew :composeApp:generateCommonMainCashFlowDatabaseInterface --info)",
+      "Bash(./gradlew :composeApp:generateCommonMainCashFlowDatabaseInterface)"
+    ]
+  }
+}
