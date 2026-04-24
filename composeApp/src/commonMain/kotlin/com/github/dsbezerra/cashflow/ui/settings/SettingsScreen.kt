@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SettingsScreen(
     onNavigateToCategoryList: () -> Unit = {},
+    onNavigateToRecurringList: () -> Unit = {},
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         SettingsRow(
@@ -29,6 +31,13 @@ fun SettingsScreen(
             title = "Gerenciar Categorias",
             subtitle = "Criar, editar e arquivar categorias",
             onClick = onNavigateToCategoryList,
+        )
+        HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+        SettingsRow(
+            icon = { Icon(Icons.Default.Repeat, contentDescription = null, modifier = Modifier.size(24.dp)) },
+            title = "Regras Recorrentes",
+            subtitle = "Gerenciar transações automáticas",
+            onClick = onNavigateToRecurringList,
         )
         HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
     }

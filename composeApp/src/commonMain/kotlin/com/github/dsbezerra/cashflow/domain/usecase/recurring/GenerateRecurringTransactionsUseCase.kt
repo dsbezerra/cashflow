@@ -21,11 +21,15 @@ class GenerateRecurringTransactionsUseCase(
         val dueRules = rules.filter { it.isActive && it.nextOccurrence <= nowMillis }
 
         for (rule in dueRules) {
-            val tx = rule.toTransaction(occurrenceMillis = rule.nextOccurrence, createdAt = nowMillis)
-            transactionRepository.insert(tx)
-
-            val advanced = rule.copy(nextOccurrence = rule.advanceNextOccurrence())
-            recurringRuleRepository.update(advanced)
+            var next = rule.nextOccurrence
+            var updated = rule
+            while (next <= nowMillis) {
+                if (updated.endDate != null && next > updated.endDate) break
+                transactionRepository.insert(updated.toTransaction(occurrenceMillis = next, createdAt = nowMillis))
+                next = updated.copy(nextOccurrence = next).advanceNextOccurrence()
+                updated = updated.copy(nextOccurrence = next)
+            }
+            recurringRuleRepository.update(updated)
         }
     }
 

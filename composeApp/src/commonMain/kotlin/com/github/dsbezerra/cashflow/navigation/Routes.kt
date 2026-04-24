@@ -35,3 +35,9 @@ data class CategoryForm(val categoryId: String? = null)
 
 @Serializable
 data object Reports
+
+@Serializable
+data object RecurringRuleList
+
+@Serializable
+data class RecurringRuleForm(val ruleId: String? = null)

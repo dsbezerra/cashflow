@@ -6,6 +6,8 @@ import com.github.dsbezerra.cashflow.ui.accounts.AccountListViewModel
 import com.github.dsbezerra.cashflow.ui.categories.CategoryFormViewModel
 import com.github.dsbezerra.cashflow.ui.categories.CategoryListViewModel
 import com.github.dsbezerra.cashflow.ui.dashboard.DashboardViewModel
+import com.github.dsbezerra.cashflow.ui.recurring.RecurringRuleFormViewModel
+import com.github.dsbezerra.cashflow.ui.recurring.RecurringRuleListViewModel
 import com.github.dsbezerra.cashflow.ui.reports.ReportViewModel
 import com.github.dsbezerra.cashflow.ui.transactions.TransactionDetailViewModel
 import com.github.dsbezerra.cashflow.ui.transactions.TransactionListViewModel
@@ -22,4 +24,6 @@ val viewModelModule = module {
     viewModel { CategoryListViewModel(get()) }
     viewModel { CategoryFormViewModel(get()) }
     viewModel { ReportViewModel(get(), get()) }
+    viewModel { RecurringRuleListViewModel(get()) }
+    viewModel { RecurringRuleFormViewModel(get(), get(), get()) }
 }
