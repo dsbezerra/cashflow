@@ -60,6 +60,7 @@ import com.github.dsbezerra.cashflow.domain.model.DreReport
 import com.github.dsbezerra.cashflow.domain.model.MonthlyAmount
 import com.github.dsbezerra.cashflow.domain.model.ReportData
 import com.github.dsbezerra.cashflow.domain.model.ReportPeriod
+import com.github.dsbezerra.cashflow.domain.model.toDecimal
 import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
 import com.github.dsbezerra.cashflow.util.namePtBr
 import kotlinx.datetime.Month
@@ -118,13 +119,6 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize(),
         ) {
-            item {
-                AccountSelector(
-                    accounts = state.accounts,
-                    selectedAccountId = state.selectedAccountId,
-                    onAccountSelected = { onAction(ReportAction.AccountSelected(it)) },
-                )
-            }
             item {
                 // Period selector
                 SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -352,7 +346,7 @@ private fun SummaryCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "${"%.2f".format(amount)}",
+                text = amount.toDecimal().toCurrency(),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = color,
@@ -370,7 +364,7 @@ private fun PeriodExtraStats(data: ReportData) {
         ) {
             StatRow(
                 label = "Média diária de despesas",
-                value = "${"%.2f".format(data.averageDailyExpense)}",
+                value = data.averageDailyExpense.toDecimal().toCurrency(),
             )
             if (data.highestExpenseCategory != null) {
                 StatRow(
@@ -574,7 +568,7 @@ private fun CategoryAmountRow(
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "${"%.2f".format(item.amount)}",
+                    text = item.amount.toDecimal().toCurrency(),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = color,
@@ -708,7 +702,7 @@ private fun DreSection(sign: String, label: String, item: DreLineItem, color: Co
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = "${"%.2f".format(item.total)}",
+                text = item.total.toDecimal().toCurrency(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = color,
@@ -729,7 +723,7 @@ private fun DreSection(sign: String, label: String, item: DreLineItem, color: Co
                         modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = "${"%.2f".format(line.amount)}",
+                        text = line.amount.toDecimal().toCurrency(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -753,7 +747,7 @@ private fun DreResultRow(label: String, item: DreLineItem, color: Color) {
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = "${"%.2f".format(item.total)}",
+            text = item.total.toDecimal().toCurrency(),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             color = color,
@@ -779,7 +773,7 @@ private fun DreTotalRow(label: String, amount: Double, highlight: Boolean = fals
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = "${"%.2f".format(amount)}",
+            text = amount.toDecimal().toCurrency(),
             style = if (highlight) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
             color = color,

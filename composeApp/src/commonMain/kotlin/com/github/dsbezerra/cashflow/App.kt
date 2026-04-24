@@ -2,8 +2,10 @@ package com.github.dsbezerra.cashflow
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.github.dsbezerra.cashflow.ui.theme.CashFlowTheme
@@ -15,6 +17,7 @@ import com.github.dsbezerra.cashflow.domain.usecase.recurring.GenerateRecurringT
 import com.github.dsbezerra.cashflow.navigation.AccountForm
 import com.github.dsbezerra.cashflow.navigation.Accounts
 import com.github.dsbezerra.cashflow.navigation.AppNavHost
+import com.github.dsbezerra.cashflow.navigation.Dashboard
 import com.github.dsbezerra.cashflow.navigation.TransactionDetail
 import com.github.dsbezerra.cashflow.navigation.TransactionList
 import com.github.dsbezerra.cashflow.ui.shell.AppShell
@@ -32,6 +35,8 @@ fun App() {
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = backStackEntry?.destination
+
+        val isOnDashboard = currentDestination?.hasRoute(Dashboard::class) == true
         val isOnTransactions = currentDestination?.hasRoute(TransactionList::class) == true
         val isOnAccounts = currentDestination?.hasRoute(Accounts::class) == true
 
@@ -39,13 +44,20 @@ fun App() {
             navController = navController,
             floatingActionButton = {
                 when {
-                    isOnTransactions -> {
-                        FloatingActionButton(onClick = {
-                            navController.navigate(TransactionDetail())
-                        }) {
-                            Icon(Icons.Default.Add, contentDescription = "Nova Transação")
-                        }
+                    isOnDashboard || isOnTransactions -> {
+                        ExtendedFloatingActionButton(
+                            text = {
+                                Text("Nova transação")
+                            },
+                            icon = {
+                                Icon(Icons.Default.Add, contentDescription = "Nova Transação")
+                            },
+                            onClick = {
+                                navController.navigate(TransactionDetail())
+                            }
+                        )
                     }
+
                     isOnAccounts -> {
                         FloatingActionButton(onClick = {
                             navController.navigate(AccountForm())

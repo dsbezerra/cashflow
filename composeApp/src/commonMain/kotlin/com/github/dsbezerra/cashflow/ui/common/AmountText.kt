@@ -16,8 +16,8 @@ fun AmountText(
 ) {
     val cashFlowColors = AppColors.colors
     val (color, prefix) = when (type) {
-        TransactionType.INCOME -> cashFlowColors.income to "+ "
-        TransactionType.EXPENSE -> cashFlowColors.expense to "- "
+        TransactionType.INCOME -> cashFlowColors.income to "+"
+        TransactionType.EXPENSE -> cashFlowColors.expense to "-"
         TransactionType.TRANSFER -> MaterialTheme.colorScheme.onSurface to ""
     }
     Text(

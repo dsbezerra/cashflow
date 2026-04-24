@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -25,10 +26,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.dsbezerra.cashflow.domain.model.Transaction
 import com.github.dsbezerra.cashflow.ui.common.AmountText
 import com.github.dsbezerra.cashflow.ui.designsystem.components.loader.DSFullscreenLoader
+import com.github.dsbezerra.cashflow.ui.model.RecentTransaction
 import com.github.dsbezerra.cashflow.util.formatFullPtBr
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.Instant

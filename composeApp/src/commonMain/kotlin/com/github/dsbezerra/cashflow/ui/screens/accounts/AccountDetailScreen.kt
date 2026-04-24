@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.dsbezerra.cashflow.domain.model.Transaction
+import com.github.dsbezerra.cashflow.domain.model.toDecimal
 import com.github.dsbezerra.cashflow.ui.common.AmountText
 import com.github.dsbezerra.cashflow.ui.common.accountIcon
 import com.github.dsbezerra.cashflow.ui.designsystem.components.loader.DSFullscreenLoader
@@ -137,7 +138,6 @@ fun AccountDetailScreen(
                     item {
                         BalanceHeader(
                             accountName = state.account?.name ?: "",
-                            currency = state.account?.currency ?: "BRL",
                             balance = state.balance,
                             icon = state.account?.icon ?: "account_balance",
                             typeName = state.account?.type?.let {
@@ -229,7 +229,6 @@ fun AccountDetailScreen(
 @Composable
 private fun BalanceHeader(
     accountName: String,
-    currency: String,
     balance: Double,
     icon: String,
     typeName: String,
@@ -263,7 +262,7 @@ private fun BalanceHeader(
                 )
             }
             Text(
-                text = "$currency ${"%.2f".format(balance)}",
+                text = balance.toDecimal().toCurrency(),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )

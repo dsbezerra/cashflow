@@ -31,14 +31,14 @@ fun AppNavHost(
         modifier = modifier,
     ) {
         composable<Dashboard> {
-            com.github.dsbezerra.cashflow.ui.screens.dashboard.DashboardScreen(
+            DashboardScreen(
                 onNavigateToTransaction = { id ->
                     navController.navigate(TransactionDetail(transactionId = id))
                 },
             )
         }
         composable<TransactionList> {
-            com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionListScreen(
+            TransactionListScreen(
                 onNavigateToDetail = { id ->
                     navController.navigate(TransactionDetail(transactionId = id))
                 },
@@ -46,7 +46,7 @@ fun AppNavHost(
         }
         composable<TransactionDetail> { entry ->
             val route = entry.toRoute<TransactionDetail>()
-            com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailScreen(
+            TransactionDetailScreen(
                 transactionId = route.transactionId,
                 defaultAccountId = route.defaultAccountId,
                 defaultType = route.defaultType,
@@ -54,7 +54,7 @@ fun AppNavHost(
             )
         }
         composable<Accounts> {
-            com.github.dsbezerra.cashflow.ui.screens.accounts.AccountListScreen(
+            AccountListScreen(
                 onNavigateToDetail = { id ->
                     navController.navigate(AccountDetail(accountId = id))
                 },
@@ -62,7 +62,7 @@ fun AppNavHost(
         }
         composable<AccountDetail> { entry ->
             val route = entry.toRoute<AccountDetail>()
-            com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailScreen(
+            AccountDetailScreen(
                 accountId = route.accountId,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToEdit = { id ->
@@ -80,13 +80,13 @@ fun AppNavHost(
         }
         composable<AccountForm> { entry ->
             val route = entry.toRoute<AccountForm>()
-            com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormScreen(
+            AccountFormScreen(
                 accountId = route.accountId,
                 onNavigateBack = { navController.popBackStack() },
             )
         }
         composable<Settings> {
-            com.github.dsbezerra.cashflow.ui.screens.settings.SettingsScreen(
+            SettingsScreen(
                 onNavigateToCategoryList = {
                     navController.navigate(CategoryList)
                 },
@@ -99,7 +99,7 @@ fun AppNavHost(
             )
         }
         composable<CategoryList> {
-            com.github.dsbezerra.cashflow.ui.screens.categories.CategoryListScreen(
+            CategoryListScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToForm = { id ->
                     navController.navigate(CategoryForm(categoryId = id))
@@ -108,16 +108,16 @@ fun AppNavHost(
         }
         composable<CategoryForm> { entry ->
             val route = entry.toRoute<CategoryForm>()
-            com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormScreen(
+            CategoryFormScreen(
                 categoryId = route.categoryId,
                 onNavigateBack = { navController.popBackStack() },
             )
         }
         composable<Reports> {
-            com.github.dsbezerra.cashflow.ui.screens.reports.ReportScreen()
+            ReportScreen()
         }
         composable<RecurringRuleList> {
-            com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListScreen(
+            RecurringRuleListScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToForm = { id ->
                     navController.navigate(RecurringRuleForm(ruleId = id))
@@ -126,13 +126,13 @@ fun AppNavHost(
         }
         composable<RecurringRuleForm> { entry ->
             val route = entry.toRoute<RecurringRuleForm>()
-            com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormScreen(
+            RecurringRuleFormScreen(
                 ruleId = route.ruleId,
                 onNavigateBack = { navController.popBackStack() },
             )
         }
         composable<About> {
-            com.github.dsbezerra.cashflow.ui.screens.about.AboutScreen(onNavigateBack = { navController.popBackStack() })
+            AboutScreen(onNavigateBack = { navController.popBackStack() })
         }
     }
 }

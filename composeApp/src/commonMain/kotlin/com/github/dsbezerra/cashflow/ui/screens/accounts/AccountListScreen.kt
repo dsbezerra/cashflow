@@ -115,7 +115,7 @@ private fun AccountRow(
             )
         }
         Text(
-            text = "${item.account.currency} ${item.balance.toCurrency()}",
+            text = item.balance.toCurrency(),
             style = MaterialTheme.typography.bodyLarge,
             color = if (item.balance.toDouble() >= 0) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.error,
