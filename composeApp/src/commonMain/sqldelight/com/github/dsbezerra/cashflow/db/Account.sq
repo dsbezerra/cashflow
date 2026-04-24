@@ -9,6 +9,7 @@ CREATE TABLE Account (
     color TEXT NOT NULL,
     icon TEXT NOT NULL,
     isArchived INTEGER AS Boolean NOT NULL DEFAULT 0,
+    isDefault INTEGER AS Boolean NOT NULL DEFAULT 0,
     createdAt INTEGER NOT NULL
 );
 
@@ -17,6 +18,9 @@ SELECT * FROM Account WHERE isArchived = 0 ORDER BY createdAt DESC;
 
 selectById:
 SELECT * FROM Account WHERE id = ?;
+
+selectDefault:
+SELECT * FROM Account WHERE isDefault = 1 LIMIT 1;
 
 insert:
 INSERT OR REPLACE INTO Account VALUES ?;
@@ -31,6 +35,9 @@ UPDATE Account SET
     icon = :icon,
     isArchived = :isArchived
 WHERE id = :id;
+
+setDefault:
+UPDATE Account SET isDefault = CASE WHEN id = :id THEN 1 ELSE 0 END;
 
 delete:
 DELETE FROM Account WHERE id = ?;

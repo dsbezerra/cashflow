@@ -36,7 +36,7 @@ class SqlDelightBudgetRepository(
         withContext(dispatcher) {
             queries.update(
                 categoryId = budget.categoryId,
-                amount = budget.amount,
+                amount = budget.amount.toDouble(),
                 period = budget.period,
                 startDate = budget.startDate,
                 isActive = budget.isActive,

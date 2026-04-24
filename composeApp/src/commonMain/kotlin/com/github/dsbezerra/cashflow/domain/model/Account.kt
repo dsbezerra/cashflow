@@ -5,9 +5,10 @@ data class Account(
     val name: String,
     val type: AccountType,
     val currency: String,
-    val initialBalance: Double,
+    val initialBalance: Decimal,
     val color: String,
     val icon: String,
     val isArchived: Boolean,
+    val isDefault: Boolean = false,
     val createdAt: Long,
 )

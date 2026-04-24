@@ -2,13 +2,14 @@ package com.github.dsbezerra.cashflow.data.mapper
 
 import com.github.dsbezerra.cashflow.db.RecurringRule as RecurringRuleEntity
 import com.github.dsbezerra.cashflow.domain.model.RecurringRule
+import com.github.dsbezerra.cashflow.domain.model.toDecimal
 
 fun RecurringRuleEntity.toDomain(): RecurringRule = RecurringRule(
     id = id,
     accountId = accountId,
     categoryId = categoryId,
     type = type,
-    amount = amount,
+    amount = amount.toDecimal(),
     description = description,
     frequency = frequency,
     interval = interval.toInt(),
@@ -23,7 +24,7 @@ fun RecurringRule.toEntity(): RecurringRuleEntity = RecurringRuleEntity(
     accountId = accountId,
     categoryId = categoryId,
     type = type,
-    amount = amount,
+    amount = amount.toDouble(),
     description = description,
     frequency = frequency,
     interval = interval.toLong(),

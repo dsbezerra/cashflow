@@ -4,9 +4,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import com.github.dsbezerra.cashflow.ui.theme.CashFlowTheme
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -23,7 +23,7 @@ import org.koin.compose.koinInject
 
 @Composable
 fun App() {
-    MaterialTheme {
+    CashFlowTheme {
         val generateRecurring: GenerateRecurringTransactionsUseCase = koinInject()
         LaunchedEffect(Unit) {
             generateRecurring(Clock.System.now().toEpochMilliseconds())

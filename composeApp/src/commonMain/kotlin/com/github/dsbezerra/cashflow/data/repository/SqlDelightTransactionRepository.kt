@@ -44,7 +44,7 @@ class SqlDelightTransactionRepository(
                 accountId = transaction.accountId,
                 categoryId = transaction.categoryId,
                 type = transaction.type,
-                amount = transaction.amount,
+                amount = transaction.amount.toDouble(),
                 description = transaction.description,
                 date = transaction.date,
                 notes = transaction.notes,

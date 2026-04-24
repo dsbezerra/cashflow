@@ -17,12 +17,13 @@ class GetDreReportUseCase(
     private val transactionRepository: TransactionRepository,
     private val categoryRepository: CategoryRepository,
 ) {
-    operator fun invoke(year: Int, month: Int): Flow<DreReport> =
+    operator fun invoke(year: Int, month: Int, accountId: String? = null): Flow<DreReport> =
         combine(transactionRepository.getAll(), categoryRepository.getAll()) { transactions, categories ->
             val tz = TimeZone.currentSystemDefault()
             val catMap = categories.associateBy { it.id }
 
-            val filtered = transactions.filter { tx ->
+            val accountFiltered = if (accountId != null) transactions.filter { it.accountId == accountId } else transactions
+            val filtered = accountFiltered.filter { tx ->
                 val d = Instant.fromEpochMilliseconds(tx.date).toLocalDateTime(tz).date
                 d.year == year && d.monthNumber == month
             }
@@ -33,7 +34,7 @@ class GetDreReportUseCase(
                     .mapNotNull { (catId, txs) ->
                         val cat = catMap[catId] ?: return@mapNotNull null
                         if (cat.dreClassification != classification) return@mapNotNull null
-                        DreCategoryLine(cat, txs.sumOf { it.amount })
+                        DreCategoryLine(cat, txs.sumOf { it.amount.toDouble() })
                     }
                     .sortedByDescending { it.amount }
                 return DreLineItem(total = lines.sumOf { it.amount }, categories = lines)

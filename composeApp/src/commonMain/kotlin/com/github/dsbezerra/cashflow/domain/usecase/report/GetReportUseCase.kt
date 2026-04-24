@@ -25,14 +25,15 @@ class GetReportUseCase(
     private val transactionRepository: TransactionRepository,
     private val categoryRepository: CategoryRepository,
 ) {
-    operator fun invoke(period: ReportPeriod): Flow<ReportData> =
+    operator fun invoke(period: ReportPeriod, accountId: String? = null): Flow<ReportData> =
         combine(transactionRepository.getAll(), categoryRepository.getAll()) { transactions, categories ->
             val tz = TimeZone.currentSystemDefault()
             val today = Clock.System.now().toLocalDateTime(tz).date
             val (start, end) = period.toDateRange(today)
             val catMap = categories.associateBy { it.id }
 
-            val filtered = transactions.filter { tx ->
+            val accountFiltered = if (accountId != null) transactions.filter { it.accountId == accountId } else transactions
+            val filtered = accountFiltered.filter { tx ->
                 val d = Instant.fromEpochMilliseconds(tx.date).toLocalDateTime(tz).date
                 d >= start && d <= end
             }
@@ -40,8 +41,8 @@ class GetReportUseCase(
             val income = filtered.filter { it.type == TransactionType.INCOME }
             val expenses = filtered.filter { it.type == TransactionType.EXPENSE }
 
-            val totalIncome = income.sumOf { it.amount }
-            val totalExpenses = expenses.sumOf { it.amount }
+            val totalIncome = income.sumOf { it.amount.toDouble() }
+            val totalExpenses = expenses.sumOf { it.amount.toDouble() }
             val netBalance = totalIncome - totalExpenses
 
             val days = (end.toEpochDays() - start.toEpochDays() + 1).coerceAtLeast(1)
@@ -51,7 +52,7 @@ class GetReportUseCase(
                 .groupBy { it.categoryId }
                 .mapNotNull { (catId, txs) ->
                     val cat = catMap[catId] ?: return@mapNotNull null
-                    CategoryAmount(cat, txs.sumOf { it.amount }, txs.size)
+                    CategoryAmount(cat, txs.sumOf { it.amount.toDouble() }, txs.size)
                 }
                 .sortedByDescending { it.amount }
 
@@ -59,7 +60,7 @@ class GetReportUseCase(
                 .groupBy { it.categoryId }
                 .mapNotNull { (catId, txs) ->
                     val cat = catMap[catId] ?: return@mapNotNull null
-                    CategoryAmount(cat, txs.sumOf { it.amount }, txs.size)
+                    CategoryAmount(cat, txs.sumOf { it.amount.toDouble() }, txs.size)
                 }
                 .sortedByDescending { it.amount }
 
@@ -79,8 +80,8 @@ class GetReportUseCase(
                     MonthlyAmount(
                         year = yearMonth.first,
                         month = yearMonth.second,
-                        income = txs.filter { it.type == TransactionType.INCOME }.sumOf { it.amount },
-                        expenses = txs.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amount },
+                        income = txs.filter { it.type == TransactionType.INCOME }.sumOf { it.amount.toDouble() },
+                        expenses = txs.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amount.toDouble() },
                     )
                 }
                 .sortedWith(compareBy({ it.year }, { it.month.ordinal }))
@@ -120,8 +121,8 @@ class GetReportUseCase(
             val dayTxs = byDate[current] ?: emptyList()
             val dayNet = dayTxs.sumOf { tx ->
                 when (tx.type) {
-                    TransactionType.INCOME -> tx.amount
-                    TransactionType.EXPENSE -> -tx.amount
+                    TransactionType.INCOME -> tx.amount.toDouble()
+                    TransactionType.EXPENSE -> -tx.amount.toDouble()
                     else -> 0.0
                 }
             }

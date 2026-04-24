@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.domain.usecase.transaction
 
 import com.github.dsbezerra.cashflow.domain.model.Transaction
 import com.github.dsbezerra.cashflow.domain.model.TransactionType
+import com.github.dsbezerra.cashflow.domain.model.toDecimal
 import com.github.dsbezerra.cashflow.domain.repository.TransactionRepository
 import com.github.dsbezerra.cashflow.util.generateId
 import kotlin.time.Clock
@@ -27,7 +28,7 @@ class CreateTransferUseCase(
             accountId = fromAccountId,
             categoryId = categoryId,
             type = TransactionType.EXPENSE,
-            amount = amount,
+            amount = amount.toDecimal(),
             description = description,
             date = date,
             notes = notes,
@@ -42,7 +43,7 @@ class CreateTransferUseCase(
             accountId = toAccountId,
             categoryId = categoryId,
             type = TransactionType.INCOME,
-            amount = amount,
+            amount = amount.toDecimal(),
             description = description,
             date = date,
             notes = notes,

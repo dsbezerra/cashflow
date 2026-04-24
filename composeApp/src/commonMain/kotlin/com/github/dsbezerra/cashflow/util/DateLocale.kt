@@ -34,3 +34,5 @@ fun DayOfWeek.namePtBr(): String = when (this) {
 fun LocalDate.formatPtBr(): String = "$day de ${month.namePtBr()} de $year"
 
 fun LocalDate.formatFullPtBr(): String = "${dayOfWeek.namePtBr()}, $day de ${month.namePtBr()} de $year"
+
+expect fun formatLongDate(timestamp: Long, pattern: String): String

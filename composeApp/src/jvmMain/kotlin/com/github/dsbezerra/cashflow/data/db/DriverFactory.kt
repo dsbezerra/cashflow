@@ -9,8 +9,10 @@ actual class DriverFactory {
     actual fun createDriver(): SqlDriver {
         val dbFile = File("cashflow.db")
         val isNew = !dbFile.exists()
-        return JdbcSqliteDriver("jdbc:sqlite:cashflow.db").also { driver ->
-            if (isNew) CashFlowDatabase.Companion.Schema.create(driver)
+        val driver = JdbcSqliteDriver("jdbc:sqlite:cashflow.db")
+        if (isNew) {
+            CashFlowDatabase.Schema.create(driver)
         }
+        return driver
     }
 }

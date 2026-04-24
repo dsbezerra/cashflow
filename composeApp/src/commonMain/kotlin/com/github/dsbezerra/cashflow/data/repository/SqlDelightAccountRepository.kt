@@ -28,6 +28,10 @@ class SqlDelightAccountRepository(
         queries.selectById(id).executeAsOneOrNull()?.toDomain()
     }
 
+    override suspend fun getDefault(): Account? = withContext(dispatcher) {
+        queries.selectDefault().executeAsOneOrNull()?.toDomain()
+    }
+
     override suspend fun insert(account: Account) {
         withContext(dispatcher) { queries.insert(account.toEntity()) }
     }
@@ -38,13 +42,17 @@ class SqlDelightAccountRepository(
                 name = account.name,
                 type = account.type,
                 currency = account.currency,
-                initialBalance = account.initialBalance,
+                initialBalance = account.initialBalance.toDouble(),
                 color = account.color,
                 icon = account.icon,
                 isArchived = account.isArchived,
                 id = account.id,
             )
         }
+    }
+
+    override suspend fun setDefault(id: String) {
+        withContext(dispatcher) { queries.setDefault(id) }
     }
 
     override suspend fun delete(id: String) {

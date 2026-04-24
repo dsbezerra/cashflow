@@ -14,7 +14,11 @@
       "Read(//c/tmp/**)",
       "Bash(jar xf:*)",
       "Bash(unzip -p \"/c/Users/Diego/.gradle/caches/modules-2/files-2.1/app.cash.sqldelight/sqlite-driver/2.3.2/d4751d9376b1691730e6d9fec7af5d88d83dd56d/sqlite-driver-2.3.2-sources.jar\" \"app/cash/sqldelight/driver/jdbc/sqlite/JdbcSqliteDriver.kt\")",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(xargs grep:*)",
+      "Bash(xargs cat:*)",
+      "Bash(unzip -q \"C:\\\\Users\\\\Diego\\\\.gradle\\\\caches\\\\modules-2\\\\files-2.1\\\\io.github.ehsannarmani\\\\compose-charts\\\\0.2.5\\\\f88ae419ee0fc09160993754ca3c8505e7201e64\\\\compose-charts-0.2.5-sources.jar\")",
+      "Bash(grep -E \"\\\\.kt$\")"
     ]
   }
 }

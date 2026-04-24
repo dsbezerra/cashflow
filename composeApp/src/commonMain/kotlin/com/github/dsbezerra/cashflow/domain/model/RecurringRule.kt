@@ -5,7 +5,7 @@ data class RecurringRule(
     val accountId: String,
     val categoryId: String,
     val type: TransactionType,
-    val amount: Double,
+    val amount: Decimal,
     val description: String,
     val frequency: Frequency,
     val interval: Int,

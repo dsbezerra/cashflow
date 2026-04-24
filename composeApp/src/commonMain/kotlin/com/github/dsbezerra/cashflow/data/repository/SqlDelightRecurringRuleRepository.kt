@@ -38,7 +38,7 @@ class SqlDelightRecurringRuleRepository(
                 accountId = rule.accountId,
                 categoryId = rule.categoryId,
                 type = rule.type,
-                amount = rule.amount,
+                amount = rule.amount.toDouble(),
                 description = rule.description,
                 frequency = rule.frequency,
                 interval = rule.interval.toLong(),

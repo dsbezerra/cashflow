@@ -5,7 +5,7 @@ data class Transaction(
     val accountId: String,
     val categoryId: String,
     val type: TransactionType,
-    val amount: Double,
+    val amount: Decimal,
     val description: String,
     val date: Long,
     val notes: String?,

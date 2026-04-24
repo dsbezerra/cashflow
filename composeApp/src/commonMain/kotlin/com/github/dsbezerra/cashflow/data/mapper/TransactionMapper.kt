@@ -2,13 +2,14 @@ package com.github.dsbezerra.cashflow.data.mapper
 
 import com.github.dsbezerra.cashflow.db.CashTransaction as TransactionEntity
 import com.github.dsbezerra.cashflow.domain.model.Transaction
+import com.github.dsbezerra.cashflow.domain.model.toDecimal
 
 fun TransactionEntity.toDomain(): Transaction = Transaction(
     id = id,
     accountId = accountId,
     categoryId = categoryId,
     type = type,
-    amount = amount,
+    amount = amount.toDecimal(),
     description = description,
     date = date,
     notes = notes,
@@ -24,7 +25,7 @@ fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
     accountId = accountId,
     categoryId = categoryId,
     type = type,
-    amount = amount,
+    amount = amount.toDouble(),
     description = description,
     date = date,
     notes = notes,
