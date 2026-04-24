@@ -57,7 +57,7 @@ private val currencies = listOf("BRL", "USD", "EUR", "GBP")
 fun AccountFormScreen(
     accountId: String?,
     onNavigateBack: () -> Unit,
-    viewModel: com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormViewModel = koinViewModel(),
+    viewModel: AccountFormViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -70,8 +70,8 @@ fun AccountFormScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormEvent.NavigateBack -> onNavigateBack()
-                is com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+                AccountFormEvent.NavigateBack -> onNavigateBack()
+                is AccountFormEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -112,7 +112,7 @@ fun AccountFormScreen(
             // Name
             OutlinedTextField(
                 value = state.name,
-                onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.NameChanged(it)) },
+                onValueChange = { viewModel.onAction(AccountFormAction.NameChanged(it)) },
                 label = { Text("Nome") },
                 isError = state.nameError != null,
                 supportingText = state.nameError?.let { { Text(it) } },
@@ -125,10 +125,10 @@ fun AccountFormScreen(
                 AccountType.entries.forEachIndexed { index, type ->
                     SegmentedButton(
                         selected = state.type == type,
-                        onClick = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.TypeChanged(type)) },
+                        onClick = { viewModel.onAction(AccountFormAction.TypeChanged(type)) },
                         shape = SegmentedButtonDefaults.itemShape(index, AccountType.entries.size),
                         label = { Text(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.accountTypeName(
+                            accountTypeName(
                                 type
                             ), maxLines = 1) },
                     )
@@ -136,13 +136,13 @@ fun AccountFormScreen(
             }
 
             // Currency
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.SimpleDropdown(
+                SimpleDropdown(
                     label = "Moeda",
                     selectedValue = state.currency,
-                    options = _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.currencies,
+                    options = currencies,
                     onSelect = {
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.CurrencyChanged(
+                            AccountFormAction.CurrencyChanged(
                                 it
                             )
                         )
@@ -152,7 +152,7 @@ fun AccountFormScreen(
             // Initial balance
             OutlinedTextField(
                 value = state.initialBalanceInput,
-                onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.InitialBalanceChanged(it)) },
+                onValueChange = { viewModel.onAction(AccountFormAction.InitialBalanceChanged(it)) },
                 label = { Text("Saldo Inicial") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = state.initialBalanceError != null,
@@ -161,13 +161,13 @@ fun AccountFormScreen(
             )
 
             // Icon
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.SimpleDropdown(
+                SimpleDropdown(
                     label = "Ícone",
                     selectedValue = state.icon,
                     options = accountIconOptions,
                     onSelect = {
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.IconChanged(
+                            AccountFormAction.IconChanged(
                                 it
                             )
                         )
@@ -177,7 +177,7 @@ fun AccountFormScreen(
             // Color
             OutlinedTextField(
                 value = state.color,
-                onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.ColorChanged(it)) },
+                onValueChange = { viewModel.onAction(AccountFormAction.ColorChanged(it)) },
                 label = { Text("Cor (hex)") },
                 placeholder = { Text("#4CAF50") },
                 modifier = Modifier.fillMaxWidth(),
@@ -186,7 +186,7 @@ fun AccountFormScreen(
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.Save) },
+                onClick = { viewModel.onAction(AccountFormAction.Save) },
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -218,7 +218,7 @@ fun AccountFormScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
-                    viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.ConfirmDelete)
+                    viewModel.onAction(AccountFormAction.ConfirmDelete)
                 }) { Text("Excluir") }
             },
             dismissButton = {

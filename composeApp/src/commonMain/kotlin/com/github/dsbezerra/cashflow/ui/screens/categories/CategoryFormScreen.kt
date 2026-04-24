@@ -58,7 +58,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun CategoryFormScreen(
     categoryId: String?,
     onNavigateBack: () -> Unit,
-    viewModel: com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormViewModel = koinViewModel(),
+    viewModel: CategoryFormViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -71,8 +71,8 @@ fun CategoryFormScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormEvent.NavigateBack -> onNavigateBack()
-                is com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+                CategoryFormEvent.NavigateBack -> onNavigateBack()
+                is CategoryFormEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -113,7 +113,7 @@ fun CategoryFormScreen(
             // Name
             OutlinedTextField(
                 value = state.name,
-                onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.NameChanged(it)) },
+                onValueChange = { viewModel.onAction(CategoryFormAction.NameChanged(it)) },
                 label = { Text("Nome") },
                 isError = state.nameError != null,
                 supportingText = state.nameError?.let { { Text(it) } },
@@ -127,7 +127,7 @@ fun CategoryFormScreen(
                 CategoryType.entries.forEachIndexed { index, type ->
                     SegmentedButton(
                         selected = state.type == type,
-                        onClick = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.TypeChanged(type)) },
+                        onClick = { viewModel.onAction(CategoryFormAction.TypeChanged(type)) },
                         shape = SegmentedButtonDefaults.itemShape(index, CategoryType.entries.size),
                         enabled = !state.isDefault,
                         label = {
@@ -145,14 +145,14 @@ fun CategoryFormScreen(
 
             // DRE Classification
             Text("Classificação DRE", style = MaterialTheme.typography.labelLarge)
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryDropdown(
+                CategoryDropdown(
                     label = "Classificação DRE",
                     selectedValue = state.dreClassification.labelPtBr(),
                     options = DreClassification.entries.map { it.labelPtBr() },
                     onSelect = { selected ->
                         val dre = DreClassification.entries.first { it.labelPtBr() == selected }
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.DreClassificationChanged(
+                            CategoryFormAction.DreClassificationChanged(
                                 dre
                             )
                         )
@@ -160,13 +160,13 @@ fun CategoryFormScreen(
                 )
 
             // Icon
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryDropdown(
+                CategoryDropdown(
                     label = "Ícone",
                     selectedValue = state.icon,
                     options = categoryIconOptions,
                     onSelect = {
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.IconChanged(
+                            CategoryFormAction.IconChanged(
                                 it
                             )
                         )
@@ -176,7 +176,7 @@ fun CategoryFormScreen(
             // Color
             OutlinedTextField(
                 value = state.color,
-                onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.ColorChanged(it)) },
+                onValueChange = { viewModel.onAction(CategoryFormAction.ColorChanged(it)) },
                 label = { Text("Cor (hex)") },
                 placeholder = { Text("#9E9E9E") },
                 modifier = Modifier.fillMaxWidth(),
@@ -186,7 +186,7 @@ fun CategoryFormScreen(
             if (state.availableParents.isNotEmpty()) {
                 val parentOptions = listOf(null to "Sem categoria pai") +
                         state.availableParents.map { it.id to it.name }
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryDropdown(
+                CategoryDropdown(
                     label = "Categoria pai (opcional)",
                     selectedValue = parentOptions.firstOrNull { it.first == state.parentId }?.second
                         ?: "Sem categoria pai",
@@ -194,7 +194,7 @@ fun CategoryFormScreen(
                     onSelect = { selected ->
                         val parentId = parentOptions.firstOrNull { it.second == selected }?.first
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.ParentChanged(
+                            CategoryFormAction.ParentChanged(
                                 parentId
                             )
                         )
@@ -210,7 +210,7 @@ fun CategoryFormScreen(
                 ) {
                     Checkbox(
                         checked = state.isArchived,
-                        onCheckedChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.ArchivedChanged(it)) },
+                        onCheckedChange = { viewModel.onAction(CategoryFormAction.ArchivedChanged(it)) },
                     )
                     Text("Arquivar categoria", style = MaterialTheme.typography.bodyLarge)
                 }
@@ -219,7 +219,7 @@ fun CategoryFormScreen(
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.Save) },
+                onClick = { viewModel.onAction(CategoryFormAction.Save) },
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -251,7 +251,7 @@ fun CategoryFormScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
-                    viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.ConfirmDelete)
+                    viewModel.onAction(CategoryFormAction.ConfirmDelete)
                 }) { Text("Excluir") }
             },
             dismissButton = {

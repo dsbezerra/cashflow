@@ -57,7 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RecurringRuleListScreen(
     onNavigateBack: () -> Unit,
     onNavigateToForm: (String?) -> Unit,
-    viewModel: com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListViewModel = koinViewModel(),
+    viewModel: RecurringRuleListViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -66,7 +66,7 @@ fun RecurringRuleListScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
-                is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+                is RecurringRuleListEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -108,12 +108,12 @@ fun RecurringRuleListScreen(
                 else -> {
                     LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
                         items(state.rules, key = { it.id }) { rule ->
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleRow(
+                            RecurringRuleRow(
                                 rule = rule,
                                 onClick = { onNavigateToForm(rule.id) },
                                 onToggleActive = { isActive ->
                                     viewModel.onAction(
-                                        _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListAction.ToggleActive(
+                                        RecurringRuleListAction.ToggleActive(
                                             rule.id,
                                             isActive
                                         )

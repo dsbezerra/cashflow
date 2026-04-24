@@ -18,10 +18,10 @@ class CategoryFormViewModel(
     private val categoryRepository: CategoryRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormState())
+    private val _state = MutableStateFlow(CategoryFormState())
     val state = _state.asStateFlow()
 
-    private val _events = Channel<com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormEvent>(Channel.BUFFERED)
+    private val _events = Channel<CategoryFormEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
     fun initialize(categoryId: String?) {
@@ -57,17 +57,17 @@ class CategoryFormViewModel(
         }
     }
 
-    fun onAction(action: com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction) {
+    fun onAction(action: CategoryFormAction) {
         when (action) {
-            is com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.NameChanged -> _state.update { it.copy(name = action.name, nameError = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.TypeChanged -> _state.update { it.copy(type = action.type, parentId = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.DreClassificationChanged -> _state.update { it.copy(dreClassification = action.dreClassification) }
-            is com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
-            is com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
-            is com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.ParentChanged -> _state.update { it.copy(parentId = action.parentId) }
-            is com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.ArchivedChanged -> _state.update { it.copy(isArchived = action.isArchived) }
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.Save -> save()
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormAction.ConfirmDelete -> delete()
+            is CategoryFormAction.NameChanged -> _state.update { it.copy(name = action.name, nameError = null) }
+            is CategoryFormAction.TypeChanged -> _state.update { it.copy(type = action.type, parentId = null) }
+            is CategoryFormAction.DreClassificationChanged -> _state.update { it.copy(dreClassification = action.dreClassification) }
+            is CategoryFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
+            is CategoryFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
+            is CategoryFormAction.ParentChanged -> _state.update { it.copy(parentId = action.parentId) }
+            is CategoryFormAction.ArchivedChanged -> _state.update { it.copy(isArchived = action.isArchived) }
+            CategoryFormAction.Save -> save()
+            CategoryFormAction.ConfirmDelete -> delete()
         }
     }
 
@@ -111,10 +111,10 @@ class CategoryFormViewModel(
                     )
                 }
             }.onSuccess {
-                _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormEvent.NavigateBack)
+                _events.send(CategoryFormEvent.NavigateBack)
             }.onFailure {
                 _state.update { st -> st.copy(isSaving = false) }
-                _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormEvent.ShowError("Falha ao salvar categoria"))
+                _events.send(CategoryFormEvent.ShowError("Falha ao salvar categoria"))
             }
         }
     }
@@ -123,8 +123,8 @@ class CategoryFormViewModel(
         val id = _state.value.categoryId ?: return
         viewModelScope.launch {
             runCatching { categoryRepository.delete(id) }
-                .onSuccess { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormEvent.NavigateBack) }
-                .onFailure { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormEvent.ShowError("Falha ao excluir categoria")) }
+                .onSuccess { _events.send(CategoryFormEvent.NavigateBack) }
+                .onFailure { _events.send(CategoryFormEvent.ShowError("Falha ao excluir categoria")) }
         }
     }
 }

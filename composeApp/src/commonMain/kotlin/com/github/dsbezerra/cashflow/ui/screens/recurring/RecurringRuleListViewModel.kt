@@ -14,10 +14,10 @@ class RecurringRuleListViewModel(
     private val recurringRuleRepository: RecurringRuleRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListState())
+    private val _state = MutableStateFlow(RecurringRuleListState())
     val state = _state.asStateFlow()
 
-    private val _events = Channel<com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListEvent>(Channel.BUFFERED)
+    private val _events = Channel<RecurringRuleListEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
     init {
@@ -28,10 +28,10 @@ class RecurringRuleListViewModel(
         }
     }
 
-    fun onAction(action: com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListAction) {
+    fun onAction(action: RecurringRuleListAction) {
         when (action) {
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListAction.ToggleActive -> toggle(action.id, action.isActive)
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListAction.Delete -> delete(action.id)
+            is RecurringRuleListAction.ToggleActive -> toggle(action.id, action.isActive)
+            is RecurringRuleListAction.Delete -> delete(action.id)
         }
     }
 
@@ -41,7 +41,7 @@ class RecurringRuleListViewModel(
                 val rule = recurringRuleRepository.getById(id) ?: return@runCatching
                 recurringRuleRepository.update(rule.copy(isActive = isActive))
             }.onFailure {
-                _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListEvent.ShowError("Erro ao atualizar regra"))
+                _events.send(RecurringRuleListEvent.ShowError("Erro ao atualizar regra"))
             }
         }
     }
@@ -49,7 +49,7 @@ class RecurringRuleListViewModel(
     private fun delete(id: String) {
         viewModelScope.launch {
             runCatching { recurringRuleRepository.delete(id) }
-                .onFailure { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListEvent.ShowError("Erro ao excluir regra")) }
+                .onFailure { _events.send(RecurringRuleListEvent.ShowError("Erro ao excluir regra")) }
         }
     }
 }

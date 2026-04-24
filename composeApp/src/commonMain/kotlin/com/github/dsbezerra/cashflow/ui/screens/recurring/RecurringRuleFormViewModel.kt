@@ -23,10 +23,10 @@ class RecurringRuleFormViewModel(
     private val categoryRepository: CategoryRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormState())
+    private val _state = MutableStateFlow(RecurringRuleFormState())
     val state = _state.asStateFlow()
 
-    private val _events = Channel<com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormEvent>(Channel.BUFFERED)
+    private val _events = Channel<RecurringRuleFormEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
     fun initialize(ruleId: String?) {
@@ -72,20 +72,20 @@ class RecurringRuleFormViewModel(
         }
     }
 
-    fun onAction(action: com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction) {
+    fun onAction(action: RecurringRuleFormAction) {
         when (action) {
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.DescriptionChanged -> _state.update { it.copy(description = action.description, descriptionError = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.AmountChanged -> _state.update { it.copy(amountInput = action.amount, amountError = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.TypeChanged -> _state.update { it.copy(type = action.type, selectedCategoryId = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.AccountSelected -> _state.update { it.copy(selectedAccountId = action.accountId, accountError = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.CategorySelected -> _state.update { it.copy(selectedCategoryId = action.categoryId, categoryError = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.FrequencyChanged -> _state.update { it.copy(frequency = action.frequency) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.IntervalChanged -> _state.update { it.copy(interval = action.interval) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.StartDateChanged -> _state.update { it.copy(startDate = action.epochMillis) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.EndDateChanged -> _state.update { it.copy(endDate = action.epochMillis) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.ActiveChanged -> _state.update { it.copy(isActive = action.isActive) }
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.Save -> save()
-            is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.ConfirmDelete -> delete()
+            is RecurringRuleFormAction.DescriptionChanged -> _state.update { it.copy(description = action.description, descriptionError = null) }
+            is RecurringRuleFormAction.AmountChanged -> _state.update { it.copy(amountInput = action.amount, amountError = null) }
+            is RecurringRuleFormAction.TypeChanged -> _state.update { it.copy(type = action.type, selectedCategoryId = null) }
+            is RecurringRuleFormAction.AccountSelected -> _state.update { it.copy(selectedAccountId = action.accountId, accountError = null) }
+            is RecurringRuleFormAction.CategorySelected -> _state.update { it.copy(selectedCategoryId = action.categoryId, categoryError = null) }
+            is RecurringRuleFormAction.FrequencyChanged -> _state.update { it.copy(frequency = action.frequency) }
+            is RecurringRuleFormAction.IntervalChanged -> _state.update { it.copy(interval = action.interval) }
+            is RecurringRuleFormAction.StartDateChanged -> _state.update { it.copy(startDate = action.epochMillis) }
+            is RecurringRuleFormAction.EndDateChanged -> _state.update { it.copy(endDate = action.epochMillis) }
+            is RecurringRuleFormAction.ActiveChanged -> _state.update { it.copy(isActive = action.isActive) }
+            is RecurringRuleFormAction.Save -> save()
+            is RecurringRuleFormAction.ConfirmDelete -> delete()
         }
     }
 
@@ -151,10 +151,10 @@ class RecurringRuleFormViewModel(
                     )
                 }
             }.onSuccess {
-                _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormEvent.NavigateBack)
+                _events.send(RecurringRuleFormEvent.NavigateBack)
             }.onFailure {
                 _state.update { st -> st.copy(isSaving = false) }
-                _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormEvent.ShowError("Erro ao salvar regra"))
+                _events.send(RecurringRuleFormEvent.ShowError("Erro ao salvar regra"))
             }
         }
     }
@@ -163,8 +163,8 @@ class RecurringRuleFormViewModel(
         val id = _state.value.ruleId ?: return
         viewModelScope.launch {
             runCatching { recurringRuleRepository.delete(id) }
-                .onSuccess { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormEvent.NavigateBack) }
-                .onFailure { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormEvent.ShowError("Erro ao excluir regra")) }
+                .onSuccess { _events.send(RecurringRuleFormEvent.NavigateBack) }
+                .onFailure { _events.send(RecurringRuleFormEvent.ShowError("Erro ao excluir regra")) }
         }
     }
 }

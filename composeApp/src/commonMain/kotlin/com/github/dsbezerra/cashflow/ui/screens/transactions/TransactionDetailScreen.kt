@@ -66,7 +66,7 @@ fun TransactionDetailScreen(
     onNavigateBack: () -> Unit,
     defaultAccountId: String? = null,
     defaultType: String? = null,
-    viewModel: com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailViewModel = koinViewModel(),
+    viewModel: TransactionDetailViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -78,8 +78,8 @@ fun TransactionDetailScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
-                is com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailEvent.NavigateBack -> onNavigateBack()
-                is com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+                is TransactionDetailEvent.NavigateBack -> onNavigateBack()
+                is TransactionDetailEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -125,7 +125,7 @@ fun TransactionDetailScreen(
                 TransactionType.entries.forEachIndexed { index, type ->
                     SegmentedButton(
                         selected = state.type == type,
-                        onClick = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.TypeChanged(type)) },
+                        onClick = { viewModel.onAction(TransactionDetailAction.TypeChanged(type)) },
                         shape = SegmentedButtonDefaults.itemShape(index, TransactionType.entries.size),
                         label = {
                             Text(
@@ -143,7 +143,7 @@ fun TransactionDetailScreen(
             // Amount
             OutlinedTextField(
                 value = state.amountInput,
-                onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.AmountChanged(it)) },
+                onValueChange = { viewModel.onAction(TransactionDetailAction.AmountChanged(it)) },
                 label = { Text("Valor") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = state.amountError != null,
@@ -154,7 +154,7 @@ fun TransactionDetailScreen(
             // Description
             OutlinedTextField(
                 value = state.description,
-                onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.DescriptionChanged(it)) },
+                onValueChange = { viewModel.onAction(TransactionDetailAction.DescriptionChanged(it)) },
                 label = { Text("Descrição") },
                 isError = state.descriptionError != null,
                 supportingText = state.descriptionError?.let { { Text(it) } },
@@ -180,7 +180,7 @@ fun TransactionDetailScreen(
                         else -> true
                     }
                 }
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.AccountOrCategoryDropdown(
+                AccountOrCategoryDropdown(
                     label = "Categoria",
                     selectedId = state.selectedCategoryId,
                     items = filteredCategories.map { it.id to it.name },
@@ -188,7 +188,7 @@ fun TransactionDetailScreen(
                     errorText = state.categoryError,
                     onSelect = {
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.CategorySelected(
+                            TransactionDetailAction.CategorySelected(
                                 it
                             )
                         )
@@ -197,7 +197,7 @@ fun TransactionDetailScreen(
             }
 
             // Account
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.AccountOrCategoryDropdown(
+                AccountOrCategoryDropdown(
                     label = if (state.type == TransactionType.TRANSFER) "Conta de Origem" else "Conta",
                     selectedId = state.selectedAccountId,
                     items = state.accounts.map { it.id to it.name },
@@ -205,7 +205,7 @@ fun TransactionDetailScreen(
                     errorText = state.accountError,
                     onSelect = {
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.AccountSelected(
+                            TransactionDetailAction.AccountSelected(
                                 it
                             )
                         )
@@ -214,7 +214,7 @@ fun TransactionDetailScreen(
 
             // To Account (TRANSFER only)
             if (state.type == TransactionType.TRANSFER) {
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.AccountOrCategoryDropdown(
+                AccountOrCategoryDropdown(
                     label = "Conta de Destino",
                     selectedId = state.selectedToAccountId,
                     items = state.accounts.map { it.id to it.name },
@@ -222,7 +222,7 @@ fun TransactionDetailScreen(
                     errorText = null,
                     onSelect = {
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.ToAccountSelected(
+                            TransactionDetailAction.ToAccountSelected(
                                 it
                             )
                         )
@@ -233,7 +233,7 @@ fun TransactionDetailScreen(
             // Notes
             OutlinedTextField(
                 value = state.notes,
-                onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.NotesChanged(it)) },
+                onValueChange = { viewModel.onAction(TransactionDetailAction.NotesChanged(it)) },
                 label = { Text("Notas (opcional)") },
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth(),
@@ -242,7 +242,7 @@ fun TransactionDetailScreen(
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.Save) },
+                onClick = { viewModel.onAction(TransactionDetailAction.Save) },
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -260,7 +260,7 @@ fun TransactionDetailScreen(
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let {
-                        viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.DateChanged(it))
+                        viewModel.onAction(TransactionDetailAction.DateChanged(it))
                     }
                     showDatePicker = false
                 }) { Text("OK") }
@@ -281,7 +281,7 @@ fun TransactionDetailScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
-                    viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailAction.ConfirmDelete)
+                    viewModel.onAction(TransactionDetailAction.ConfirmDelete)
                 }) { Text("Excluir") }
             },
             dismissButton = {

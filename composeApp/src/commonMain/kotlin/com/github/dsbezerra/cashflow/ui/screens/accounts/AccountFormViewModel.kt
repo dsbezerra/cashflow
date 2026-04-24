@@ -18,10 +18,10 @@ class AccountFormViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormState())
+    private val _state = MutableStateFlow(AccountFormState())
     val state = _state.asStateFlow()
 
-    private val _events = Channel<com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormEvent>(Channel.BUFFERED)
+    private val _events = Channel<AccountFormEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
     fun initialize(accountId: String?) {
@@ -44,16 +44,16 @@ class AccountFormViewModel(
         }
     }
 
-    fun onAction(action: com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction) {
+    fun onAction(action: AccountFormAction) {
         when (action) {
-            is com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.NameChanged -> _state.update { it.copy(name = action.name, nameError = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.TypeChanged -> _state.update { it.copy(type = action.type) }
-            is com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.CurrencyChanged -> _state.update { it.copy(currency = action.currency) }
-            is com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.InitialBalanceChanged -> _state.update { it.copy(initialBalanceInput = action.value, initialBalanceError = null) }
-            is com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
-            is com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.Save -> save()
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction.ConfirmDelete -> delete()
+            is AccountFormAction.NameChanged -> _state.update { it.copy(name = action.name, nameError = null) }
+            is AccountFormAction.TypeChanged -> _state.update { it.copy(type = action.type) }
+            is AccountFormAction.CurrencyChanged -> _state.update { it.copy(currency = action.currency) }
+            is AccountFormAction.InitialBalanceChanged -> _state.update { it.copy(initialBalanceInput = action.value, initialBalanceError = null) }
+            is AccountFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
+            is AccountFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
+            AccountFormAction.Save -> save()
+            AccountFormAction.ConfirmDelete -> delete()
         }
     }
 
@@ -106,10 +106,10 @@ class AccountFormViewModel(
                     )
                 }
             }.onSuccess {
-                _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormEvent.NavigateBack)
+                _events.send(AccountFormEvent.NavigateBack)
             }.onFailure {
                 _state.update { st -> st.copy(isSaving = false) }
-                _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormEvent.ShowError("Falha ao salvar conta"))
+                _events.send(AccountFormEvent.ShowError("Falha ao salvar conta"))
             }
         }
     }
@@ -118,8 +118,8 @@ class AccountFormViewModel(
         val id = _state.value.accountId ?: return
         viewModelScope.launch {
             runCatching { accountRepository.delete(id) }
-                .onSuccess { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormEvent.NavigateBack) }
-                .onFailure { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormEvent.ShowError("Falha ao excluir conta")) }
+                .onSuccess { _events.send(AccountFormEvent.NavigateBack) }
+                .onFailure { _events.send(AccountFormEvent.ShowError("Falha ao excluir conta")) }
         }
     }
 }

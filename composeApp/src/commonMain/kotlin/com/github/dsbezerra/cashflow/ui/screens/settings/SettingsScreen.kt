@@ -30,7 +30,7 @@ fun SettingsScreen(
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.settings.SettingsRow(
+            SettingsRow(
                 icon = {
                     Icon(
                         Icons.Default.Category,
@@ -43,7 +43,7 @@ fun SettingsScreen(
                 onClick = onNavigateToCategoryList,
             )
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.settings.SettingsRow(
+            SettingsRow(
                 icon = {
                     Icon(
                         Icons.Default.Repeat,
@@ -56,7 +56,7 @@ fun SettingsScreen(
                 onClick = onNavigateToRecurringList,
             )
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.settings.SettingsRow(
+            SettingsRow(
                 icon = {
                     Icon(
                         Icons.Default.Info,

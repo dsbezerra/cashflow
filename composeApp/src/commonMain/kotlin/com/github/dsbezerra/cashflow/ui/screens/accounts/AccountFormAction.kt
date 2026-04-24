@@ -4,17 +4,17 @@ import com.github.dsbezerra.cashflow.domain.model.AccountType
 
 sealed interface AccountFormAction {
     data class NameChanged(val name: String) :
-        com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction
+        AccountFormAction
     data class TypeChanged(val type: AccountType) :
-        com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction
+        AccountFormAction
     data class CurrencyChanged(val currency: String) :
-        com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction
+        AccountFormAction
     data class InitialBalanceChanged(val value: String) :
-        com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction
+        AccountFormAction
     data class ColorChanged(val color: String) :
-        com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction
+        AccountFormAction
     data class IconChanged(val icon: String) :
-        com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction
-    data object Save : com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction
-    data object ConfirmDelete : com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormAction
+        AccountFormAction
+    data object Save : AccountFormAction
+    data object ConfirmDelete : AccountFormAction
 }

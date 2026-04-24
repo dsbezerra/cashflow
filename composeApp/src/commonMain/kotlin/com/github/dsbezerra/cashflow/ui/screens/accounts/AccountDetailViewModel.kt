@@ -20,10 +20,10 @@ class AccountDetailViewModel(
     private val transactionRepository: TransactionRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailState())
+    private val _state = MutableStateFlow(AccountDetailState())
     val state = _state.asStateFlow()
 
-    private val _events = Channel<com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailEvent>(Channel.BUFFERED)
+    private val _events = Channel<AccountDetailEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
     private var collectJob: Job? = null
@@ -59,10 +59,10 @@ class AccountDetailViewModel(
         }
     }
 
-    fun onAction(action: com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailAction) {
+    fun onAction(action: AccountDetailAction) {
         when (action) {
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailAction.ConfirmDelete -> delete()
-            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailAction.ConfirmArchive -> archive()
+            AccountDetailAction.ConfirmDelete -> delete()
+            AccountDetailAction.ConfirmArchive -> archive()
         }
     }
 
@@ -70,8 +70,8 @@ class AccountDetailViewModel(
         val id = _state.value.account?.id ?: return
         viewModelScope.launch {
             runCatching { accountRepository.delete(id) }
-                .onSuccess { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailEvent.NavigateBack) }
-                .onFailure { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailEvent.ShowError("Falha ao excluir conta")) }
+                .onSuccess { _events.send(AccountDetailEvent.NavigateBack) }
+                .onFailure { _events.send(AccountDetailEvent.ShowError("Falha ao excluir conta")) }
         }
     }
 
@@ -79,8 +79,8 @@ class AccountDetailViewModel(
         val account = _state.value.account ?: return
         viewModelScope.launch {
             runCatching { accountRepository.update(account.copy(isArchived = true)) }
-                .onSuccess { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailEvent.NavigateBack) }
-                .onFailure { _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailEvent.ShowError("Falha ao arquivar conta")) }
+                .onSuccess { _events.send(AccountDetailEvent.NavigateBack) }
+                .onFailure { _events.send(AccountDetailEvent.ShowError("Falha ao arquivar conta")) }
         }
     }
 }

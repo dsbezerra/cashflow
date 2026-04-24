@@ -16,20 +16,20 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel {
-        com.github.dsbezerra.cashflow.ui.screens.dashboard.DashboardViewModel(
+        DashboardViewModel(
             get(),
             get(),
             get()
         )
     }
     viewModel {
-        com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionListViewModel(
+        TransactionListViewModel(
             get(),
             get()
         )
     }
     viewModel {
-        com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionDetailViewModel(
+        TransactionDetailViewModel(
             get(),
             get(),
             get(),
@@ -39,24 +39,24 @@ val viewModelModule = module {
         )
     }
     viewModel {
-        com.github.dsbezerra.cashflow.ui.screens.accounts.AccountListViewModel(
+        AccountListViewModel(
             get(),
             get()
         )
     }
     viewModel {
-        com.github.dsbezerra.cashflow.ui.screens.accounts.AccountDetailViewModel(
+        AccountDetailViewModel(
             get(),
             get()
         )
     }
-    viewModel { com.github.dsbezerra.cashflow.ui.screens.accounts.AccountFormViewModel(get()) }
-    viewModel { com.github.dsbezerra.cashflow.ui.screens.categories.CategoryListViewModel(get()) }
-    viewModel { com.github.dsbezerra.cashflow.ui.screens.categories.CategoryFormViewModel(get()) }
-    viewModel { com.github.dsbezerra.cashflow.ui.screens.reports.ReportViewModel(get(), get(), get()) }
-    viewModel { com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleListViewModel(get()) }
+    viewModel { AccountFormViewModel(get()) }
+    viewModel { CategoryListViewModel(get()) }
+    viewModel { CategoryFormViewModel(get()) }
+    viewModel { ReportViewModel(get(), get(), get()) }
+    viewModel { RecurringRuleListViewModel(get()) }
     viewModel {
-        com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormViewModel(
+        RecurringRuleFormViewModel(
             get(),
             get(),
             get()

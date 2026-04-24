@@ -67,7 +67,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RecurringRuleFormScreen(
     ruleId: String?,
     onNavigateBack: () -> Unit,
-    viewModel: com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormViewModel = koinViewModel(),
+    viewModel: RecurringRuleFormViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -82,8 +82,8 @@ fun RecurringRuleFormScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormEvent.NavigateBack -> onNavigateBack()
-                is com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+                RecurringRuleFormEvent.NavigateBack -> onNavigateBack()
+                is RecurringRuleFormEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -127,7 +127,7 @@ fun RecurringRuleFormScreen(
                     types.forEachIndexed { index, type ->
                         SegmentedButton(
                             selected = state.type == type,
-                            onClick = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.TypeChanged(type)) },
+                            onClick = { viewModel.onAction(RecurringRuleFormAction.TypeChanged(type)) },
                             shape = SegmentedButtonDefaults.itemShape(index, types.size),
                             label = {
                                 Text(
@@ -144,7 +144,7 @@ fun RecurringRuleFormScreen(
                 // Description
                 OutlinedTextField(
                     value = state.description,
-                    onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.DescriptionChanged(it)) },
+                    onValueChange = { viewModel.onAction(RecurringRuleFormAction.DescriptionChanged(it)) },
                     label = { Text("Descrição") },
                     isError = state.descriptionError != null,
                     supportingText = state.descriptionError?.let { { Text(it) } },
@@ -154,7 +154,7 @@ fun RecurringRuleFormScreen(
                 // Amount
                 OutlinedTextField(
                     value = state.amountInput,
-                    onValueChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.AmountChanged(it)) },
+                    onValueChange = { viewModel.onAction(RecurringRuleFormAction.AmountChanged(it)) },
                     label = { Text("Valor") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = state.amountError != null,
@@ -163,7 +163,7 @@ fun RecurringRuleFormScreen(
                 )
 
                 // Account
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RuleDropdown(
+                RuleDropdown(
                     label = "Conta",
                     selectedId = state.selectedAccountId,
                     items = state.availableAccounts.map { it.id to it.name },
@@ -171,7 +171,7 @@ fun RecurringRuleFormScreen(
                     errorText = state.accountError,
                     onSelect = {
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.AccountSelected(
+                            RecurringRuleFormAction.AccountSelected(
                                 it
                             )
                         )
@@ -186,7 +186,7 @@ fun RecurringRuleFormScreen(
                         else -> true
                     }
                 }
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RuleDropdown(
+                RuleDropdown(
                     label = "Categoria",
                     selectedId = state.selectedCategoryId,
                     items = filteredCategories.map { it.id to it.name },
@@ -194,7 +194,7 @@ fun RecurringRuleFormScreen(
                     errorText = state.categoryError,
                     onSelect = {
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.CategorySelected(
+                            RecurringRuleFormAction.CategorySelected(
                                 it
                             )
                         )
@@ -202,14 +202,14 @@ fun RecurringRuleFormScreen(
                 )
 
                 // Frequency
-                _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RuleStringDropdown(
+                RuleStringDropdown(
                     label = "Frequência",
                     selectedValue = state.frequency.labelPtBr(),
                     options = Frequency.entries.map { it.labelPtBr() },
                     onSelect = { selected ->
                         val freq = Frequency.entries.first { it.labelPtBr() == selected }
                         viewModel.onAction(
-                            _root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.FrequencyChanged(
+                            RecurringRuleFormAction.FrequencyChanged(
                                 freq
                             )
                         )
@@ -220,7 +220,7 @@ fun RecurringRuleFormScreen(
                 OutlinedTextField(
                     value = state.interval.toString(),
                     onValueChange = { v ->
-                        v.toIntOrNull()?.let { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.IntervalChanged(it)) }
+                        v.toIntOrNull()?.let { viewModel.onAction(RecurringRuleFormAction.IntervalChanged(it)) }
                     },
                     label = { Text("Intervalo") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -262,14 +262,14 @@ fun RecurringRuleFormScreen(
                     Text("Ativo", style = MaterialTheme.typography.bodyLarge)
                     Switch(
                         checked = state.isActive,
-                        onCheckedChange = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.ActiveChanged(it)) },
+                        onCheckedChange = { viewModel.onAction(RecurringRuleFormAction.ActiveChanged(it)) },
                     )
                 }
 
                 Spacer(Modifier.height(8.dp))
 
                 Button(
-                    onClick = { viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.Save) },
+                    onClick = { viewModel.onAction(RecurringRuleFormAction.Save) },
                     enabled = !state.isSaving,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -289,7 +289,7 @@ fun RecurringRuleFormScreen(
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let {
-                        viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.StartDateChanged(it))
+                        viewModel.onAction(RecurringRuleFormAction.StartDateChanged(it))
                     }
                     showStartDatePicker = false
                 }) { Text("OK") }
@@ -308,7 +308,7 @@ fun RecurringRuleFormScreen(
             onDismissRequest = { showEndDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.EndDateChanged(datePickerState.selectedDateMillis))
+                    viewModel.onAction(RecurringRuleFormAction.EndDateChanged(datePickerState.selectedDateMillis))
                     showEndDatePicker = false
                 }) { Text("OK") }
             },
@@ -328,7 +328,7 @@ fun RecurringRuleFormScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
-                    viewModel.onAction(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.recurring.RecurringRuleFormAction.ConfirmDelete)
+                    viewModel.onAction(RecurringRuleFormAction.ConfirmDelete)
                 }) { Text("Excluir") }
             },
             dismissButton = {

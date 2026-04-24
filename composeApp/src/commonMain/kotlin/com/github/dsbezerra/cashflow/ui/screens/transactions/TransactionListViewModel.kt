@@ -17,10 +17,10 @@ class TransactionListViewModel(
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionListState())
+    private val _state = MutableStateFlow(TransactionListState())
     val state = _state.asStateFlow()
 
-    private val _events = Channel<com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionListEvent>(Channel.BUFFERED)
+    private val _events = Channel<TransactionListEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
     private var collectJob: Job? = null
@@ -29,17 +29,17 @@ class TransactionListViewModel(
         startCollecting()
     }
 
-    fun onAction(action: com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionListAction) {
+    fun onAction(action: TransactionListAction) {
         when (action) {
-            is com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionListAction.Refresh -> {
+            is TransactionListAction.Refresh -> {
                 collectJob?.cancel()
                 startCollecting()
             }
-            is com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionListAction.DeleteTransaction -> {
+            is TransactionListAction.DeleteTransaction -> {
                 viewModelScope.launch {
                     runCatching { deleteTransactionUseCase(action.id) }
                         .onFailure {
-                            _events.send(_root_ide_package_.com.github.dsbezerra.cashflow.ui.screens.transactions.TransactionListEvent.ShowError("Failed to delete transaction"))
+                            _events.send(TransactionListEvent.ShowError("Failed to delete transaction"))
                         }
                 }
             }
