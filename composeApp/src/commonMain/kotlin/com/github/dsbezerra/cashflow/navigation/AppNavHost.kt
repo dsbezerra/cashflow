@@ -12,6 +12,7 @@ import com.github.dsbezerra.cashflow.ui.accounts.AccountListScreen
 import com.github.dsbezerra.cashflow.ui.categories.CategoryFormScreen
 import com.github.dsbezerra.cashflow.ui.categories.CategoryListScreen
 import com.github.dsbezerra.cashflow.ui.dashboard.DashboardScreen
+import com.github.dsbezerra.cashflow.ui.about.AboutScreen
 import com.github.dsbezerra.cashflow.ui.recurring.RecurringRuleFormScreen
 import com.github.dsbezerra.cashflow.ui.recurring.RecurringRuleListScreen
 import com.github.dsbezerra.cashflow.ui.reports.ReportScreen
@@ -92,6 +93,9 @@ fun AppNavHost(
                 onNavigateToRecurringList = {
                     navController.navigate(RecurringRuleList)
                 },
+                onNavigateToAbout = {
+                    navController.navigate(About)
+                },
             )
         }
         composable<CategoryList> {
@@ -126,6 +130,9 @@ fun AppNavHost(
                 ruleId = route.ruleId,
                 onNavigateBack = { navController.popBackStack() },
             )
+        }
+        composable<About> {
+            AboutScreen(onNavigateBack = { navController.popBackStack() })
         }
     }
 }

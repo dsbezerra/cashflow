@@ -41,3 +41,6 @@ data object RecurringRuleList
 
 @Serializable
 data class RecurringRuleForm(val ruleId: String? = null)
+
+@Serializable
+data object About
