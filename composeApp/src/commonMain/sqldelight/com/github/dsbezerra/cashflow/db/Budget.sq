@@ -4,7 +4,7 @@ CREATE TABLE Budget (
     id TEXT NOT NULL PRIMARY KEY,
     categoryId TEXT NOT NULL,
     amount REAL NOT NULL,
-    period TEXT AS com.github.dsbezerra.cashflow.domain.model.BudgetPeriod NOT NULL,
+    period TEXT AS com.github.dsbezerra.cashflow.core.domain.model.BudgetPeriod NOT NULL,
     startDate INTEGER NOT NULL,
     isActive INTEGER AS Boolean NOT NULL DEFAULT 1,
     FOREIGN KEY (categoryId) REFERENCES Category(id)

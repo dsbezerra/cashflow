@@ -1,0 +1,19 @@
+package com.github.dsbezerra.cashflow.feature.recurring.form
+
+import com.github.dsbezerra.cashflow.core.domain.model.Frequency
+import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
+
+sealed interface RecurringRuleFormAction {
+    data class DescriptionChanged(val description: String) : RecurringRuleFormAction
+    data class AmountChanged(val cents: Long) : RecurringRuleFormAction
+    data class TypeChanged(val type: TransactionType) : RecurringRuleFormAction
+    data class AccountSelected(val accountId: String) : RecurringRuleFormAction
+    data class CategorySelected(val categoryId: String) : RecurringRuleFormAction
+    data class FrequencyChanged(val frequency: Frequency) : RecurringRuleFormAction
+    data class IntervalChanged(val interval: Int) : RecurringRuleFormAction
+    data class StartDateChanged(val epochMillis: Long) : RecurringRuleFormAction
+    data class EndDateChanged(val epochMillis: Long?) : RecurringRuleFormAction
+    data class ActiveChanged(val isActive: Boolean) : RecurringRuleFormAction
+    data object Save : RecurringRuleFormAction
+    data object ConfirmDelete : RecurringRuleFormAction
+}

@@ -5,7 +5,7 @@ CREATE TABLE CashTransaction (
     id TEXT NOT NULL PRIMARY KEY,
     accountId TEXT NOT NULL,
     categoryId TEXT NOT NULL,
-    type TEXT AS com.github.dsbezerra.cashflow.domain.model.TransactionType NOT NULL,
+    type TEXT AS com.github.dsbezerra.cashflow.core.domain.model.TransactionType NOT NULL,
     amount REAL NOT NULL,
     description TEXT NOT NULL,
     date INTEGER NOT NULL,

@@ -3,7 +3,7 @@ import kotlin.Boolean;
 CREATE TABLE Account (
     id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
-    type TEXT AS com.github.dsbezerra.cashflow.domain.model.AccountType NOT NULL,
+    type TEXT AS com.github.dsbezerra.cashflow.core.domain.model.AccountType NOT NULL,
     currency TEXT NOT NULL,
     initialBalance REAL NOT NULL,
     color TEXT NOT NULL,

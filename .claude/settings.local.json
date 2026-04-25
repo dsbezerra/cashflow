@@ -18,7 +18,10 @@
       "Bash(xargs grep:*)",
       "Bash(xargs cat:*)",
       "Bash(unzip -q \"C:\\\\Users\\\\Diego\\\\.gradle\\\\caches\\\\modules-2\\\\files-2.1\\\\io.github.ehsannarmani\\\\compose-charts\\\\0.2.5\\\\f88ae419ee0fc09160993754ca3c8505e7201e64\\\\compose-charts-0.2.5-sources.jar\")",
-      "Bash(grep -E \"\\\\.kt$\")"
+      "Bash(grep -E \"\\\\.kt$\")",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(xargs head:*)"
     ]
   }
 }

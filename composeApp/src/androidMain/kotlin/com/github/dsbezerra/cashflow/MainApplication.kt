@@ -1,7 +1,7 @@
 package com.github.dsbezerra.cashflow
 
 import android.app.Application
-import com.github.dsbezerra.cashflow.di.appModules
+import com.github.dsbezerra.cashflow.core.di.appModules
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
