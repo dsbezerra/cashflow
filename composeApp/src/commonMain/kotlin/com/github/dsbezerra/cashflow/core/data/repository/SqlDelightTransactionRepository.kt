@@ -1,7 +1,12 @@
 package com.github.dsbezerra.cashflow.core.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.paging3.QueryPagingSource
 import com.github.dsbezerra.cashflow.core.data.mapper.toDomain
 import com.github.dsbezerra.cashflow.core.data.mapper.toEntity
 import com.github.dsbezerra.cashflow.db.TransactionQueries
@@ -56,6 +61,16 @@ class SqlDelightTransactionRepository(
             )
         }
     }
+
+    override fun getPagedTransactions(pageSize: Int): Flow<PagingData<Transaction>> =
+        Pager(PagingConfig(pageSize = pageSize, enablePlaceholders = false)) {
+            QueryPagingSource(
+                countQuery = queries.countAll(),
+                transacter = queries,
+                context = dispatcher,
+                queryProvider = queries::selectAllPaged,
+            )
+        }.flow.map { pagingData -> pagingData.map { it.toDomain() } }
 
     override suspend fun delete(id: String) {
         withContext(dispatcher) { queries.delete(id) }

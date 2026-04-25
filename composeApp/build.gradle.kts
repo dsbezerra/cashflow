@@ -56,6 +56,9 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.compose.charts)
+            implementation(libs.androidx.paging.common)
+            implementation(libs.androidx.paging.compose)
+            implementation(libs.sqldelight.paging)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

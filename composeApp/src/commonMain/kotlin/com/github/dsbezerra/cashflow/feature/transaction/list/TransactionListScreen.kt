@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -21,23 +24,16 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.dsbezerra.cashflow.core.domain.model.Transaction
 import com.github.dsbezerra.cashflow.core.designsystem.component.AmountText
 import com.github.dsbezerra.cashflow.core.designsystem.component.DSFullscreenLoader
-import com.github.dsbezerra.cashflow.feature.dashboard.RecentTransaction
+import com.github.dsbezerra.cashflow.core.domain.model.Transaction
 import com.github.dsbezerra.cashflow.util.formatFullPtBr
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -45,7 +41,7 @@ fun TransactionListScreen(
     onNavigateToDetail: (String?) -> Unit,
     viewModel: TransactionListViewModel = koinViewModel(),
 ) {
-    val state by viewModel.state.collectAsState()
+    val lazyPagingItems: LazyPagingItems<TransactionListItem> = viewModel.transactions.collectAsLazyPagingItems()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
 
@@ -59,42 +55,64 @@ fun TransactionListScreen(
 
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            if (state.isLoading) {
-                DSFullscreenLoader()
-            } else if (state.transactions.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Nenhuma transação ainda", style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            "Toque em + para adicionar sua primeira transação",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+            when {
+                lazyPagingItems.loadState.refresh is LoadState.Loading -> {
+                    DSFullscreenLoader()
                 }
-            } else {
-                val grouped = state.transactions.groupBy { tx ->
-                    Instant.fromEpochMilliseconds(tx.date)
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                        .date
-                }
-                LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                    grouped.forEach { (date, transactions) ->
-                        stickyHeader(key = date.toString()) {
-                            DateHeader(
-                                date
+
+                lazyPagingItems.itemCount == 0 -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                "Nenhuma transação ainda",
+                                style = MaterialTheme.typography.titleMedium,
                             )
-                        }
-                        items(transactions, key = { it.id }) { tx ->
-                            TransactionRow(
-                                transaction = tx,
-                                onClick = { onNavigateToDetail(tx.id) },
+                            Text(
+                                "Toque em + para adicionar sua primeira transação",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            HorizontalDivider()
                         }
                     }
                 }
-                DesktopVerticalScrollbar(listState)
+
+                else -> {
+                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+                        items(
+                            count = lazyPagingItems.itemCount,
+                            key = lazyPagingItems.itemKey { item ->
+                                when (item) {
+                                    is TransactionListItem.Header -> "header-${item.date}"
+                                    is TransactionListItem.Entry -> item.transaction.id
+                                }
+                            },
+                        ) { index ->
+                            when (val item = lazyPagingItems[index]) {
+                                is TransactionListItem.Header -> DateHeader(item.date)
+                                is TransactionListItem.Entry -> {
+                                    TransactionRow(
+                                        transaction = item.transaction,
+                                        onClick = { onNavigateToDetail(item.transaction.id) },
+                                    )
+                                    HorizontalDivider()
+                                }
+                                null -> {}
+                            }
+                        }
+
+                        if (lazyPagingItems.loadState.append is LoadState.Loading) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
+                    }
+                    DesktopVerticalScrollbar(listState)
+                }
             }
         }
     }
