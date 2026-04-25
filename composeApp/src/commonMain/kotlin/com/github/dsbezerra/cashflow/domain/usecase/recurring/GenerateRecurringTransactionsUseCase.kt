@@ -8,9 +8,9 @@ import com.github.dsbezerra.cashflow.domain.repository.TransactionRepository
 import com.github.dsbezerra.cashflow.util.generateId
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
+import kotlin.time.Instant
 
 class GenerateRecurringTransactionsUseCase(
     private val recurringRuleRepository: RecurringRuleRepository,

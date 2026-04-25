@@ -50,7 +50,7 @@ fun App() {
                                 Text("Nova transação")
                             },
                             icon = {
-                                Icon(Icons.Default.Add, contentDescription = "Nova Transação")
+                                Icon(Icons.Default.Add, contentDescription = "Nova transação")
                             },
                             onClick = {
                                 navController.navigate(TransactionDetail())
@@ -59,11 +59,17 @@ fun App() {
                     }
 
                     isOnAccounts -> {
-                        FloatingActionButton(onClick = {
-                            navController.navigate(AccountForm())
-                        }) {
-                            Icon(Icons.Default.Add, contentDescription = "Nova Conta")
-                        }
+                        ExtendedFloatingActionButton(
+                            text = {
+                                Text("Nova conta")
+                            },
+                            icon = {
+                                Icon(Icons.Default.Add, contentDescription = "Nova conta")
+                            },
+                            onClick = {
+                                navController.navigate(AccountForm())
+                            }
+                        )
                     }
                 }
             },
