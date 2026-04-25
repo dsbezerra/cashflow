@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
+import com.github.dsbezerra.cashflow.ui.designsystem.components.input.ChipSelector
+import com.github.dsbezerra.cashflow.ui.designsystem.components.input.CurrencyTextField
 import androidx.compose.foundation.verticalScroll
 import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
 import androidx.compose.material.icons.Icons
@@ -19,13 +20,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -46,10 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.github.dsbezerra.cashflow.domain.model.Account
-import com.github.dsbezerra.cashflow.domain.model.Category
 import com.github.dsbezerra.cashflow.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.util.formatPtBr
@@ -141,11 +135,10 @@ fun TransactionDetailScreen(
             }
 
             // Amount
-            OutlinedTextField(
-                value = state.amountInput,
+            CurrencyTextField(
+                value = state.amountInCents,
                 onValueChange = { viewModel.onAction(TransactionDetailAction.AmountChanged(it)) },
-                label = { Text("Valor") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                label = "Valor",
                 isError = state.amountError != null,
                 supportingText = state.amountError?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
@@ -180,53 +173,33 @@ fun TransactionDetailScreen(
                         else -> true
                     }
                 }
-                AccountOrCategoryDropdown(
+                ChipSelector(
                     label = "Categoria",
                     selectedId = state.selectedCategoryId,
                     items = filteredCategories.map { it.id to it.name },
                     isError = state.categoryError != null,
                     errorText = state.categoryError,
-                    onSelect = {
-                        viewModel.onAction(
-                            TransactionDetailAction.CategorySelected(
-                                it
-                            )
-                        )
-                    },
+                    onSelect = { viewModel.onAction(TransactionDetailAction.CategorySelected(it)) },
                 )
             }
 
             // Account
-                AccountOrCategoryDropdown(
-                    label = if (state.type == TransactionType.TRANSFER) "Conta de Origem" else "Conta",
-                    selectedId = state.selectedAccountId,
-                    items = state.accounts.map { it.id to it.name },
-                    isError = state.accountError != null,
-                    errorText = state.accountError,
-                    onSelect = {
-                        viewModel.onAction(
-                            TransactionDetailAction.AccountSelected(
-                                it
-                            )
-                        )
-                    },
-                )
+            ChipSelector(
+                label = if (state.type == TransactionType.TRANSFER) "Conta de Origem" else "Conta",
+                selectedId = state.selectedAccountId,
+                items = state.accounts.map { it.id to it.name },
+                isError = state.accountError != null,
+                errorText = state.accountError,
+                onSelect = { viewModel.onAction(TransactionDetailAction.AccountSelected(it)) },
+            )
 
             // To Account (TRANSFER only)
             if (state.type == TransactionType.TRANSFER) {
-                AccountOrCategoryDropdown(
+                ChipSelector(
                     label = "Conta de Destino",
                     selectedId = state.selectedToAccountId,
                     items = state.accounts.map { it.id to it.name },
-                    isError = false,
-                    errorText = null,
-                    onSelect = {
-                        viewModel.onAction(
-                            TransactionDetailAction.ToAccountSelected(
-                                it
-                            )
-                        )
-                    },
+                    onSelect = { viewModel.onAction(TransactionDetailAction.ToAccountSelected(it)) },
                 )
             }
 
@@ -288,49 +261,5 @@ fun TransactionDetailScreen(
                 TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar") }
             },
         )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AccountOrCategoryDropdown(
-    label: String,
-    selectedId: String?,
-    items: List<Pair<String, String>>,
-    isError: Boolean,
-    errorText: String?,
-    onSelect: (String) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selectedName = items.firstOrNull { it.first == selectedId }?.second ?: ""
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-    ) {
-        OutlinedTextField(
-            value = selectedName,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            isError = isError,
-            supportingText = errorText?.let { { Text(it) } },
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            items.forEach { (id, name) ->
-                DropdownMenuItem(
-                    text = { Text(name) },
-                    onClick = {
-                        onSelect(id)
-                        expanded = false
-                    },
-                )
-            }
-        }
     }
 }

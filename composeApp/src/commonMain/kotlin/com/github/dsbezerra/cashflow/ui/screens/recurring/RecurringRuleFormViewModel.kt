@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.math.roundToLong
 import kotlin.time.Clock
 
 class RecurringRuleFormViewModel(
@@ -44,7 +45,7 @@ class RecurringRuleFormViewModel(
                             isEditMode = true,
                             isLoading = false,
                             description = rule.description,
-                            amountInput = rule.amount.toString(),
+                            amountInCents = (rule.amount.toDouble() * 100).roundToLong(),
                             type = rule.type,
                             selectedAccountId = rule.accountId,
                             selectedCategoryId = rule.categoryId,
@@ -75,7 +76,7 @@ class RecurringRuleFormViewModel(
     fun onAction(action: RecurringRuleFormAction) {
         when (action) {
             is RecurringRuleFormAction.DescriptionChanged -> _state.update { it.copy(description = action.description, descriptionError = null) }
-            is RecurringRuleFormAction.AmountChanged -> _state.update { it.copy(amountInput = action.amount, amountError = null) }
+            is RecurringRuleFormAction.AmountChanged -> _state.update { it.copy(amountInCents = action.cents, amountError = null) }
             is RecurringRuleFormAction.TypeChanged -> _state.update { it.copy(type = action.type, selectedCategoryId = null) }
             is RecurringRuleFormAction.AccountSelected -> _state.update { it.copy(selectedAccountId = action.accountId, accountError = null) }
             is RecurringRuleFormAction.CategorySelected -> _state.update { it.copy(selectedCategoryId = action.categoryId, categoryError = null) }
@@ -93,11 +94,11 @@ class RecurringRuleFormViewModel(
         val s = _state.value
         var hasError = false
 
-        val amount = s.amountInput.toDoubleOrNull()
-        if (amount == null || amount <= 0.0) {
+        if (s.amountInCents <= 0L) {
             _state.update { it.copy(amountError = "Informe um valor válido") }
             hasError = true
         }
+        val amount = s.amountInCents / 100.0
         if (s.description.isBlank()) {
             _state.update { it.copy(descriptionError = "Descrição é obrigatória") }
             hasError = true
@@ -121,7 +122,7 @@ class RecurringRuleFormViewModel(
                     recurringRuleRepository.update(
                         existing.copy(
                             description = s.description,
-                            amount = amount?.toDecimal()!!,
+                            amount = amount.toDecimal(),
                             type = s.type,
                             accountId = s.selectedAccountId!!,
                             categoryId = s.selectedCategoryId!!,
@@ -139,7 +140,7 @@ class RecurringRuleFormViewModel(
                             accountId = s.selectedAccountId!!,
                             categoryId = s.selectedCategoryId!!,
                             type = s.type,
-                            amount = amount?.toDecimal()!!,
+                            amount = amount.toDecimal(),
                             description = s.description,
                             frequency = s.frequency,
                             interval = s.interval,

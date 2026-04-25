@@ -5,7 +5,7 @@ import com.github.dsbezerra.cashflow.domain.model.TransactionType
 
 sealed interface RecurringRuleFormAction {
     data class DescriptionChanged(val description: String) : RecurringRuleFormAction
-    data class AmountChanged(val amount: String) : RecurringRuleFormAction
+    data class AmountChanged(val cents: Long) : RecurringRuleFormAction
     data class TypeChanged(val type: TransactionType) : RecurringRuleFormAction
     data class AccountSelected(val accountId: String) : RecurringRuleFormAction
     data class CategorySelected(val categoryId: String) : RecurringRuleFormAction

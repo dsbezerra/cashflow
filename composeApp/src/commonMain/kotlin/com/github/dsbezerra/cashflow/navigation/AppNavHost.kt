@@ -32,6 +32,13 @@ fun AppNavHost(
     ) {
         composable<Dashboard> {
             DashboardScreen(
+                onSeeAll = {
+                    navController.navigate(TransactionList) {
+                        popUpTo(Dashboard) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 onNavigateToTransaction = { id ->
                     navController.navigate(TransactionDetail(transactionId = id))
                 },

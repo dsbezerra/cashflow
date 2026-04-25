@@ -9,7 +9,7 @@ sealed interface AccountFormAction {
         AccountFormAction
     data class CurrencyChanged(val currency: String) :
         AccountFormAction
-    data class InitialBalanceChanged(val value: String) :
+    data class InitialBalanceChanged(val cents: Long) :
         AccountFormAction
     data class ColorChanged(val color: String) :
         AccountFormAction

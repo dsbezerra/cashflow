@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.math.roundToLong
 import kotlin.time.Clock
 
 class TransactionDetailViewModel(
@@ -52,7 +53,7 @@ class TransactionDetailViewModel(
                         it.copy(
                             transactionId = tx.id,
                             type = tx.type,
-                            amountInput = tx.amount.toString(),
+                            amountInCents = (tx.amount.toDouble() * 100).roundToLong(),
                             description = tx.description,
                             selectedDate = tx.date,
                             selectedCategoryId = tx.categoryId,
@@ -87,7 +88,7 @@ class TransactionDetailViewModel(
     fun onAction(action: TransactionDetailAction) {
         when (action) {
             is TransactionDetailAction.TypeChanged -> _state.update { it.copy(type = action.type, selectedCategoryId = null) }
-            is TransactionDetailAction.AmountChanged -> _state.update { it.copy(amountInput = action.amount, amountError = null) }
+            is TransactionDetailAction.AmountChanged -> _state.update { it.copy(amountInCents = action.cents, amountError = null) }
             is TransactionDetailAction.DescriptionChanged -> _state.update { it.copy(description = action.description, descriptionError = null) }
             is TransactionDetailAction.DateChanged -> _state.update { it.copy(selectedDate = action.epochMillis) }
             is TransactionDetailAction.CategorySelected -> _state.update { it.copy(selectedCategoryId = action.categoryId, categoryError = null) }
@@ -103,11 +104,11 @@ class TransactionDetailViewModel(
         val s = _state.value
         var hasError = false
 
-        val amount = s.amountInput.toDoubleOrNull()
-        if (amount == null || amount <= 0.0) {
+        if (s.amountInCents <= 0L) {
             _state.update { it.copy(amountError = "Enter a valid amount") }
             hasError = true
         }
+        val amount = s.amountInCents / 100.0
         if (s.description.isBlank()) {
             _state.update { it.copy(descriptionError = "Description is required") }
             hasError = true
@@ -132,7 +133,7 @@ class TransactionDetailViewModel(
                         createTransferUseCase(
                             fromAccountId = s.selectedAccountId!!,
                             toAccountId = s.selectedToAccountId ?: s.selectedAccountId,
-                            amount = amount!!,
+                            amount = amount,
                             description = s.description,
                             date = s.selectedDate,
                             categoryId = s.selectedCategoryId ?: "",
@@ -144,7 +145,7 @@ class TransactionDetailViewModel(
                         transactionRepository.update(
                             existing.copy(
                                 type = s.type,
-                                amount = amount?.toDecimal()!!,
+                                amount = amount.toDecimal(),
                                 description = s.description,
                                 date = s.selectedDate,
                                 categoryId = s.selectedCategoryId!!,
@@ -161,7 +162,7 @@ class TransactionDetailViewModel(
                                 accountId = s.selectedAccountId!!,
                                 categoryId = s.selectedCategoryId!!,
                                 type = s.type,
-                                amount = amount?.toDecimal()!!,
+                                amount = amount.toDecimal(),
                                 description = s.description,
                                 date = s.selectedDate,
                                 notes = s.notes.ifBlank { null },

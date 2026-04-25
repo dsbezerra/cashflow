@@ -12,7 +12,7 @@ data class RecurringRuleFormState(
     val isSaving: Boolean = false,
     val description: String = "",
     val descriptionError: String? = null,
-    val amountInput: String = "",
+    val amountInCents: Long = 0L,
     val amountError: String? = null,
     val type: TransactionType = TransactionType.EXPENSE,
     val selectedAccountId: String? = null,

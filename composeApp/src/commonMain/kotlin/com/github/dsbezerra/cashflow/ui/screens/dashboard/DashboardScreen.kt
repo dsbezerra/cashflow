@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,6 +36,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -73,6 +75,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DashboardScreen(
+    onSeeAll: () -> Unit,
     onNavigateToTransaction: (String?) -> Unit,
     viewModel: DashboardViewModel = koinViewModel(),
 ) {
@@ -121,6 +124,7 @@ fun DashboardScreen(
             } else {
                 DashboardContent(
                     state = state,
+                    onSeeAll = onSeeAll,
                     onNavigateToTransaction = onNavigateToTransaction,
                 )
             }
@@ -131,6 +135,7 @@ fun DashboardScreen(
 @Composable
 private fun DashboardContent(
     state: DashboardState,
+    onSeeAll: () -> Unit,
     onNavigateToTransaction: (String?) -> Unit,
 ) {
     val summary = state.summary ?: return
@@ -155,6 +160,7 @@ private fun DashboardContent(
             item {
                 RecentTransactions(
                     transactions = summary.recentTransactions,
+                    onSeeAll = onSeeAll,
                     onTransactionClick = { onNavigateToTransaction(it) },
                 )
             }
@@ -251,7 +257,7 @@ private fun SummaryCards(summary: DashboardSummary) {
             label = "Despesas",
             amount = summary.monthlyExpenses,
             color = cashFlowColors.expense,
-            icon = Icons.Filled.ArrowUpward,
+            icon = Icons.Filled.ArrowDownward,
             modifier = Modifier.weight(1f),
         )
     }
@@ -403,15 +409,33 @@ private fun IncomeExpenseBarChart(breakdown: List<MonthlyAmount>) {
 @Composable
 private fun RecentTransactions(
     transactions: List<RecentTransaction>,
+    onSeeAll: () -> Unit,
     onTransactionClick: (String) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Recentes",
-            style = MaterialTheme.typography.titleSmallEmphasized,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "Recentes",
+                style = MaterialTheme.typography.titleSmallEmphasized,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+            if (transactions.isNotEmpty()) {
+                TextButton(
+                    onClick = onSeeAll,
+                ) {
+                    Text(
+                        text = "Ver tudo",
+                        style = MaterialTheme.typography.labelSmallEmphasized,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+        }
         if (transactions.isEmpty()) {
             Text(
                 text = "Nenhuma transação neste mês",

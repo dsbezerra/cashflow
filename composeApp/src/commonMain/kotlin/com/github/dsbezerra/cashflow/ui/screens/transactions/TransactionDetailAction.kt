@@ -5,7 +5,7 @@ import com.github.dsbezerra.cashflow.domain.model.TransactionType
 sealed interface TransactionDetailAction {
     data class TypeChanged(val type: TransactionType) :
         TransactionDetailAction
-    data class AmountChanged(val amount: String) :
+    data class AmountChanged(val cents: Long) :
         TransactionDetailAction
     data class DescriptionChanged(val description: String) :
         TransactionDetailAction

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.math.roundToLong
 import kotlin.time.Clock
 
 class AccountFormViewModel(
@@ -34,7 +35,7 @@ class AccountFormViewModel(
                     name = account.name,
                     type = account.type,
                     currency = account.currency,
-                    initialBalanceInput = account.initialBalance.toString(),
+                    initialBalanceInCents = (account.initialBalance.toDouble() * 100).roundToLong(),
                     color = account.color,
                     icon = account.icon,
                     isArchived = account.isArchived,
@@ -49,7 +50,7 @@ class AccountFormViewModel(
             is AccountFormAction.NameChanged -> _state.update { it.copy(name = action.name, nameError = null) }
             is AccountFormAction.TypeChanged -> _state.update { it.copy(type = action.type) }
             is AccountFormAction.CurrencyChanged -> _state.update { it.copy(currency = action.currency) }
-            is AccountFormAction.InitialBalanceChanged -> _state.update { it.copy(initialBalanceInput = action.value, initialBalanceError = null) }
+            is AccountFormAction.InitialBalanceChanged -> _state.update { it.copy(initialBalanceInCents = action.cents, initialBalanceError = null) }
             is AccountFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
             is AccountFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
             AccountFormAction.Save -> save()
@@ -65,11 +66,7 @@ class AccountFormViewModel(
             _state.update { it.copy(nameError = "Nome é obrigatório") }
             hasError = true
         }
-        val balance = s.initialBalanceInput.toDoubleOrNull()
-        if (balance == null) {
-            _state.update { it.copy(initialBalanceError = "Saldo inicial inválido") }
-            hasError = true
-        }
+        val balance = s.initialBalanceInCents / 100.0
         if (hasError) return
 
         _state.update { it.copy(isSaving = true) }
@@ -84,7 +81,7 @@ class AccountFormViewModel(
                             name = s.name,
                             type = s.type,
                             currency = s.currency,
-                            initialBalance = balance?.toDecimal()!!,
+                            initialBalance = balance.toDecimal(),
                             color = s.color,
                             icon = s.icon,
                             isArchived = s.isArchived,
@@ -97,7 +94,7 @@ class AccountFormViewModel(
                             name = s.name,
                             type = s.type,
                             currency = s.currency,
-                            initialBalance = balance?.toDecimal()!!,
+                            initialBalance = balance.toDecimal(),
                             color = s.color,
                             icon = s.icon,
                             isArchived = false,

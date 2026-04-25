@@ -8,7 +8,7 @@ import kotlin.time.Clock
 data class TransactionDetailState(
     val transactionId: String? = null,
     val type: TransactionType = TransactionType.EXPENSE,
-    val amountInput: String = "",
+    val amountInCents: Long = 0L,
     val description: String = "",
     val selectedDate: Long = Clock.System.now().toEpochMilliseconds(),
     val selectedCategoryId: String? = null,

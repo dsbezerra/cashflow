@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import com.github.dsbezerra.cashflow.ui.designsystem.components.input.ChipSelector
+import com.github.dsbezerra.cashflow.ui.designsystem.components.input.CurrencyTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -54,7 +56,6 @@ import com.github.dsbezerra.cashflow.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.domain.model.Frequency
 import com.github.dsbezerra.cashflow.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.ui.common.DesktopVerticalScrollbar
-import com.github.dsbezerra.cashflow.ui.screens.recurring.labelPtBr
 import com.github.dsbezerra.cashflow.util.formatPtBr
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.Instant
@@ -152,30 +153,23 @@ fun RecurringRuleFormScreen(
                 )
 
                 // Amount
-                OutlinedTextField(
-                    value = state.amountInput,
+                CurrencyTextField(
+                    value = state.amountInCents,
                     onValueChange = { viewModel.onAction(RecurringRuleFormAction.AmountChanged(it)) },
-                    label = { Text("Valor") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    label = "Valor",
                     isError = state.amountError != null,
                     supportingText = state.amountError?.let { { Text(it) } },
                     modifier = Modifier.fillMaxWidth(),
                 )
 
                 // Account
-                RuleDropdown(
+                ChipSelector(
                     label = "Conta",
                     selectedId = state.selectedAccountId,
                     items = state.availableAccounts.map { it.id to it.name },
                     isError = state.accountError != null,
                     errorText = state.accountError,
-                    onSelect = {
-                        viewModel.onAction(
-                            RecurringRuleFormAction.AccountSelected(
-                                it
-                            )
-                        )
-                    },
+                    onSelect = { viewModel.onAction(RecurringRuleFormAction.AccountSelected(it)) },
                 )
 
                 // Category (filtered by type)
@@ -186,33 +180,22 @@ fun RecurringRuleFormScreen(
                         else -> true
                     }
                 }
-                RuleDropdown(
+                ChipSelector(
                     label = "Categoria",
                     selectedId = state.selectedCategoryId,
                     items = filteredCategories.map { it.id to it.name },
                     isError = state.categoryError != null,
                     errorText = state.categoryError,
-                    onSelect = {
-                        viewModel.onAction(
-                            RecurringRuleFormAction.CategorySelected(
-                                it
-                            )
-                        )
-                    },
+                    onSelect = { viewModel.onAction(RecurringRuleFormAction.CategorySelected(it)) },
                 )
 
-                // Frequency
-                RuleStringDropdown(
+                ChipSelector(
                     label = "Frequência",
-                    selectedValue = state.frequency.labelPtBr(),
-                    options = Frequency.entries.map { it.labelPtBr() },
+                    selectedId = state.frequency.name,
+                    items = Frequency.entries.map { it.name to it.labelPtBr() },
                     onSelect = { selected ->
-                        val freq = Frequency.entries.first { it.labelPtBr() == selected }
-                        viewModel.onAction(
-                            RecurringRuleFormAction.FrequencyChanged(
-                                freq
-                            )
-                        )
+                        val freq = Frequency.entries.first { it.name == selected }
+                        viewModel.onAction(RecurringRuleFormAction.FrequencyChanged(freq))
                     },
                 )
 
@@ -343,87 +326,4 @@ private fun Frequency.labelPtBr(): String = when (this) {
     Frequency.WEEKLY -> "Semanal"
     Frequency.MONTHLY -> "Mensal"
     Frequency.YEARLY -> "Anual"
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun RuleDropdown(
-    label: String,
-    selectedId: String?,
-    items: List<Pair<String, String>>,
-    isError: Boolean,
-    errorText: String?,
-    onSelect: (String) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selectedName = items.firstOrNull { it.first == selectedId }?.second ?: ""
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-    ) {
-        OutlinedTextField(
-            value = selectedName,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            isError = isError,
-            supportingText = errorText?.let { { Text(it) } },
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            items.forEach { (id, name) ->
-                DropdownMenuItem(
-                    text = { Text(name) },
-                    onClick = {
-                        onSelect(id)
-                        expanded = false
-                    },
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun RuleStringDropdown(
-    label: String,
-    selectedValue: String,
-    options: List<String>,
-    onSelect: (String) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-    ) {
-        OutlinedTextField(
-            value = selectedValue,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onSelect(option)
-                        expanded = false
-                    },
-                )
-            }
-        }
-    }
 }

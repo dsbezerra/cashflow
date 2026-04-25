@@ -8,7 +8,7 @@ data class AccountFormState(
     val nameError: String? = null,
     val type: AccountType = AccountType.CHECKING,
     val currency: String = "BRL",
-    val initialBalanceInput: String = "0",
+    val initialBalanceInCents: Long = 0L,
     val initialBalanceError: String? = null,
     val color: String = "#4CAF50",
     val icon: String = "account_balance",
