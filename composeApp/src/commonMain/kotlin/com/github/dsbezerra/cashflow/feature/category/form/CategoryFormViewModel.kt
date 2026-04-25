@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 
 class CategoryFormViewModel(
@@ -81,7 +82,7 @@ class CategoryFormViewModel(
         _state.update { it.copy(isSaving = true) }
 
         viewModelScope.launch {
-            runCatching {
+            safeRunCatching {
                 if (s.isEditMode) {
                     val existing = categoryRepository.getById(s.categoryId!!)!!
                     categoryRepository.update(
@@ -122,7 +123,7 @@ class CategoryFormViewModel(
     private fun delete() {
         val id = _state.value.categoryId ?: return
         viewModelScope.launch {
-            runCatching { categoryRepository.delete(id) }
+            safeRunCatching { categoryRepository.delete(id) }
                 .onSuccess { _events.send(CategoryFormEvent.NavigateBack) }
                 .onFailure { _events.send(CategoryFormEvent.ShowError("Falha ao excluir categoria")) }
         }

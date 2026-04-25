@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 import kotlin.math.roundToLong
 import kotlin.time.Clock
@@ -70,7 +71,7 @@ class TransactionDetailViewModel(
             }
 
             val prefilledType = defaultType?.let {
-                runCatching { TransactionType.valueOf(it) }.getOrNull()
+                safeRunCatching { TransactionType.valueOf(it) }.getOrNull()
             }
             val resolvedAccountId = defaultAccountId ?: accountRepository.getDefault()?.id
             _state.update {
@@ -126,7 +127,7 @@ class TransactionDetailViewModel(
         _state.update { it.copy(isSaving = true) }
 
         viewModelScope.launch {
-            runCatching {
+            safeRunCatching {
                 val now = Clock.System.now().toEpochMilliseconds()
                 when {
                     s.type == TransactionType.TRANSFER -> {
@@ -187,7 +188,7 @@ class TransactionDetailViewModel(
     private fun delete() {
         val id = _state.value.transactionId ?: return
         viewModelScope.launch {
-            runCatching { deleteTransactionUseCase(id) }
+            safeRunCatching { deleteTransactionUseCase(id) }
                 .onSuccess { _events.send(TransactionDetailEvent.NavigateBack) }
                 .onFailure { _events.send(TransactionDetailEvent.ShowError("Failed to delete transaction")) }
         }

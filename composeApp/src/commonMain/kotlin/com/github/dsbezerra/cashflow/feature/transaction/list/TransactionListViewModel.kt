@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 
 class TransactionListViewModel(
@@ -37,7 +38,7 @@ class TransactionListViewModel(
             }
             is TransactionListAction.DeleteTransaction -> {
                 viewModelScope.launch {
-                    runCatching { deleteTransactionUseCase(action.id) }
+                    safeRunCatching { deleteTransactionUseCase(action.id) }
                         .onFailure {
                             _events.send(TransactionListEvent.ShowError("Failed to delete transaction"))
                         }

@@ -15,14 +15,16 @@ import androidx.compose.foundation.verticalScroll
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import com.github.dsbezerra.cashflow.core.designsystem.component.IconButtonWithTooltip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -35,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryType
@@ -78,9 +82,6 @@ fun TransactionDetailScreen(
         }
     }
 
-    var showDatePicker by remember { mutableStateOf(false) }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -90,36 +91,76 @@ fun TransactionDetailScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
                     }
                 },
-                actions = {
-                    if (state.isEditMode) {
-                        IconButtonWithTooltip(onClick = { showDeleteConfirm = true }, tooltip = "Excluir") {
-                            Icon(Icons.Default.Delete, contentDescription = "Excluir")
-                        }
-                    }
-                },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
-        val scrollState = rememberScrollState()
-        Box(
+        TransactionFormBody(
+            state = state,
+            onAction = viewModel::onAction,
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TransactionFormSheet(
+    onDismiss: () -> Unit,
+    viewModel: TransactionDetailViewModel = koinViewModel(),
+) {
+    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.initialize(null)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                is TransactionDetailEvent.NavigateBack -> onDismiss()
+                is TransactionDetailEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+            }
+        }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    ) {
+        Box {
+            TransactionFormBody(state = state, onAction = viewModel::onAction)
+            SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TransactionFormBody(
+    state: TransactionDetailState,
+    onAction: (TransactionDetailAction) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
             // Type selector
             SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                 TransactionType.entries.forEachIndexed { index, type ->
                     SegmentedButton(
                         selected = state.type == type,
-                        onClick = { viewModel.onAction(TransactionDetailAction.TypeChanged(type)) },
+                        onClick = { onAction(TransactionDetailAction.TypeChanged(type)) },
                         shape = SegmentedButtonDefaults.itemShape(index, TransactionType.entries.size),
                         label = {
                             Text(
@@ -137,7 +178,7 @@ fun TransactionDetailScreen(
             // Amount
             CurrencyTextField(
                 value = state.amountInCents,
-                onValueChange = { viewModel.onAction(TransactionDetailAction.AmountChanged(it)) },
+                onValueChange = { onAction(TransactionDetailAction.AmountChanged(it)) },
                 label = "Valor",
                 isError = state.amountError != null,
                 supportingText = state.amountError?.let { { Text(it) } },
@@ -147,7 +188,7 @@ fun TransactionDetailScreen(
             // Description
             OutlinedTextField(
                 value = state.description,
-                onValueChange = { viewModel.onAction(TransactionDetailAction.DescriptionChanged(it)) },
+                onValueChange = { onAction(TransactionDetailAction.DescriptionChanged(it)) },
                 label = { Text("Descrição") },
                 isError = state.descriptionError != null,
                 supportingText = state.descriptionError?.let { { Text(it) } },
@@ -179,7 +220,7 @@ fun TransactionDetailScreen(
                     items = filteredCategories.map { it.id to it.name },
                     isError = state.categoryError != null,
                     errorText = state.categoryError,
-                    onSelect = { viewModel.onAction(TransactionDetailAction.CategorySelected(it)) },
+                    onSelect = { onAction(TransactionDetailAction.CategorySelected(it)) },
                 )
             }
 
@@ -190,7 +231,7 @@ fun TransactionDetailScreen(
                 items = state.accounts.map { it.id to it.name },
                 isError = state.accountError != null,
                 errorText = state.accountError,
-                onSelect = { viewModel.onAction(TransactionDetailAction.AccountSelected(it)) },
+                onSelect = { onAction(TransactionDetailAction.AccountSelected(it)) },
             )
 
             // To Account (TRANSFER only)
@@ -199,14 +240,14 @@ fun TransactionDetailScreen(
                     label = "Conta de Destino",
                     selectedId = state.selectedToAccountId,
                     items = state.accounts.map { it.id to it.name },
-                    onSelect = { viewModel.onAction(TransactionDetailAction.ToAccountSelected(it)) },
+                    onSelect = { onAction(TransactionDetailAction.ToAccountSelected(it)) },
                 )
             }
 
             // Notes
             OutlinedTextField(
                 value = state.notes,
-                onValueChange = { viewModel.onAction(TransactionDetailAction.NotesChanged(it)) },
+                onValueChange = { onAction(TransactionDetailAction.NotesChanged(it)) },
                 label = { Text("Notas (opcional)") },
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth(),
@@ -215,15 +256,29 @@ fun TransactionDetailScreen(
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = { viewModel.onAction(TransactionDetailAction.Save) },
+                onClick = { onAction(TransactionDetailAction.Save) },
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(if (state.isSaving) "Salvando..." else "Salvar")
             }
+
+            if (state.isEditMode) {
+                Button(
+                    onClick = { showDeleteConfirm = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Excluir Transação")
+                }
             }
-            DesktopVerticalScrollbar(scrollState)
+
+            Spacer(Modifier.height(8.dp))
         }
+        DesktopVerticalScrollbar(scrollState)
     }
 
     if (showDatePicker) {
@@ -233,7 +288,7 @@ fun TransactionDetailScreen(
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let {
-                        viewModel.onAction(TransactionDetailAction.DateChanged(it))
+                        onAction(TransactionDetailAction.DateChanged(it))
                     }
                     showDatePicker = false
                 }) { Text("OK") }
@@ -254,7 +309,7 @@ fun TransactionDetailScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
-                    viewModel.onAction(TransactionDetailAction.ConfirmDelete)
+                    onAction(TransactionDetailAction.ConfirmDelete)
                 }) { Text("Excluir") }
             },
             dismissButton = {

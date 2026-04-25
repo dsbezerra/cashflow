@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
@@ -81,7 +82,7 @@ class DashboardViewModel(
     private fun startCollecting() {
         val s = _state.value
         collectJob = viewModelScope.launch {
-            runCatching {
+            safeRunCatching {
                 combine(
                     getDashboardSummary(s.selectedAccountId, s.selectedYear, s.selectedMonth),
                     categoryRepository.getAll(),

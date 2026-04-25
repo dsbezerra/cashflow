@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 
 class AccountDetailViewModel(
@@ -69,7 +70,7 @@ class AccountDetailViewModel(
     private fun delete() {
         val id = _state.value.account?.id ?: return
         viewModelScope.launch {
-            runCatching { accountRepository.delete(id) }
+            safeRunCatching { accountRepository.delete(id) }
                 .onSuccess { _events.send(AccountDetailEvent.NavigateBack) }
                 .onFailure { _events.send(AccountDetailEvent.ShowError("Falha ao excluir conta")) }
         }
@@ -78,7 +79,7 @@ class AccountDetailViewModel(
     private fun archive() {
         val account = _state.value.account ?: return
         viewModelScope.launch {
-            runCatching { accountRepository.update(account.copy(isArchived = true)) }
+            safeRunCatching { accountRepository.update(account.copy(isArchived = true)) }
                 .onSuccess { _events.send(AccountDetailEvent.NavigateBack) }
                 .onFailure { _events.send(AccountDetailEvent.ShowError("Falha ao arquivar conta")) }
         }

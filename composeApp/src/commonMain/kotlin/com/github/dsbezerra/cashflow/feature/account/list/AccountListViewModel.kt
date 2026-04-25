@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 
 class AccountListViewModel(
@@ -36,7 +37,7 @@ class AccountListViewModel(
                 startCollecting()
             }
             is AccountListAction.SetDefault -> viewModelScope.launch {
-                runCatching { accountRepository.setDefault(action.accountId) }
+                safeRunCatching { accountRepository.setDefault(action.accountId) }
                     .onFailure { _events.send(AccountListEvent.ShowError("Falha ao definir conta padrão")) }
             }
         }
@@ -48,7 +49,7 @@ class AccountListViewModel(
                 val visible = accounts.filter { !it.isArchived }
                 val withBalances = mutableListOf<AccountWithBalance>()
                 for (account in visible) {
-                    val balance = runCatching { getAccountBalanceUseCase(account) }
+                    val balance = safeRunCatching { getAccountBalanceUseCase(account) }
                         .getOrDefault(account.initialBalance)
                     withBalances.add(AccountWithBalance(account, balance))
                 }

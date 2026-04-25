@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 import kotlin.math.roundToLong
 import kotlin.time.Clock
@@ -116,9 +117,9 @@ class RecurringRuleFormViewModel(
         _state.update { it.copy(isSaving = true) }
 
         viewModelScope.launch {
-            runCatching {
+            safeRunCatching {
                 if (s.isEditMode && s.ruleId != null) {
-                    val existing = recurringRuleRepository.getById(s.ruleId) ?: return@runCatching
+                    val existing = recurringRuleRepository.getById(s.ruleId) ?: return@safeRunCatching
                     recurringRuleRepository.update(
                         existing.copy(
                             description = s.description,
@@ -163,7 +164,7 @@ class RecurringRuleFormViewModel(
     private fun delete() {
         val id = _state.value.ruleId ?: return
         viewModelScope.launch {
-            runCatching { recurringRuleRepository.delete(id) }
+            safeRunCatching { recurringRuleRepository.delete(id) }
                 .onSuccess { _events.send(RecurringRuleFormEvent.NavigateBack) }
                 .onFailure { _events.send(RecurringRuleFormEvent.ShowError("Erro ao excluir regra")) }
         }

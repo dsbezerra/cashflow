@@ -10,17 +10,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.github.dsbezerra.cashflow.core.designsystem.theme.CashFlowTheme
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.github.dsbezerra.cashflow.core.domain.usecase.recurring.GenerateRecurringTransactionsUseCase
-import com.github.dsbezerra.cashflow.core.navigation.AccountForm
 import com.github.dsbezerra.cashflow.core.navigation.Accounts
 import com.github.dsbezerra.cashflow.core.navigation.AppNavHost
 import com.github.dsbezerra.cashflow.core.navigation.Dashboard
-import com.github.dsbezerra.cashflow.core.navigation.TransactionDetail
 import com.github.dsbezerra.cashflow.core.navigation.TransactionList
 import com.github.dsbezerra.cashflow.core.navigation.AppShell
+import com.github.dsbezerra.cashflow.feature.account.form.AccountFormSheet
+import com.github.dsbezerra.cashflow.feature.transaction.detail.TransactionFormSheet
 import kotlin.time.Clock
 import org.koin.compose.koinInject
 
@@ -40,6 +43,9 @@ fun App() {
         val isOnTransactions = currentDestination?.hasRoute(TransactionList::class) == true
         val isOnAccounts = currentDestination?.hasRoute(Accounts::class) == true
 
+        var showTransactionSheet by remember { mutableStateOf(false) }
+        var showAccountSheet by remember { mutableStateOf(false) }
+
         AppShell(
             navController = navController,
             floatingActionButton = {
@@ -52,9 +58,7 @@ fun App() {
                             icon = {
                                 Icon(Icons.Default.Add, contentDescription = "Nova transação")
                             },
-                            onClick = {
-                                navController.navigate(TransactionDetail())
-                            }
+                            onClick = { showTransactionSheet = true }
                         )
                     }
 
@@ -66,15 +70,20 @@ fun App() {
                             icon = {
                                 Icon(Icons.Default.Add, contentDescription = "Nova conta")
                             },
-                            onClick = {
-                                navController.navigate(AccountForm())
-                            }
+                            onClick = { showAccountSheet = true }
                         )
                     }
                 }
             },
         ) { contentModifier ->
             AppNavHost(navController = navController, modifier = contentModifier)
+        }
+
+        if (showTransactionSheet) {
+            TransactionFormSheet(onDismiss = { showTransactionSheet = false })
+        }
+        if (showAccountSheet) {
+            AccountFormSheet(onDismiss = { showAccountSheet = false })
         }
     }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.dsbezerra.cashflow.core.domain.repository.AccountRepository
 import com.github.dsbezerra.cashflow.core.domain.usecase.report.GetDreReportUseCase
 import com.github.dsbezerra.cashflow.core.domain.usecase.report.GetReportUseCase
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,7 +74,7 @@ class ReportViewModel(
     private fun startCollecting() {
         val s = _state.value
         collectJob = viewModelScope.launch {
-            runCatching {
+            safeRunCatching {
                 getReport(s.selectedPeriod, s.selectedAccountId).collect { data ->
                     _state.update { it.copy(isLoading = false, data = data) }
                 }
@@ -86,7 +87,7 @@ class ReportViewModel(
     private fun startDreCollecting() {
         val s = _state.value
         dreCollectJob = viewModelScope.launch {
-            runCatching {
+            safeRunCatching {
                 getDreReport(s.dreYear, s.dreMonth, s.selectedAccountId).collect { report ->
                     _state.update { it.copy(isDreLoading = false, dreReport = report) }
                 }

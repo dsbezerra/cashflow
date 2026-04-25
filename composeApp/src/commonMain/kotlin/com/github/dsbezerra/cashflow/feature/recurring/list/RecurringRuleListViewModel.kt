@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 
 class RecurringRuleListViewModel(
@@ -37,8 +38,8 @@ class RecurringRuleListViewModel(
 
     private fun toggle(id: String, isActive: Boolean) {
         viewModelScope.launch {
-            runCatching {
-                val rule = recurringRuleRepository.getById(id) ?: return@runCatching
+            safeRunCatching {
+                val rule = recurringRuleRepository.getById(id) ?: return@safeRunCatching
                 recurringRuleRepository.update(rule.copy(isActive = isActive))
             }.onFailure {
                 _events.send(RecurringRuleListEvent.ShowError("Erro ao atualizar regra"))
@@ -48,7 +49,7 @@ class RecurringRuleListViewModel(
 
     private fun delete(id: String) {
         viewModelScope.launch {
-            runCatching { recurringRuleRepository.delete(id) }
+            safeRunCatching { recurringRuleRepository.delete(id) }
                 .onFailure { _events.send(RecurringRuleListEvent.ShowError("Erro ao excluir regra")) }
         }
     }

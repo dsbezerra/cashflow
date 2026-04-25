@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +25,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import com.github.dsbezerra.cashflow.core.designsystem.component.IconButtonWithTooltip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -36,6 +36,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -61,7 +62,6 @@ fun CategoryFormScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     LaunchedEffect(categoryId) {
         viewModel.initialize(categoryId)
@@ -87,7 +87,10 @@ fun CategoryFormScreen(
                 },
                 actions = {
                     if (state.isEditMode && !state.isDefault) {
-                        IconButtonWithTooltip(onClick = { showDeleteConfirm = true }, tooltip = "Excluir") {
+                        IconButtonWithTooltip(
+                            onClick = { viewModel.onAction(CategoryFormAction.ConfirmDelete) },
+                            tooltip = "Excluir",
+                        ) {
                             Icon(Icons.Default.Delete, contentDescription = "Excluir")
                         }
                     }
@@ -96,23 +99,69 @@ fun CategoryFormScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
-        val scrollState = rememberScrollState()
-        Box(
+        CategoryFormBody(
+            state = state,
+            onAction = viewModel::onAction,
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryFormSheet(
+    onDismiss: () -> Unit,
+    viewModel: CategoryFormViewModel = koinViewModel(),
+) {
+    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.initialize(null)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                CategoryFormEvent.NavigateBack -> onDismiss()
+                is CategoryFormEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+            }
+        }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    ) {
+        Box {
+            CategoryFormBody(state = state, onAction = viewModel::onAction)
+            SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryFormBody(
+    state: CategoryFormState,
+    onAction: (CategoryFormAction) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
             // Name
             OutlinedTextField(
                 value = state.name,
-                onValueChange = { viewModel.onAction(CategoryFormAction.NameChanged(it)) },
+                onValueChange = { onAction(CategoryFormAction.NameChanged(it)) },
                 label = { Text("Nome") },
                 isError = state.nameError != null,
                 supportingText = state.nameError?.let { { Text(it) } },
@@ -126,7 +175,7 @@ fun CategoryFormScreen(
                 CategoryType.entries.forEachIndexed { index, type ->
                     SegmentedButton(
                         selected = state.type == type,
-                        onClick = { viewModel.onAction(CategoryFormAction.TypeChanged(type)) },
+                        onClick = { onAction(CategoryFormAction.TypeChanged(type)) },
                         shape = SegmentedButtonDefaults.itemShape(index, CategoryType.entries.size),
                         enabled = !state.isDefault,
                         label = {
@@ -144,38 +193,28 @@ fun CategoryFormScreen(
 
             // DRE Classification
             Text("Classificação DRE", style = MaterialTheme.typography.labelLarge)
-                CategoryDropdown(
-                    label = "Classificação DRE",
-                    selectedValue = state.dreClassification.labelPtBr(),
-                    options = DreClassification.entries.map { it.labelPtBr() },
-                    onSelect = { selected ->
-                        val dre = DreClassification.entries.first { it.labelPtBr() == selected }
-                        viewModel.onAction(
-                            CategoryFormAction.DreClassificationChanged(
-                                dre
-                            )
-                        )
-                    },
-                )
+            CategoryDropdown(
+                label = "Classificação DRE",
+                selectedValue = state.dreClassification.labelPtBr(),
+                options = DreClassification.entries.map { it.labelPtBr() },
+                onSelect = { selected ->
+                    val dre = DreClassification.entries.first { it.labelPtBr() == selected }
+                    onAction(CategoryFormAction.DreClassificationChanged(dre))
+                },
+            )
 
             // Icon
-                CategoryDropdown(
-                    label = "Ícone",
-                    selectedValue = state.icon,
-                    options = categoryIconOptions,
-                    onSelect = {
-                        viewModel.onAction(
-                            CategoryFormAction.IconChanged(
-                                it
-                            )
-                        )
-                    },
-                )
+            CategoryDropdown(
+                label = "Ícone",
+                selectedValue = state.icon,
+                options = categoryIconOptions,
+                onSelect = { onAction(CategoryFormAction.IconChanged(it)) },
+            )
 
             // Color
             OutlinedTextField(
                 value = state.color,
-                onValueChange = { viewModel.onAction(CategoryFormAction.ColorChanged(it)) },
+                onValueChange = { onAction(CategoryFormAction.ColorChanged(it)) },
                 label = { Text("Cor (hex)") },
                 placeholder = { Text("#9E9E9E") },
                 modifier = Modifier.fillMaxWidth(),
@@ -192,11 +231,7 @@ fun CategoryFormScreen(
                     options = parentOptions.map { it.second },
                     onSelect = { selected ->
                         val parentId = parentOptions.firstOrNull { it.second == selected }?.first
-                        viewModel.onAction(
-                            CategoryFormAction.ParentChanged(
-                                parentId
-                            )
-                        )
+                        onAction(CategoryFormAction.ParentChanged(parentId))
                     },
                 )
             }
@@ -209,7 +244,7 @@ fun CategoryFormScreen(
                 ) {
                     Checkbox(
                         checked = state.isArchived,
-                        onCheckedChange = { viewModel.onAction(CategoryFormAction.ArchivedChanged(it)) },
+                        onCheckedChange = { onAction(CategoryFormAction.ArchivedChanged(it)) },
                     )
                     Text("Arquivar categoria", style = MaterialTheme.typography.bodyLarge)
                 }
@@ -218,7 +253,7 @@ fun CategoryFormScreen(
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = { viewModel.onAction(CategoryFormAction.Save) },
+                onClick = { onAction(CategoryFormAction.Save) },
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -237,9 +272,10 @@ fun CategoryFormScreen(
                     Text("Excluir Categoria")
                 }
             }
-            }
-            DesktopVerticalScrollbar(scrollState)
+
+            Spacer(Modifier.height(8.dp))
         }
+        DesktopVerticalScrollbar(scrollState)
     }
 
     if (showDeleteConfirm) {
@@ -250,7 +286,7 @@ fun CategoryFormScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
-                    viewModel.onAction(CategoryFormAction.ConfirmDelete)
+                    onAction(CategoryFormAction.ConfirmDelete)
                 }) { Text("Excluir") }
             },
             dismissButton = {

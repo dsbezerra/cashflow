@@ -34,7 +34,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -42,6 +44,7 @@ import com.github.dsbezerra.cashflow.core.domain.model.Category
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.core.designsystem.component.categoryIcon
 import com.github.dsbezerra.cashflow.core.designsystem.component.DSFullscreenLoader
+import com.github.dsbezerra.cashflow.feature.category.form.CategoryFormSheet
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -54,6 +57,7 @@ fun CategoryListScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showCreateSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
@@ -77,12 +81,15 @@ fun CategoryListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { onNavigateToForm(null) }) {
+            FloatingActionButton(onClick = { showCreateSheet = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Nova Categoria")
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
+        if (showCreateSheet) {
+            CategoryFormSheet(onDismiss = { showCreateSheet = false })
+        }
         val listState = rememberLazyListState()
         if (state.isLoading) {
             DSFullscreenLoader(

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import com.github.dsbezerra.cashflow.util.safeRunCatching
 import kotlinx.coroutines.launch
 import kotlin.math.roundToLong
 import kotlin.time.Clock
@@ -72,7 +73,7 @@ class AccountFormViewModel(
         _state.update { it.copy(isSaving = true) }
 
         viewModelScope.launch {
-            runCatching {
+            safeRunCatching {
                 val now = Clock.System.now().toEpochMilliseconds()
                 if (s.isEditMode) {
                     val existing = accountRepository.getById(s.accountId!!)!!
@@ -114,7 +115,7 @@ class AccountFormViewModel(
     private fun delete() {
         val id = _state.value.accountId ?: return
         viewModelScope.launch {
-            runCatching { accountRepository.delete(id) }
+            safeRunCatching { accountRepository.delete(id) }
                 .onSuccess { _events.send(AccountFormEvent.NavigateBack) }
                 .onFailure { _events.send(AccountFormEvent.ShowError("Falha ao excluir conta")) }
         }
