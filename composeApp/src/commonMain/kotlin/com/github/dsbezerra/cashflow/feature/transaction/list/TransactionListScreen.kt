@@ -36,7 +36,6 @@ import cashflow.composeapp.generated.resources.transaction_empty_subtitle
 import cashflow.composeapp.generated.resources.transaction_empty_title
 import com.github.dsbezerra.cashflow.core.designsystem.component.AmountText
 import com.github.dsbezerra.cashflow.core.designsystem.component.DSFullscreenLoader
-import com.github.dsbezerra.cashflow.core.domain.model.Transaction
 import com.github.dsbezerra.cashflow.util.formatFullPtBr
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.LocalDate
@@ -159,7 +158,7 @@ private fun DateHeader(date: LocalDate) {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TransactionRow(
-    transaction: Transaction,
+    transaction: TransactionUiModel,
     onClick: () -> Unit,
 ) {
     Row(
@@ -176,7 +175,7 @@ private fun TransactionRow(
                 style = MaterialTheme.typography.bodyLargeEmphasized,
             )
             Text(
-                text = transaction.categoryId,
+                text = transaction.categoryName,
                 style = MaterialTheme.typography.bodySmallEmphasized,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

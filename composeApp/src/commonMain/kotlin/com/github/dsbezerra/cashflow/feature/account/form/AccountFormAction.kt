@@ -11,8 +11,6 @@ sealed interface AccountFormAction {
         AccountFormAction
     data class InitialBalanceChanged(val cents: Long) :
         AccountFormAction
-    data class ColorChanged(val color: String) :
-        AccountFormAction
     data class IconChanged(val icon: String) :
         AccountFormAction
     data object Save : AccountFormAction

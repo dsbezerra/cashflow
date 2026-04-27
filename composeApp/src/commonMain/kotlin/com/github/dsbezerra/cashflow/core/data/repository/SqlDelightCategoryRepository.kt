@@ -38,7 +38,6 @@ class SqlDelightCategoryRepository(
                 name = category.name,
                 type = category.type,
                 icon = category.icon,
-                color = category.color,
                 parentId = category.parentId,
                 isDefault = category.isDefault,
                 isArchived = category.isArchived,

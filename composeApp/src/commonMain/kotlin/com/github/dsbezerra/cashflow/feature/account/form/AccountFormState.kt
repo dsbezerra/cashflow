@@ -10,7 +10,6 @@ data class AccountFormState(
     val currency: String = "BRL",
     val initialBalanceInCents: Long = 0L,
     val initialBalanceError: String? = null,
-    val color: String = "#4CAF50",
     val icon: String = "account_balance",
     val isArchived: Boolean = false,
     val isEditMode: Boolean = false,

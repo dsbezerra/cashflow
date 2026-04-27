@@ -6,7 +6,6 @@ CREATE TABLE Account (
     type TEXT AS com.github.dsbezerra.cashflow.core.domain.model.AccountType NOT NULL,
     currency TEXT NOT NULL,
     initialBalance REAL NOT NULL,
-    color TEXT NOT NULL,
     icon TEXT NOT NULL,
     isArchived INTEGER AS Boolean NOT NULL DEFAULT 0,
     isDefault INTEGER AS Boolean NOT NULL DEFAULT 0,
@@ -31,7 +30,6 @@ UPDATE Account SET
     type = :type,
     currency = :currency,
     initialBalance = :initialBalance,
-    color = :color,
     icon = :icon,
     isArchived = :isArchived
 WHERE id = :id;

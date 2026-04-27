@@ -25,6 +25,7 @@ val viewModelModule = module {
     viewModel {
         TransactionListViewModel(
             get(),
+            get(),
             get()
         )
     }

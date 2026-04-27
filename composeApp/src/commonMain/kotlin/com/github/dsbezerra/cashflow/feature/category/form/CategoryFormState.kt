@@ -11,7 +11,6 @@ data class CategoryFormState(
     val type: CategoryType = CategoryType.EXPENSE,
     val dreClassification: DreClassification = DreClassification.EXPENSE,
     val icon: String = "category",
-    val color: String = "#9E9E9E",
     val parentId: String? = null,
     val isArchived: Boolean = false,
     val isDefault: Boolean = false,

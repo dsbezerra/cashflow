@@ -6,7 +6,6 @@ data class Account(
     val type: AccountType,
     val currency: String,
     val initialBalance: Decimal,
-    val color: String,
     val icon: String,
     val isArchived: Boolean,
     val isDefault: Boolean = false,

@@ -3,7 +3,6 @@ package com.github.dsbezerra.cashflow.feature.category.form
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.dsbezerra.cashflow.core.domain.model.Category
-import com.github.dsbezerra.cashflow.core.domain.model.DreClassification
 import com.github.dsbezerra.cashflow.core.domain.repository.CategoryRepository
 import com.github.dsbezerra.cashflow.util.generateId
 import kotlinx.coroutines.channels.Channel
@@ -47,7 +46,6 @@ class CategoryFormViewModel(
                     type = category.type,
                     dreClassification = category.dreClassification,
                     icon = category.icon,
-                    color = category.color,
                     parentId = category.parentId,
                     isArchived = category.isArchived,
                     isDefault = category.isDefault,
@@ -81,7 +79,6 @@ class CategoryFormViewModel(
             }
 
             is CategoryFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
-            is CategoryFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
             is CategoryFormAction.ParentChanged -> _state.update { it.copy(parentId = action.parentId) }
             is CategoryFormAction.ArchivedChanged -> _state.update { it.copy(isArchived = action.isArchived) }
             CategoryFormAction.Save -> save()
@@ -108,7 +105,6 @@ class CategoryFormViewModel(
                             type = s.type,
                             dreClassification = s.dreClassification,
                             icon = s.icon,
-                            color = s.color,
                             parentId = s.parentId,
                             isArchived = s.isArchived,
                         )
@@ -121,7 +117,6 @@ class CategoryFormViewModel(
                             type = s.type,
                             dreClassification = s.dreClassification,
                             icon = s.icon,
-                            color = s.color,
                             parentId = s.parentId,
                             isDefault = false,
                             isArchived = false,

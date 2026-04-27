@@ -3,14 +3,17 @@ package com.github.dsbezerra.cashflow.core.designsystem.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 /**
@@ -33,6 +36,7 @@ fun ChipSelector(
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     errorText: String? = null,
+    leadingIcon: ((String) -> ImageVector)? = null,
 ) {
     Column(modifier = modifier) {
         Text(
@@ -49,7 +53,16 @@ fun ChipSelector(
                 FilterChip(
                     selected = id == selectedId,
                     onClick = { onSelect(id) },
-                    label = { Text(name) },
+                    label = {
+                        Row {
+                            if (leadingIcon != null) {
+                                Icon(leadingIcon(id), contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize))
+                            }
+                            if (name.isNotEmpty()) {
+                                Text(name)
+                            }
+                        }
+                    }
                 )
             }
         }

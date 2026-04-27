@@ -12,8 +12,6 @@ sealed interface CategoryFormAction {
         CategoryFormAction
     data class IconChanged(val icon: String) :
         CategoryFormAction
-    data class ColorChanged(val color: String) :
-        CategoryFormAction
     data class ParentChanged(val parentId: String?) :
         CategoryFormAction
     data class ArchivedChanged(val isArchived: Boolean) :

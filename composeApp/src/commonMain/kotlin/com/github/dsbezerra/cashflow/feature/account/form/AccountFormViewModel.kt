@@ -37,7 +37,6 @@ class AccountFormViewModel(
                     type = account.type,
                     currency = account.currency,
                     initialBalanceInCents = (account.initialBalance.toDouble() * 100).roundToLong(),
-                    color = account.color,
                     icon = account.icon,
                     isArchived = account.isArchived,
                     isEditMode = true,
@@ -52,7 +51,6 @@ class AccountFormViewModel(
             is AccountFormAction.TypeChanged -> _state.update { it.copy(type = action.type) }
             is AccountFormAction.CurrencyChanged -> _state.update { it.copy(currency = action.currency) }
             is AccountFormAction.InitialBalanceChanged -> _state.update { it.copy(initialBalanceInCents = action.cents, initialBalanceError = null) }
-            is AccountFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
             is AccountFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
             AccountFormAction.Save -> save()
             AccountFormAction.ConfirmDelete -> delete()
@@ -83,7 +81,6 @@ class AccountFormViewModel(
                             type = s.type,
                             currency = s.currency,
                             initialBalance = balance.toDecimal(),
-                            color = s.color,
                             icon = s.icon,
                             isArchived = s.isArchived,
                         )
@@ -96,7 +93,6 @@ class AccountFormViewModel(
                             type = s.type,
                             currency = s.currency,
                             initialBalance = balance.toDecimal(),
-                            color = s.color,
                             icon = s.icon,
                             isArchived = false,
                             createdAt = now,

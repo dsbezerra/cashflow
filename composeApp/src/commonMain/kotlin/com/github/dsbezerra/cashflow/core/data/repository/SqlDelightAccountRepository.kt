@@ -43,7 +43,6 @@ class SqlDelightAccountRepository(
                 type = account.type,
                 currency = account.currency,
                 initialBalance = account.initialBalance.toDouble(),
-                color = account.color,
                 icon = account.icon,
                 isArchived = account.isArchived,
                 id = account.id,

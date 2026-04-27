@@ -18,10 +18,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import com.github.dsbezerra.cashflow.core.designsystem.component.IconButtonWithTooltip
 import androidx.compose.material3.MaterialTheme
@@ -52,7 +49,6 @@ import cashflow.composeapp.generated.resources.back
 import cashflow.composeapp.generated.resources.cancel
 import cashflow.composeapp.generated.resources.category_archive
 import cashflow.composeapp.generated.resources.category_both_short
-import cashflow.composeapp.generated.resources.category_color_placeholder
 import cashflow.composeapp.generated.resources.category_delete
 import cashflow.composeapp.generated.resources.category_delete_confirm
 import cashflow.composeapp.generated.resources.category_dre_classification
@@ -60,7 +56,6 @@ import cashflow.composeapp.generated.resources.category_edit
 import cashflow.composeapp.generated.resources.category_new
 import cashflow.composeapp.generated.resources.category_no_parent
 import cashflow.composeapp.generated.resources.category_parent_label
-import cashflow.composeapp.generated.resources.color_hex_label
 import cashflow.composeapp.generated.resources.delete
 import cashflow.composeapp.generated.resources.dre_costs
 import cashflow.composeapp.generated.resources.dre_deductions
@@ -76,6 +71,8 @@ import cashflow.composeapp.generated.resources.saving
 import cashflow.composeapp.generated.resources.type_label
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.core.domain.model.DreClassification
+import com.github.dsbezerra.cashflow.core.designsystem.component.ChipSelector
+import com.github.dsbezerra.cashflow.core.designsystem.component.categoryIcon
 import com.github.dsbezerra.cashflow.core.designsystem.component.categoryIconOptions
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
@@ -220,9 +217,8 @@ fun CategoryFormBody(
             }
 
             // DRE Classification
-            Text(stringResource(Res.string.category_dre_classification), style = MaterialTheme.typography.labelLarge)
-            val dreLabels = DreClassification.entries.map { dre ->
-                dre to when (dre) {
+            val dreItems = DreClassification.entries.map { dre ->
+                dre.name to when (dre) {
                     DreClassification.GROSS_REVENUE -> stringResource(Res.string.dre_gross_revenue)
                     DreClassification.DEDUCTION -> stringResource(Res.string.dre_deductions)
                     DreClassification.COST -> stringResource(Res.string.dre_costs)
@@ -230,47 +226,31 @@ fun CategoryFormBody(
                     DreClassification.NONE -> stringResource(Res.string.dre_unclassified)
                 }
             }
-            CategoryDropdown(
+            ChipSelector(
                 label = stringResource(Res.string.category_dre_classification),
-                selectedValue = dreLabels.first { it.first == state.dreClassification }.second,
-                options = dreLabels.map { it.second },
-                onSelect = { selected ->
-                    val dre = dreLabels.first { it.second == selected }.first
-                    onAction(CategoryFormAction.DreClassificationChanged(dre))
-                },
+                selectedId = state.dreClassification.name,
+                items = dreItems,
+                onSelect = { onAction(CategoryFormAction.DreClassificationChanged(DreClassification.valueOf(it))) },
             )
 
             // Icon
-            CategoryDropdown(
+            ChipSelector(
                 label = stringResource(Res.string.icon_label),
-                selectedValue = state.icon,
-                options = categoryIconOptions,
+                selectedId = state.icon,
+                items = categoryIconOptions.map { it to "" },
+                leadingIcon = { categoryIcon(it) },
                 onSelect = { onAction(CategoryFormAction.IconChanged(it)) },
-            )
-
-            // Color
-            OutlinedTextField(
-                value = state.color,
-                onValueChange = { onAction(CategoryFormAction.ColorChanged(it)) },
-                label = { Text(stringResource(Res.string.color_hex_label)) },
-                placeholder = { Text(stringResource(Res.string.category_color_placeholder)) },
-                modifier = Modifier.fillMaxWidth(),
             )
 
             // Parent category
             if (state.availableParents.isNotEmpty()) {
                 val noParentLabel = stringResource(Res.string.category_no_parent)
-                val parentOptions = listOf(null to noParentLabel) +
-                        state.availableParents.map { it.id to it.name }
-                CategoryDropdown(
+                ChipSelector(
                     label = stringResource(Res.string.category_parent_label),
-                    selectedValue = parentOptions.firstOrNull { it.first == state.parentId }?.second
-                        ?: noParentLabel,
-                    options = parentOptions.map { it.second },
-                    onSelect = { selected ->
-                        val parentId = parentOptions.firstOrNull { it.second == selected }?.first
-                        onAction(CategoryFormAction.ParentChanged(parentId))
-                    },
+                    selectedId = state.parentId ?: "",
+                    items = listOf("" to noParentLabel) +
+                            state.availableParents.map { it.id to it.name },
+                    onSelect = { onAction(CategoryFormAction.ParentChanged(it.takeIf { id -> id.isNotEmpty() })) },
                 )
             }
 
@@ -334,40 +314,3 @@ fun CategoryFormBody(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CategoryDropdown(
-    label: String,
-    selectedValue: String,
-    options: List<String>,
-    onSelect: (String) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-    ) {
-        OutlinedTextField(
-            value = selectedValue,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onSelect(option)
-                        expanded = false
-                    },
-                )
-            }
-        }
-    }
-}

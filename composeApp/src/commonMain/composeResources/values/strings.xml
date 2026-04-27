@@ -15,7 +15,6 @@
     <string name="account_label">Conta</string>
     <string name="category_label">Categoria</string>
     <string name="icon_label">Ícone</string>
-    <string name="color_hex_label">Cor (hex)</string>
     <string name="income">Receita</string>
     <string name="expense">Despesa</string>
     <string name="all">Todas</string>
@@ -42,7 +41,6 @@
     <string name="account_set_default">Definir como padrão</string>
     <string name="account_initial_balance">Saldo Inicial</string>
     <string name="account_currency_label">Moeda</string>
-    <string name="account_color_placeholder">#4CAF50</string>
     <string name="account_type_checking">Conta Corrente</string>
     <string name="account_type_savings">Poupança</string>
     <string name="account_type_cash">Dinheiro</string>
@@ -67,7 +65,6 @@
     <string name="category_parent_label">Categoria pai (opcional)</string>
     <string name="category_no_parent">Sem categoria pai</string>
     <string name="category_dre_classification">Classificação DRE</string>
-    <string name="category_color_placeholder">#9E9E9E</string>
 
     <!-- Transaction -->
     <string name="transaction_new">Nova Transação</string>
@@ -133,8 +130,8 @@
 
     <!-- Recurring rules -->
     <string name="recurring_title">Transações Recorrentes</string>
-    <string name="recurring_new">Nova Regra Recorrente</string>
-    <string name="recurring_edit">Editar Regra Recorrente</string>
+    <string name="recurring_new">Nova regra recorrente</string>
+    <string name="recurring_edit">Editar regra recorrente</string>
     <string name="recurring_delete_title">Excluir Regra</string>
     <string name="recurring_delete_confirm">Tem certeza que deseja excluir esta regra recorrente?</string>
     <string name="recurring_empty_title">Nenhuma regra recorrente</string>

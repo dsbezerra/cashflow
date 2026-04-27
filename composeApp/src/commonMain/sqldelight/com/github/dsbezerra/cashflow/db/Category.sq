@@ -6,7 +6,6 @@ CREATE TABLE Category (
     type TEXT AS com.github.dsbezerra.cashflow.core.domain.model.CategoryType NOT NULL,
     dreClassification TEXT AS com.github.dsbezerra.cashflow.core.domain.model.DreClassification NOT NULL DEFAULT 'NONE',
     icon TEXT NOT NULL,
-    color TEXT NOT NULL,
     parentId TEXT,
     isDefault INTEGER AS Boolean NOT NULL DEFAULT 0,
     isArchived INTEGER AS Boolean NOT NULL DEFAULT 0
@@ -27,7 +26,6 @@ UPDATE Category SET
     type = :type,
     dreClassification = :dreClassification,
     icon = :icon,
-    color = :color,
     parentId = :parentId,
     isDefault = :isDefault,
     isArchived = :isArchived

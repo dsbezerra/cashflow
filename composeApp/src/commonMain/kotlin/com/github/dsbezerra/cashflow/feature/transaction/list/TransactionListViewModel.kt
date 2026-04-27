@@ -6,11 +6,14 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
+import com.github.dsbezerra.cashflow.core.domain.repository.CategoryRepository
 import com.github.dsbezerra.cashflow.core.domain.repository.TransactionRepository
 import com.github.dsbezerra.cashflow.core.domain.usecase.transaction.DeleteTransactionUseCase
 import com.github.dsbezerra.cashflow.util.safeRunCatching
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -20,25 +23,31 @@ import kotlin.time.Instant
 
 class TransactionListViewModel(
     private val transactionRepository: TransactionRepository,
+    private val categoryRepository: CategoryRepository,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
 ) : ViewModel() {
 
     private val _events = Channel<TransactionListEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val transactions: Flow<PagingData<TransactionListItem>> =
-        transactionRepository.getPagedTransactions(PAGE_SIZE)
-            .map { pagingData ->
-                pagingData
-                    .map { tx -> TransactionListItem.Entry(tx) as TransactionListItem }
-                    .insertSeparators { before, after ->
-                        val beforeDate = (before as? TransactionListItem.Entry)
-                            ?.transaction?.date?.toLocalDate()
-                        val afterDate = (after as? TransactionListItem.Entry)
-                            ?.transaction?.date?.toLocalDate()
-                        if (afterDate != null && afterDate != beforeDate)
-                            TransactionListItem.Header(afterDate)
-                        else null
+        categoryRepository.getAll()
+            .map { list -> list.associate { it.id to it.name } }
+            .flatMapLatest { categoryMap ->
+                transactionRepository.getPagedTransactions(PAGE_SIZE)
+                    .map { pagingData ->
+                        pagingData
+                            .map { tx -> TransactionListItem.Entry(tx.toUiModel(categoryMap)) as TransactionListItem }
+                            .insertSeparators { before, after ->
+                                val beforeDate = (before as? TransactionListItem.Entry)
+                                    ?.transaction?.date?.toLocalDate()
+                                val afterDate = (after as? TransactionListItem.Entry)
+                                    ?.transaction?.date?.toLocalDate()
+                                if (afterDate != null && afterDate != beforeDate)
+                                    TransactionListItem.Header(afterDate)
+                                else null
+                            }
                     }
             }
             .cachedIn(viewModelScope)
