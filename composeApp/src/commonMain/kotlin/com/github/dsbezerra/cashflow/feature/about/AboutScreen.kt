@@ -1,5 +1,6 @@
 package com.github.dsbezerra.cashflow.feature.about
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -59,17 +61,11 @@ fun AboutScreen(onNavigateBack: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = CashflowLogo,
-                    contentDescription = stringResource(Res.string.about_app_name),
-                )
-            }
+            Image(
+                modifier = Modifier.size(80.dp),
+                imageVector = CashflowLogo,
+                contentDescription = stringResource(Res.string.about_app_name),
+            )
             Spacer(Modifier.height(24.dp))
             Text(
                 text = stringResource(Res.string.about_app_name),
