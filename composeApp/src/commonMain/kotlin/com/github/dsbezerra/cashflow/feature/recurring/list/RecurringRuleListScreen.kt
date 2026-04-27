@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -66,11 +68,11 @@ import com.github.dsbezerra.cashflow.util.formatFullPtBr
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import com.github.dsbezerra.cashflow.core.designsystem.theme.AppColors
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,7 +132,11 @@ fun RecurringRuleListScreen(
                 }
 
                 else -> {
-                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
                         groupedItems(state.rules, key = { it.id }) { rule, position ->
                             GroupedListItem(position = position) {
                                 RecurringRuleRow(
@@ -155,6 +161,7 @@ fun RecurringRuleListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun RecurringRuleRow(
     rule: RecurringRule,
@@ -193,32 +200,25 @@ private fun RecurringRuleRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = rule.description,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(
-                    text = rule.amount.toCurrency(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = amountColor,
-                )
-            }
+            Text(
+                text = rule.description,
+                style = MaterialTheme.typography.bodyLargeEmphasized,
+                fontWeight = FontWeight.Medium,
+            )
+            Text(
+                text = rule.amount.toCurrency(),
+                style = MaterialTheme.typography.bodyLargeEmphasized,
+                fontWeight = FontWeight.SemiBold,
+                color = amountColor,
+            )
             Text(
                 text = frequencyLabel,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmallEmphasized,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = stringResource(Res.string.recurring_next_date, nextDate.formatFullPtBr()),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmallEmphasized,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -62,7 +63,7 @@ import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CategoryListScreen(
     onNavigateBack: () -> Unit,
@@ -118,7 +119,7 @@ fun CategoryListScreen(
                     Text(stringResource(Res.string.category_empty_title), style = MaterialTheme.typography.titleMedium)
                     Text(
                         stringResource(Res.string.category_empty_subtitle),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMediumEmphasized,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -131,7 +132,7 @@ fun CategoryListScreen(
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 56.dp),
+                    contentPadding = PaddingValues(bottom = 56.dp, start = 16.dp, end = 16.dp),
                 ) {
                     typeOrder.forEach { type ->
                         val items = grouped[type] ?: return@forEach
@@ -168,6 +169,7 @@ fun CategoryListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TypeSectionHeader(type: CategoryType?) {
     Text(
@@ -177,7 +179,7 @@ private fun TypeSectionHeader(type: CategoryType?) {
             CategoryType.BOTH -> stringResource(Res.string.category_both)
             null -> stringResource(Res.string.category_archived)
         },
-        style = MaterialTheme.typography.labelMedium,
+        style = MaterialTheme.typography.titleMediumEmphasized,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
             .fillMaxWidth()

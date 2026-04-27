@@ -3,6 +3,7 @@ package com.github.dsbezerra.cashflow.feature.account.detail
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,11 +57,11 @@ import com.github.dsbezerra.cashflow.core.designsystem.component.DSFullscreenLoa
 import com.github.dsbezerra.cashflow.feature.account.accountTypeName
 import com.github.dsbezerra.cashflow.util.formatFullPtBr
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,6 +139,7 @@ fun AccountDetailScreen(
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
                 ) {
                     item {
                         BalanceHeader(
@@ -226,6 +229,7 @@ fun AccountDetailScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BalanceHeader(
     accountName: String,
@@ -235,8 +239,7 @@ private fun BalanceHeader(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
@@ -257,28 +260,29 @@ private fun BalanceHeader(
                 )
                 Text(
                     text = typeName,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelMediumEmphasized,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
             Text(
                 text = balance.toDecimal().toCurrency(),
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineMediumEmphasized,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TransactionDateHeader(date: LocalDate) {
     Text(
         text = date.formatFullPtBr(),
-        style = MaterialTheme.typography.labelMedium,
+        style = MaterialTheme.typography.titleLargeEmphasized,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
     )
 }
 
