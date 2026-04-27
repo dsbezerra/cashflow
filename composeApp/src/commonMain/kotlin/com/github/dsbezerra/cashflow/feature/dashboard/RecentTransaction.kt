@@ -20,7 +20,7 @@ fun Transaction.toRecentTransaction() = RecentTransaction(
     amount = amount.toCurrency(),
     description = description,
     category = categoryId,
-    dateFormatted = formatLongDate(date, "dd 'de' MMMM"),
+    dateFormatted = formatLongDate(date, "dd 'de' MMMM").lowercase(),
 )
 
 fun List<RecentTransaction>.mapCategories(categories: List<Category>) = map {

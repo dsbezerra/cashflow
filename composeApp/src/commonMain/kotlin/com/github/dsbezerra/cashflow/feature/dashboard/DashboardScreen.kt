@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -159,7 +160,6 @@ private fun DashboardContent(
             state = listState,
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize(),
         ) {
             item {
                 NetBalance(summary, state)
@@ -179,32 +179,6 @@ private fun DashboardContent(
             }
         }
         DesktopVerticalScrollbar(listState)
-    }
-}
-
-@Composable
-private fun AccountSelector(
-    accounts: List<Account>,
-    selectedAccountId: String?,
-    onAccountSelected: (String?) -> Unit,
-) {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        item {
-            FilterChip(
-                selected = selectedAccountId == null,
-                onClick = { onAccountSelected(null) },
-                label = { Text(stringResource(Res.string.all)) },
-            )
-        }
-        items(accounts) { account ->
-            FilterChip(
-                selected = account.id == selectedAccountId,
-                onClick = { onAccountSelected(account.id) },
-                label = { Text(account.name) },
-            )
-        }
     }
 }
 
@@ -232,6 +206,10 @@ private fun NetBalance(summary: DashboardSummary, state: DashboardState) {
             text = summary.netBalance.toCurrency(),
             style = MaterialTheme.typography.displayLargeEmphasized,
             fontWeight = FontWeight.Bold,
+            autoSize = TextAutoSize.StepBased(
+                maxFontSize = MaterialTheme.typography.displayLargeEmphasized.fontSize
+            ),
+            maxLines = 1
         )
         Spacer(Modifier.height(4.dp))
         Row(
@@ -331,88 +309,91 @@ private fun SummaryCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun IncomeExpenseBarChart(breakdown: List<MonthlyAmount>) {
     val cashFlowColors = AppColors.colors
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-    ) {
-        Column(
-            Modifier.padding(16.dp)
+    Column {
+        Text(
+            text = stringResource(Res.string.dashboard_last_6_months),
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
+        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceVariant,
         ) {
-            Text(
-                text = stringResource(Res.string.dashboard_last_6_months),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(bottom = 8.dp),
-            )
-            if (breakdown.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(120.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(Res.string.dashboard_no_data_6_months),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+            Column(
+                Modifier.padding(16.dp)
+            ) {
+                if (breakdown.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(120.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.dashboard_no_data_6_months),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                } else {
+                    val onSurface = MaterialTheme.colorScheme.onSurfaceVariant
+                    val outlineVariant = MaterialTheme.colorScheme.outlineVariant
+                    val labelStyle = MaterialTheme.typography.labelSmall.copy(color = onSurface)
+                    ColumnChart(
+                        data = breakdown.map { month ->
+                            Bars(
+                                label = month.month.namePtBr().take(3)
+                                    .replaceFirstChar { it.uppercase() },
+                                values = listOf(
+                                    Bars.Data(
+                                        label = stringResource(Res.string.dashboard_income_chart),
+                                        value = month.income,
+                                        color = SolidColor(cashFlowColors.income)
+                                    ),
+                                    Bars.Data(
+                                        label = stringResource(Res.string.dashboard_expense_chart),
+                                        value = month.expenses,
+                                        color = SolidColor(cashFlowColors.expense)
+                                    ),
+                                ),
+                            )
+                        },
+                        barProperties = BarProperties(
+                            thickness = 16.dp,
+                            spacing = 4.dp,
+                        ),
+                        labelProperties = LabelProperties(
+                            enabled = true,
+                            textStyle = labelStyle,
+                        ),
+                        indicatorProperties = HorizontalIndicatorProperties(
+                            textStyle = labelStyle,
+                        ),
+                        gridProperties = GridProperties(
+                            xAxisProperties = GridProperties.AxisProperties(
+                                color = SolidColor(
+                                    outlineVariant
+                                )
+                            ),
+                            yAxisProperties = GridProperties.AxisProperties(
+                                color = SolidColor(
+                                    outlineVariant
+                                )
+                            ),
+                        ),
+                        dividerProperties = DividerProperties(
+                            xAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
+                            yAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
                     )
                 }
-            } else {
-                val onSurface = MaterialTheme.colorScheme.onSurfaceVariant
-                val outlineVariant = MaterialTheme.colorScheme.outlineVariant
-                val labelStyle = MaterialTheme.typography.labelSmall.copy(color = onSurface)
-                ColumnChart(
-                    data = breakdown.map { month ->
-                        Bars(
-                            label = month.month.namePtBr().take(3)
-                                .replaceFirstChar { it.uppercase() },
-                            values = listOf(
-                                Bars.Data(
-                                    label = stringResource(Res.string.dashboard_income_chart),
-                                    value = month.income,
-                                    color = SolidColor(cashFlowColors.income)
-                                ),
-                                Bars.Data(
-                                    label = stringResource(Res.string.dashboard_expense_chart),
-                                    value = month.expenses,
-                                    color = SolidColor(cashFlowColors.expense)
-                                ),
-                            ),
-                        )
-                    },
-                    barProperties = BarProperties(
-                        thickness = 16.dp,
-                        spacing = 4.dp,
-                    ),
-                    labelProperties = LabelProperties(
-                        enabled = true,
-                        textStyle = labelStyle,
-                    ),
-                    indicatorProperties = HorizontalIndicatorProperties(
-                        textStyle = labelStyle,
-                    ),
-                    gridProperties = GridProperties(
-                        xAxisProperties = GridProperties.AxisProperties(
-                            color = SolidColor(
-                                outlineVariant
-                            )
-                        ),
-                        yAxisProperties = GridProperties.AxisProperties(
-                            color = SolidColor(
-                                outlineVariant
-                            )
-                        ),
-                    ),
-                    dividerProperties = DividerProperties(
-                        xAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
-                        yAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                )
             }
         }
     }
@@ -433,7 +414,7 @@ private fun RecentTransactions(
         ) {
             Text(
                 text = stringResource(Res.string.dashboard_recent),
-                style = MaterialTheme.typography.titleSmallEmphasized,
+                style = MaterialTheme.typography.titleMediumEmphasized,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 8.dp),
             )
@@ -452,7 +433,7 @@ private fun RecentTransactions(
         if (transactions.isEmpty()) {
             Text(
                 text = stringResource(Res.string.dashboard_no_transactions_month),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMediumEmphasized,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp),
             )
@@ -462,12 +443,14 @@ private fun RecentTransactions(
                 color = MaterialTheme.colorScheme.surfaceVariant,
             ) {
                 Column {
-                    transactions.forEach { transaction ->
+                    transactions.forEachIndexed { index, transaction ->
                         TransactionRow(
                             transaction = transaction,
                             onTransactionClick = onTransactionClick,
                         )
-                        HorizontalDivider()
+                        if (index != transactions.lastIndex) {
+                            HorizontalDivider(color = MaterialTheme.colorScheme.surface)
+                        }
                     }
                 }
             }

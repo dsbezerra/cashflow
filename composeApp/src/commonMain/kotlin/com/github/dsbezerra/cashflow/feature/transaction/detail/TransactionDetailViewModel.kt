@@ -177,6 +177,7 @@ class TransactionDetailViewModel(
                     }
                 }
             }.onSuccess {
+                _state.update { TransactionDetailState() }
                 _events.send(TransactionDetailEvent.NavigateBack)
             }.onFailure {
                 _state.update { st -> st.copy(isSaving = false) }

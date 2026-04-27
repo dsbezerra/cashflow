@@ -36,8 +36,12 @@ fun SettingsScreen(
     onNavigateToRecurringList: () -> Unit = {},
     onNavigateToAbout: () -> Unit = {},
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        modifier = Modifier.padding(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = MaterialTheme.shapes.small
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             SettingsRow(
                 icon = {
                     Icon(
@@ -50,7 +54,7 @@ fun SettingsScreen(
                 subtitle = stringResource(Res.string.settings_manage_categories_desc),
                 onClick = onNavigateToCategoryList,
             )
-            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.surface)
             SettingsRow(
                 icon = {
                     Icon(
@@ -63,7 +67,7 @@ fun SettingsScreen(
                 subtitle = stringResource(Res.string.settings_recurring_desc),
                 onClick = onNavigateToRecurringList,
             )
-            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.surface)
             SettingsRow(
                 icon = {
                     Icon(
@@ -76,7 +80,6 @@ fun SettingsScreen(
                 subtitle = stringResource(Res.string.settings_about_desc),
                 onClick = onNavigateToAbout,
             )
-            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
         }
     }
 }

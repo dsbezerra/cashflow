@@ -25,7 +25,7 @@
     <string name="nav_transactions">Transações</string>
     <string name="nav_accounts">Contas</string>
     <string name="nav_reports">Relatórios</string>
-    <string name="nav_settings">Configurações</string>
+    <string name="nav_settings">Config.</string>
 
     <!-- Top bar navigation -->
     <string name="topbar_previous">Anterior</string>
@@ -87,7 +87,7 @@
     <string name="dashboard_account">Conta %1$s</string>
     <string name="dashboard_income">Receitas</string>
     <string name="dashboard_expenses">Despesas</string>
-    <string name="dashboard_last_6_months">Ultimos 6 meses</string>
+    <string name="dashboard_last_6_months">Últimos 6 meses</string>
     <string name="dashboard_no_data_6_months">Sem dados nos últimos 6 meses</string>
     <string name="dashboard_recent">Recentes</string>
     <string name="dashboard_see_all">Ver tudo</string>

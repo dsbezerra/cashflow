@@ -12,7 +12,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 @Composable
 fun CashFlowTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = rememberColorScheme(darkTheme = darkTheme, dynamicColor = dynamicColor)
