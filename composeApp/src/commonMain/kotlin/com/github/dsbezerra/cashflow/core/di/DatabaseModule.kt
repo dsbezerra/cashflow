@@ -39,7 +39,7 @@ val databaseModule = module {
             BudgetAdapter = Budget.Adapter(
                 periodAdapter = enumColumnAdapter(BudgetPeriod::valueOf),
             ),
-        ).also { db -> DatabaseSeeder(db.categoryQueries).seedIfEmpty() }
+        ).also { db -> DatabaseSeeder(db.accountQueries, db.categoryQueries).seedIfEmpty() }
     }
     single { get<CashFlowDatabase>().accountQueries }
     single { get<CashFlowDatabase>().categoryQueries }

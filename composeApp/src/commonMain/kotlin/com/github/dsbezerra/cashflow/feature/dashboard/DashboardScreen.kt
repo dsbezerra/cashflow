@@ -232,7 +232,7 @@ private fun NetBalance(summary: DashboardSummary, state: DashboardState) {
                 shape = CircleShape,
             ) {}
             Text(
-                text = "Conta ${defaultAccount.name}",
+                text = "Conta ${defaultAccount?.name}",
                 style = MaterialTheme.typography.labelSmallEmphasized,
             )
         }
