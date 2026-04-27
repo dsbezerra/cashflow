@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Arrowhead for income (mint green) -->
+    <marker id="am" viewBox="0 0 12 12" refX="10" refY="6"
+            markerWidth="54" markerHeight="54" orient="auto"
+            markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 12 6, 0 12" fill="#8EF8C3"/>
+    </marker>
+    <!-- Arrowhead for outflow (white) -->
+    <marker id="aw" viewBox="0 0 12 12" refX="10" refY="6"
+            markerWidth="54" markerHeight="54" orient="auto"
+            markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 12 6, 0 12" fill="#FFFFFF"/>
+    </marker>
+  </defs>
+
+  <!-- Background: deep green rounded square -->
+  <rect width="512" height="512" rx="100" fill="#006C47"/>
+
+  <!-- Top arc: income — mint green, clockwise through top (φ 200°→340°, 140°) -->
+  <!-- Start (115,205) = φ200°, End (397,205) = φ340°, center (256,256), r=150 -->
+  <path d="M 115 205 A 150 150 0 0 1 397 205"
+        fill="none" stroke="#8EF8C3" stroke-width="36" stroke-linecap="round"
+        marker-end="url(#am)"/>
+
+  <!-- Bottom arc: outflow — white, clockwise through bottom (φ 20°→160°, 140°) -->
+  <!-- Start (397,307) = φ20°, End (115,307) = φ160°, center (256,256), r=150 -->
+  <path d="M 397 307 A 150 150 0 0 1 115 307"
+        fill="none" stroke="#FFFFFF" stroke-width="36" stroke-linecap="round"
+        marker-end="url(#aw)"/>
+</svg>

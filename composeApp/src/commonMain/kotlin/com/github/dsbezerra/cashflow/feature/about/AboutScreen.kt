@@ -23,16 +23,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cashflow.composeapp.generated.resources.Res
-import cashflow.composeapp.generated.resources.about_app_initials
 import cashflow.composeapp.generated.resources.about_app_name
 import cashflow.composeapp.generated.resources.about_made_with
 import cashflow.composeapp.generated.resources.about_tagline
 import cashflow.composeapp.generated.resources.about_title
 import cashflow.composeapp.generated.resources.about_version
 import cashflow.composeapp.generated.resources.back
+import com.github.dsbezerra.cashflow.core.designsystem.icon.CashflowLogo
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,11 +65,9 @@ fun AboutScreen(onNavigateBack: () -> Unit) {
                     .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = stringResource(Res.string.about_app_initials),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                Icon(
+                    imageVector = CashflowLogo,
+                    contentDescription = stringResource(Res.string.about_app_name),
                 )
             }
             Spacer(Modifier.height(24.dp))
