@@ -25,6 +25,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.about_app_initials
+import cashflow.composeapp.generated.resources.about_app_name
+import cashflow.composeapp.generated.resources.about_made_with
+import cashflow.composeapp.generated.resources.about_tagline
+import cashflow.composeapp.generated.resources.about_title
+import cashflow.composeapp.generated.resources.about_version
+import cashflow.composeapp.generated.resources.back
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,10 +41,10 @@ fun AboutScreen(onNavigateBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Sobre") },
+                title = { Text(stringResource(Res.string.about_title)) },
                 navigationIcon = {
-                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = "Voltar") {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = stringResource(Res.string.back)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
             )
@@ -56,7 +65,7 @@ fun AboutScreen(onNavigateBack: () -> Unit) {
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "CF",
+                    text = stringResource(Res.string.about_app_initials),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -64,19 +73,19 @@ fun AboutScreen(onNavigateBack: () -> Unit) {
             }
             Spacer(Modifier.height(24.dp))
             Text(
-                text = "CashFlow",
+                text = stringResource(Res.string.about_app_name),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "Versão 1.0.0",
+                text = stringResource(Res.string.about_version),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Gerenciamento pessoal de finanças",
+                text = stringResource(Res.string.about_tagline),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -84,7 +93,7 @@ fun AboutScreen(onNavigateBack: () -> Unit) {
             HorizontalDivider()
             Spacer(Modifier.height(24.dp))
             Text(
-                text = "Desenvolvido com ♥ usando Kotlin Multiplatform",
+                text = stringResource(Res.string.about_made_with),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

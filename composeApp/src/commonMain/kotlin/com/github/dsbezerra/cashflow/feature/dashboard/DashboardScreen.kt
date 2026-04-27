@@ -1,6 +1,5 @@
 package com.github.dsbezerra.cashflow.feature.dashboard
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,14 +50,26 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.github.dsbezerra.cashflow.core.designsystem.theme.AppColors
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.all
+import cashflow.composeapp.generated.resources.dashboard_account
+import cashflow.composeapp.generated.resources.dashboard_expense_chart
+import cashflow.composeapp.generated.resources.dashboard_expenses
+import cashflow.composeapp.generated.resources.dashboard_income
+import cashflow.composeapp.generated.resources.dashboard_income_chart
+import cashflow.composeapp.generated.resources.dashboard_last_6_months
+import cashflow.composeapp.generated.resources.dashboard_month_balance
+import cashflow.composeapp.generated.resources.dashboard_no_data_6_months
+import cashflow.composeapp.generated.resources.dashboard_no_transactions_month
+import cashflow.composeapp.generated.resources.dashboard_recent
+import cashflow.composeapp.generated.resources.dashboard_see_all
+import cashflow.composeapp.generated.resources.transaction_count
 import com.github.dsbezerra.cashflow.core.domain.model.Account
 import com.github.dsbezerra.cashflow.core.domain.model.DashboardSummary
 import com.github.dsbezerra.cashflow.core.domain.model.Decimal
 import com.github.dsbezerra.cashflow.core.domain.model.MonthlyAmount
-import com.github.dsbezerra.cashflow.core.domain.model.toDecimal
 import com.github.dsbezerra.cashflow.core.designsystem.component.AmountText
 import com.github.dsbezerra.cashflow.core.designsystem.component.TopBarWithNavigation
-import com.github.dsbezerra.cashflow.feature.dashboard.RecentTransaction
 import com.github.dsbezerra.cashflow.util.namePtBr
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
@@ -69,6 +80,8 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.LineProperties
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -106,7 +119,7 @@ fun DashboardScreen(
                                 fontWeight = FontWeight.Bold,
                             )
                             Text(
-                                text = "${state.summary?.year} · ${state.summary?.transactionCount} transações",
+                                text = "${state.summary?.year} · ${pluralStringResource(Res.plurals.transaction_count, state.summary?.transactionCount ?: 0, state.summary?.transactionCount ?: 0)}",
                                 style = MaterialTheme.typography.titleSmallEmphasized,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -182,7 +195,7 @@ private fun AccountSelector(
             FilterChip(
                 selected = selectedAccountId == null,
                 onClick = { onAccountSelected(null) },
-                label = { Text("Todas") },
+                label = { Text(stringResource(Res.string.all)) },
             )
         }
         items(accounts) { account ->
@@ -210,7 +223,7 @@ private fun NetBalance(summary: DashboardSummary, state: DashboardState) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "Saldo do Mês".uppercase(),
+            text = stringResource(Res.string.dashboard_month_balance).uppercase(),
             style = MaterialTheme.typography.titleSmallEmphasized,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -232,7 +245,7 @@ private fun NetBalance(summary: DashboardSummary, state: DashboardState) {
                 shape = CircleShape,
             ) {}
             Text(
-                text = "Conta ${defaultAccount?.name}",
+                text = stringResource(Res.string.dashboard_account, defaultAccount.name),
                 style = MaterialTheme.typography.labelSmallEmphasized,
             )
         }
@@ -247,14 +260,14 @@ private fun SummaryCards(summary: DashboardSummary) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         SummaryCard(
-            label = "Receitas",
+            label = stringResource(Res.string.dashboard_income),
             amount = summary.monthlyIncome,
             color = cashFlowColors.income,
             icon = Icons.Filled.ArrowUpward,
             modifier = Modifier.weight(1f),
         )
         SummaryCard(
-            label = "Despesas",
+            label = stringResource(Res.string.dashboard_expenses),
             amount = summary.monthlyExpenses,
             color = cashFlowColors.expense,
             icon = Icons.Filled.ArrowDownward,
@@ -330,7 +343,7 @@ private fun IncomeExpenseBarChart(breakdown: List<MonthlyAmount>) {
             Modifier.padding(16.dp)
         ) {
             Text(
-                text = "Ultimos 6 meses",
+                text = stringResource(Res.string.dashboard_last_6_months),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -341,7 +354,7 @@ private fun IncomeExpenseBarChart(breakdown: List<MonthlyAmount>) {
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "Sem dados nos últimos 6 meses",
+                        text = stringResource(Res.string.dashboard_no_data_6_months),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -357,12 +370,12 @@ private fun IncomeExpenseBarChart(breakdown: List<MonthlyAmount>) {
                                 .replaceFirstChar { it.uppercase() },
                             values = listOf(
                                 Bars.Data(
-                                    label = "Receita",
+                                    label = stringResource(Res.string.dashboard_income_chart),
                                     value = month.income,
                                     color = SolidColor(cashFlowColors.income)
                                 ),
                                 Bars.Data(
-                                    label = "Despesa",
+                                    label = stringResource(Res.string.dashboard_expense_chart),
                                     value = month.expenses,
                                     color = SolidColor(cashFlowColors.expense)
                                 ),
@@ -419,7 +432,7 @@ private fun RecentTransactions(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Recentes",
+                text = stringResource(Res.string.dashboard_recent),
                 style = MaterialTheme.typography.titleSmallEmphasized,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -429,7 +442,7 @@ private fun RecentTransactions(
                     onClick = onSeeAll,
                 ) {
                     Text(
-                        text = "Ver tudo",
+                        text = stringResource(Res.string.dashboard_see_all),
                         style = MaterialTheme.typography.labelSmallEmphasized,
                         fontWeight = FontWeight.SemiBold,
                     )
@@ -438,7 +451,7 @@ private fun RecentTransactions(
         }
         if (transactions.isEmpty()) {
             Text(
-                text = "Nenhuma transação neste mês",
+                text = stringResource(Res.string.dashboard_no_transactions_month),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp),

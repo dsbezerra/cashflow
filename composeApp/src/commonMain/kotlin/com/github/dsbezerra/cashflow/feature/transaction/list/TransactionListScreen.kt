@@ -28,12 +28,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.transaction_empty_subtitle
+import cashflow.composeapp.generated.resources.transaction_empty_title
 import com.github.dsbezerra.cashflow.core.designsystem.component.AmountText
 import com.github.dsbezerra.cashflow.core.designsystem.component.DSFullscreenLoader
 import com.github.dsbezerra.cashflow.core.domain.model.Transaction
 import com.github.dsbezerra.cashflow.util.formatFullPtBr
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.LocalDate
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -64,11 +68,11 @@ fun TransactionListScreen(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                "Nenhuma transação ainda",
+                                stringResource(Res.string.transaction_empty_title),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
-                                "Toque em + para adicionar sua primeira transação",
+                                stringResource(Res.string.transaction_empty_subtitle),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )

@@ -32,10 +32,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.account_default_tooltip
+import cashflow.composeapp.generated.resources.account_empty_subtitle
+import cashflow.composeapp.generated.resources.account_empty_title
+import cashflow.composeapp.generated.resources.account_set_default
 import com.github.dsbezerra.cashflow.core.designsystem.component.accountIcon
 import com.github.dsbezerra.cashflow.core.designsystem.component.DSFullscreenLoader
 import com.github.dsbezerra.cashflow.feature.account.accountTypeName
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -62,9 +68,9 @@ fun AccountListScreen(
             } else if (state.accounts.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Nenhuma conta ainda", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(Res.string.account_empty_title), style = MaterialTheme.typography.titleMedium)
                         Text(
-                            "Toque em + para adicionar sua primeira conta",
+                            stringResource(Res.string.account_empty_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -123,11 +129,11 @@ private fun AccountRow(
         )
         IconButtonWithTooltip(
             onClick = onSetDefault,
-            tooltip = if (item.account.isDefault) "Conta padrão" else "Definir como padrão",
+            tooltip = if (item.account.isDefault) stringResource(Res.string.account_default_tooltip) else stringResource(Res.string.account_set_default),
         ) {
             Icon(
                 imageVector = if (item.account.isDefault) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                contentDescription = if (item.account.isDefault) "Conta padrão" else "Definir como padrão",
+                contentDescription = if (item.account.isDefault) stringResource(Res.string.account_default_tooltip) else stringResource(Res.string.account_set_default),
                 tint = if (item.account.isDefault) MaterialTheme.colorScheme.primary
                        else MaterialTheme.colorScheme.onSurfaceVariant,
             )

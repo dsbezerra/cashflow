@@ -38,12 +38,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.back
+import cashflow.composeapp.generated.resources.days
+import cashflow.composeapp.generated.resources.months
+import cashflow.composeapp.generated.resources.recurring_active
+import cashflow.composeapp.generated.resources.recurring_add
+import cashflow.composeapp.generated.resources.recurring_empty_subtitle
+import cashflow.composeapp.generated.resources.recurring_empty_title
+import cashflow.composeapp.generated.resources.recurring_freq_daily
+import cashflow.composeapp.generated.resources.recurring_freq_monthly
+import cashflow.composeapp.generated.resources.recurring_freq_weekly
+import cashflow.composeapp.generated.resources.recurring_freq_yearly
+import cashflow.composeapp.generated.resources.recurring_frequency_format
+import cashflow.composeapp.generated.resources.recurring_next_date
+import cashflow.composeapp.generated.resources.recurring_paused
+import cashflow.composeapp.generated.resources.recurring_title
+import cashflow.composeapp.generated.resources.weeks
+import cashflow.composeapp.generated.resources.years
 import com.github.dsbezerra.cashflow.core.domain.model.Frequency
 import com.github.dsbezerra.cashflow.core.domain.model.RecurringRule
 import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
 import com.github.dsbezerra.cashflow.util.formatFullPtBr
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -72,17 +92,17 @@ fun RecurringRuleListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Transações Recorrentes") },
+                title = { Text(stringResource(Res.string.recurring_title)) },
                 navigationIcon = {
-                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = "Voltar") {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = stringResource(Res.string.back)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { onNavigateToForm(null) }) {
-                Icon(Icons.Default.Add, contentDescription = "Adicionar regra")
+                Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.recurring_add))
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -96,11 +116,11 @@ fun RecurringRuleListScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            "Nenhuma regra recorrente",
+                            stringResource(Res.string.recurring_empty_title),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            "Toque em + para adicionar",
+                            stringResource(Res.string.recurring_empty_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -147,8 +167,19 @@ private fun RecurringRuleRow(
         TransactionType.EXPENSE -> cashFlowColors.expense
         TransactionType.TRANSFER -> Color.Unspecified
     }
-    val frequencyLabel =
-        "${rule.frequency.labelPtBr()} · a cada ${rule.interval} ${rule.frequency.unitPtBr(rule.interval)}"
+    val freqLabel = when (rule.frequency) {
+        Frequency.DAILY -> stringResource(Res.string.recurring_freq_daily)
+        Frequency.WEEKLY -> stringResource(Res.string.recurring_freq_weekly)
+        Frequency.MONTHLY -> stringResource(Res.string.recurring_freq_monthly)
+        Frequency.YEARLY -> stringResource(Res.string.recurring_freq_yearly)
+    }
+    val unitLabel = when (rule.frequency) {
+        Frequency.DAILY -> pluralStringResource(Res.plurals.days, rule.interval)
+        Frequency.WEEKLY -> pluralStringResource(Res.plurals.weeks, rule.interval)
+        Frequency.MONTHLY -> pluralStringResource(Res.plurals.months, rule.interval)
+        Frequency.YEARLY -> pluralStringResource(Res.plurals.years, rule.interval)
+    }
+    val frequencyLabel = stringResource(Res.string.recurring_frequency_format, freqLabel, rule.interval, unitLabel)
 
     Row(
         modifier = Modifier
@@ -183,7 +214,7 @@ private fun RecurringRuleRow(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "Próximo: ${nextDate.formatFullPtBr()}",
+                text = stringResource(Res.string.recurring_next_date, nextDate.formatFullPtBr()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -191,7 +222,7 @@ private fun RecurringRuleRow(
         FilterChip(
             selected = rule.isActive,
             onClick = { onToggleActive(!rule.isActive) },
-            label = { Text(if (rule.isActive) "Ativo" else "Pausado") },
+            label = { Text(if (rule.isActive) stringResource(Res.string.recurring_active) else stringResource(Res.string.recurring_paused)) },
             modifier = Modifier.padding(start = 8.dp),
             colors = FilterChipDefaults.filterChipColors(
                 selectedContainerColor = cashFlowColors.income.copy(alpha = 0.2f),
@@ -201,16 +232,3 @@ private fun RecurringRuleRow(
     }
 }
 
-private fun Frequency.labelPtBr(): String = when (this) {
-    Frequency.DAILY -> "Diário"
-    Frequency.WEEKLY -> "Semanal"
-    Frequency.MONTHLY -> "Mensal"
-    Frequency.YEARLY -> "Anual"
-}
-
-private fun Frequency.unitPtBr(interval: Int): String = when (this) {
-    Frequency.DAILY -> if (interval == 1) "dia" else "dias"
-    Frequency.WEEKLY -> if (interval == 1) "semana" else "semanas"
-    Frequency.MONTHLY -> if (interval == 1) "mês" else "meses"
-    Frequency.YEARLY -> if (interval == 1) "ano" else "anos"
-}

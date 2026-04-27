@@ -45,10 +45,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.account_color_placeholder
+import cashflow.composeapp.generated.resources.account_currency_label
+import cashflow.composeapp.generated.resources.account_delete
+import cashflow.composeapp.generated.resources.account_delete_confirm
+import cashflow.composeapp.generated.resources.account_edit
+import cashflow.composeapp.generated.resources.account_initial_balance
+import cashflow.composeapp.generated.resources.account_new
+import cashflow.composeapp.generated.resources.back
+import cashflow.composeapp.generated.resources.cancel
+import cashflow.composeapp.generated.resources.color_hex_label
+import cashflow.composeapp.generated.resources.delete
+import cashflow.composeapp.generated.resources.icon_label
+import cashflow.composeapp.generated.resources.name_label
+import cashflow.composeapp.generated.resources.save
+import cashflow.composeapp.generated.resources.saving
+import cashflow.composeapp.generated.resources.type_label
 import com.github.dsbezerra.cashflow.core.domain.model.AccountType
 import com.github.dsbezerra.cashflow.core.designsystem.component.accountIconOptions
 import com.github.dsbezerra.cashflow.feature.account.accountTypeName
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 private val currencies = listOf("BRL", "USD", "EUR", "GBP")
@@ -79,10 +97,10 @@ fun AccountFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (state.isEditMode) "Editar Conta" else "Nova Conta") },
+                title = { Text(if (state.isEditMode) stringResource(Res.string.account_edit) else stringResource(Res.string.account_new)) },
                 navigationIcon = {
-                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = "Voltar") {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = stringResource(Res.string.back)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
             )
@@ -152,14 +170,14 @@ fun AccountFormBody(
             OutlinedTextField(
                 value = state.name,
                 onValueChange = { onAction(AccountFormAction.NameChanged(it)) },
-                label = { Text("Nome") },
+                label = { Text(stringResource(Res.string.name_label)) },
                 isError = state.nameError != null,
                 supportingText = state.nameError?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
             )
 
             // Type
-            Text("Tipo", style = MaterialTheme.typography.labelLarge)
+            Text(stringResource(Res.string.type_label), style = MaterialTheme.typography.labelLarge)
             SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                 AccountType.entries.forEachIndexed { index, type ->
                     SegmentedButton(
@@ -173,7 +191,7 @@ fun AccountFormBody(
 
             // Currency
             SimpleDropdown(
-                label = "Moeda",
+                label = stringResource(Res.string.account_currency_label),
                 selectedValue = state.currency,
                 options = currencies,
                 onSelect = { onAction(AccountFormAction.CurrencyChanged(it)) },
@@ -183,7 +201,7 @@ fun AccountFormBody(
             CurrencyTextField(
                 value = state.initialBalanceInCents,
                 onValueChange = { onAction(AccountFormAction.InitialBalanceChanged(it)) },
-                label = "Saldo Inicial",
+                label = stringResource(Res.string.account_initial_balance),
                 isError = state.initialBalanceError != null,
                 supportingText = state.initialBalanceError?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
@@ -191,7 +209,7 @@ fun AccountFormBody(
 
             // Icon
             SimpleDropdown(
-                label = "Ícone",
+                label = stringResource(Res.string.icon_label),
                 selectedValue = state.icon,
                 options = accountIconOptions,
                 onSelect = { onAction(AccountFormAction.IconChanged(it)) },
@@ -201,8 +219,8 @@ fun AccountFormBody(
             OutlinedTextField(
                 value = state.color,
                 onValueChange = { onAction(AccountFormAction.ColorChanged(it)) },
-                label = { Text("Cor (hex)") },
-                placeholder = { Text("#4CAF50") },
+                label = { Text(stringResource(Res.string.color_hex_label)) },
+                placeholder = { Text(stringResource(Res.string.account_color_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -213,7 +231,7 @@ fun AccountFormBody(
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(if (state.isSaving) "Salvando..." else "Salvar")
+                Text(if (state.isSaving) stringResource(Res.string.saving) else stringResource(Res.string.save))
             }
 
             if (state.isEditMode) {
@@ -225,7 +243,7 @@ fun AccountFormBody(
                     ),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Excluir Conta")
+                    Text(stringResource(Res.string.account_delete))
                 }
             }
 
@@ -237,16 +255,16 @@ fun AccountFormBody(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Excluir Conta") },
-            text = { Text("Tem certeza que deseja excluir esta conta?") },
+            title = { Text(stringResource(Res.string.account_delete)) },
+            text = { Text(stringResource(Res.string.account_delete_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     onAction(AccountFormAction.ConfirmDelete)
-                }) { Text("Excluir") }
+                }) { Text(stringResource(Res.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar") }
+                TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(Res.string.cancel)) }
             },
         )
     }

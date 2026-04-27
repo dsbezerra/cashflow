@@ -40,12 +40,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.back
+import cashflow.composeapp.generated.resources.categories_title
+import cashflow.composeapp.generated.resources.category_archived
+import cashflow.composeapp.generated.resources.category_both
+import cashflow.composeapp.generated.resources.category_default
+import cashflow.composeapp.generated.resources.category_empty_subtitle
+import cashflow.composeapp.generated.resources.category_empty_title
+import cashflow.composeapp.generated.resources.category_expenses
+import cashflow.composeapp.generated.resources.category_income
+import cashflow.composeapp.generated.resources.category_new
 import com.github.dsbezerra.cashflow.core.domain.model.Category
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.core.designsystem.component.categoryIcon
 import com.github.dsbezerra.cashflow.core.designsystem.component.DSFullscreenLoader
 import com.github.dsbezerra.cashflow.feature.category.form.CategoryFormSheet
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,17 +84,17 @@ fun CategoryListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Categorias") },
+                title = { Text(stringResource(Res.string.categories_title)) },
                 navigationIcon = {
-                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = "Voltar") {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = stringResource(Res.string.back)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showCreateSheet = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Nova Categoria")
+                Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.category_new))
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -101,9 +113,9 @@ fun CategoryListScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Nenhuma categoria", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(Res.string.category_empty_title), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "Toque em + para criar sua primeira categoria",
+                        stringResource(Res.string.category_empty_subtitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -160,10 +172,10 @@ fun CategoryListScreen(
 private fun TypeSectionHeader(type: CategoryType?) {
     Text(
         text = when (type) {
-            CategoryType.INCOME -> "Receitas"
-            CategoryType.EXPENSE -> "Despesas"
-            CategoryType.BOTH -> "Receitas e Despesas"
-            null -> "Arquivadas"
+            CategoryType.INCOME -> stringResource(Res.string.category_income)
+            CategoryType.EXPENSE -> stringResource(Res.string.category_expenses)
+            CategoryType.BOTH -> stringResource(Res.string.category_both)
+            null -> stringResource(Res.string.category_archived)
         },
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.primary,
@@ -202,7 +214,7 @@ private fun CategoryRow(
         if (category.isDefault) {
             SuggestionChip(
                 onClick = {},
-                label = { Text("Padrão", style = MaterialTheme.typography.labelSmall) },
+                label = { Text(stringResource(Res.string.category_default), style = MaterialTheme.typography.labelSmall) },
                 colors = SuggestionChipDefaults.suggestionChipColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),

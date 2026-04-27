@@ -47,10 +47,38 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.back
+import cashflow.composeapp.generated.resources.cancel
+import cashflow.composeapp.generated.resources.category_archive
+import cashflow.composeapp.generated.resources.category_both_short
+import cashflow.composeapp.generated.resources.category_color_placeholder
+import cashflow.composeapp.generated.resources.category_delete
+import cashflow.composeapp.generated.resources.category_delete_confirm
+import cashflow.composeapp.generated.resources.category_dre_classification
+import cashflow.composeapp.generated.resources.category_edit
+import cashflow.composeapp.generated.resources.category_new
+import cashflow.composeapp.generated.resources.category_no_parent
+import cashflow.composeapp.generated.resources.category_parent_label
+import cashflow.composeapp.generated.resources.color_hex_label
+import cashflow.composeapp.generated.resources.delete
+import cashflow.composeapp.generated.resources.dre_costs
+import cashflow.composeapp.generated.resources.dre_deductions
+import cashflow.composeapp.generated.resources.dre_gross_revenue
+import cashflow.composeapp.generated.resources.dre_operational_expenses
+import cashflow.composeapp.generated.resources.dre_unclassified
+import cashflow.composeapp.generated.resources.expense
+import cashflow.composeapp.generated.resources.icon_label
+import cashflow.composeapp.generated.resources.income
+import cashflow.composeapp.generated.resources.name_label
+import cashflow.composeapp.generated.resources.save
+import cashflow.composeapp.generated.resources.saving
+import cashflow.composeapp.generated.resources.type_label
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.core.domain.model.DreClassification
 import com.github.dsbezerra.cashflow.core.designsystem.component.categoryIconOptions
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,19 +107,19 @@ fun CategoryFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (state.isEditMode) "Editar Categoria" else "Nova Categoria") },
+                title = { Text(if (state.isEditMode) stringResource(Res.string.category_edit) else stringResource(Res.string.category_new)) },
                 navigationIcon = {
-                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = "Voltar") {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = stringResource(Res.string.back)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
                 actions = {
                     if (state.isEditMode && !state.isDefault) {
                         IconButtonWithTooltip(
                             onClick = { viewModel.onAction(CategoryFormAction.ConfirmDelete) },
-                            tooltip = "Excluir",
+                            tooltip = stringResource(Res.string.delete),
                         ) {
-                            Icon(Icons.Default.Delete, contentDescription = "Excluir")
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(Res.string.delete))
                         }
                     }
                 },
@@ -162,7 +190,7 @@ fun CategoryFormBody(
             OutlinedTextField(
                 value = state.name,
                 onValueChange = { onAction(CategoryFormAction.NameChanged(it)) },
-                label = { Text("Nome") },
+                label = { Text(stringResource(Res.string.name_label)) },
                 isError = state.nameError != null,
                 supportingText = state.nameError?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
@@ -170,7 +198,7 @@ fun CategoryFormBody(
             )
 
             // Type
-            Text("Tipo", style = MaterialTheme.typography.labelLarge)
+            Text(stringResource(Res.string.type_label), style = MaterialTheme.typography.labelLarge)
             SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                 CategoryType.entries.forEachIndexed { index, type ->
                     SegmentedButton(
@@ -181,9 +209,9 @@ fun CategoryFormBody(
                         label = {
                             Text(
                                 when (type) {
-                                    CategoryType.INCOME -> "Receita"
-                                    CategoryType.EXPENSE -> "Despesa"
-                                    CategoryType.BOTH -> "Ambos"
+                                    CategoryType.INCOME -> stringResource(Res.string.income)
+                                    CategoryType.EXPENSE -> stringResource(Res.string.expense)
+                                    CategoryType.BOTH -> stringResource(Res.string.category_both_short)
                                 }
                             )
                         },
@@ -192,20 +220,29 @@ fun CategoryFormBody(
             }
 
             // DRE Classification
-            Text("Classificação DRE", style = MaterialTheme.typography.labelLarge)
+            Text(stringResource(Res.string.category_dre_classification), style = MaterialTheme.typography.labelLarge)
+            val dreLabels = DreClassification.entries.map { dre ->
+                dre to when (dre) {
+                    DreClassification.GROSS_REVENUE -> stringResource(Res.string.dre_gross_revenue)
+                    DreClassification.DEDUCTION -> stringResource(Res.string.dre_deductions)
+                    DreClassification.COST -> stringResource(Res.string.dre_costs)
+                    DreClassification.EXPENSE -> stringResource(Res.string.dre_operational_expenses)
+                    DreClassification.NONE -> stringResource(Res.string.dre_unclassified)
+                }
+            }
             CategoryDropdown(
-                label = "Classificação DRE",
-                selectedValue = state.dreClassification.labelPtBr(),
-                options = DreClassification.entries.map { it.labelPtBr() },
+                label = stringResource(Res.string.category_dre_classification),
+                selectedValue = dreLabels.first { it.first == state.dreClassification }.second,
+                options = dreLabels.map { it.second },
                 onSelect = { selected ->
-                    val dre = DreClassification.entries.first { it.labelPtBr() == selected }
+                    val dre = dreLabels.first { it.second == selected }.first
                     onAction(CategoryFormAction.DreClassificationChanged(dre))
                 },
             )
 
             // Icon
             CategoryDropdown(
-                label = "Ícone",
+                label = stringResource(Res.string.icon_label),
                 selectedValue = state.icon,
                 options = categoryIconOptions,
                 onSelect = { onAction(CategoryFormAction.IconChanged(it)) },
@@ -215,19 +252,20 @@ fun CategoryFormBody(
             OutlinedTextField(
                 value = state.color,
                 onValueChange = { onAction(CategoryFormAction.ColorChanged(it)) },
-                label = { Text("Cor (hex)") },
-                placeholder = { Text("#9E9E9E") },
+                label = { Text(stringResource(Res.string.color_hex_label)) },
+                placeholder = { Text(stringResource(Res.string.category_color_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
             )
 
             // Parent category
             if (state.availableParents.isNotEmpty()) {
-                val parentOptions = listOf(null to "Sem categoria pai") +
+                val noParentLabel = stringResource(Res.string.category_no_parent)
+                val parentOptions = listOf(null to noParentLabel) +
                         state.availableParents.map { it.id to it.name }
                 CategoryDropdown(
-                    label = "Categoria pai (opcional)",
+                    label = stringResource(Res.string.category_parent_label),
                     selectedValue = parentOptions.firstOrNull { it.first == state.parentId }?.second
-                        ?: "Sem categoria pai",
+                        ?: noParentLabel,
                     options = parentOptions.map { it.second },
                     onSelect = { selected ->
                         val parentId = parentOptions.firstOrNull { it.second == selected }?.first
@@ -246,7 +284,7 @@ fun CategoryFormBody(
                         checked = state.isArchived,
                         onCheckedChange = { onAction(CategoryFormAction.ArchivedChanged(it)) },
                     )
-                    Text("Arquivar categoria", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(Res.string.category_archive), style = MaterialTheme.typography.bodyLarge)
                 }
             }
 
@@ -257,7 +295,7 @@ fun CategoryFormBody(
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(if (state.isSaving) "Salvando..." else "Salvar")
+                Text(if (state.isSaving) stringResource(Res.string.saving) else stringResource(Res.string.save))
             }
 
             if (state.isEditMode && !state.isDefault) {
@@ -269,7 +307,7 @@ fun CategoryFormBody(
                     ),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Excluir Categoria")
+                    Text(stringResource(Res.string.category_delete))
                 }
             }
 
@@ -281,27 +319,19 @@ fun CategoryFormBody(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Excluir Categoria") },
-            text = { Text("Tem certeza que deseja excluir esta categoria?") },
+            title = { Text(stringResource(Res.string.category_delete)) },
+            text = { Text(stringResource(Res.string.category_delete_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     onAction(CategoryFormAction.ConfirmDelete)
-                }) { Text("Excluir") }
+                }) { Text(stringResource(Res.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar") }
+                TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(Res.string.cancel)) }
             },
         )
     }
-}
-
-private fun DreClassification.labelPtBr(): String = when (this) {
-    DreClassification.GROSS_REVENUE -> "Receita Bruta"
-    DreClassification.DEDUCTION -> "Deduções"
-    DreClassification.COST -> "Custos"
-    DreClassification.EXPENSE -> "Despesas Operacionais"
-    DreClassification.NONE -> "Não classificado"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

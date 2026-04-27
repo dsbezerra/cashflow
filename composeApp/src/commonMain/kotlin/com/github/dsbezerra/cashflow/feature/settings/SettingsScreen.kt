@@ -21,6 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.settings_about
+import cashflow.composeapp.generated.resources.settings_about_desc
+import cashflow.composeapp.generated.resources.settings_manage_categories
+import cashflow.composeapp.generated.resources.settings_manage_categories_desc
+import cashflow.composeapp.generated.resources.settings_recurring
+import cashflow.composeapp.generated.resources.settings_recurring_desc
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SettingsScreen(
@@ -38,8 +46,8 @@ fun SettingsScreen(
                         modifier = Modifier.size(24.dp)
                     )
                 },
-                title = "Gerenciar Categorias",
-                subtitle = "Criar, editar e arquivar categorias",
+                title = stringResource(Res.string.settings_manage_categories),
+                subtitle = stringResource(Res.string.settings_manage_categories_desc),
                 onClick = onNavigateToCategoryList,
             )
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
@@ -51,8 +59,8 @@ fun SettingsScreen(
                         modifier = Modifier.size(24.dp)
                     )
                 },
-                title = "Regras Recorrentes",
-                subtitle = "Gerenciar transações automáticas",
+                title = stringResource(Res.string.settings_recurring),
+                subtitle = stringResource(Res.string.settings_recurring_desc),
                 onClick = onNavigateToRecurringList,
             )
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
@@ -64,8 +72,8 @@ fun SettingsScreen(
                         modifier = Modifier.size(24.dp)
                     )
                 },
-                title = "Sobre o App",
-                subtitle = "Versão, informações e créditos",
+                title = stringResource(Res.string.settings_about),
+                subtitle = stringResource(Res.string.settings_about_desc),
                 onClick = onNavigateToAbout,
             )
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))

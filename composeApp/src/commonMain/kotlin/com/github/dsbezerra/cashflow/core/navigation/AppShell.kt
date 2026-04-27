@@ -38,21 +38,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.nav_accounts
+import cashflow.composeapp.generated.resources.nav_dashboard
+import cashflow.composeapp.generated.resources.nav_reports
+import cashflow.composeapp.generated.resources.nav_settings
+import cashflow.composeapp.generated.resources.nav_transactions
 import com.github.dsbezerra.cashflow.isDesktop
-import com.github.dsbezerra.cashflow.core.navigation.Accounts
-import com.github.dsbezerra.cashflow.core.navigation.Dashboard
-import com.github.dsbezerra.cashflow.core.navigation.Reports
-import com.github.dsbezerra.cashflow.core.navigation.Settings
-import com.github.dsbezerra.cashflow.core.navigation.TransactionDetail
-import com.github.dsbezerra.cashflow.core.navigation.TransactionList
-
-private val navItems = listOf(
-    NavItem("Painel", Icons.Default.Dashboard, Dashboard),
-    NavItem("Transações", Icons.Default.List, TransactionList),
-    NavItem("Contas", Icons.Default.AccountBalance, Accounts),
-    NavItem("Relatórios", Icons.Default.BarChart, Reports),
-    NavItem("Configurações", Icons.Default.Settings, Settings),
-)
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AppShell(
@@ -60,6 +53,13 @@ fun AppShell(
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (Modifier) -> Unit,
 ) {
+    val navItems = listOf(
+        NavItem(stringResource(Res.string.nav_dashboard), Icons.Default.Dashboard, Dashboard),
+        NavItem(stringResource(Res.string.nav_transactions), Icons.Default.List, TransactionList),
+        NavItem(stringResource(Res.string.nav_accounts), Icons.Default.AccountBalance, Accounts),
+        NavItem(stringResource(Res.string.nav_reports), Icons.Default.BarChart, Reports),
+        NavItem(stringResource(Res.string.nav_settings), Icons.Default.Settings, Settings),
+    )
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 

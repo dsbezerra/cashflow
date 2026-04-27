@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Common -->
+    <string name="back">Voltar</string>
+    <string name="save">Salvar</string>
+    <string name="saving">Salvando...</string>
+    <string name="delete">Excluir</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="name_label">Nome</string>
+    <string name="type_label">Tipo</string>
+    <string name="description_label">Descrição</string>
+    <string name="amount_label">Valor</string>
+    <string name="account_label">Conta</string>
+    <string name="category_label">Categoria</string>
+    <string name="icon_label">Ícone</string>
+    <string name="color_hex_label">Cor (hex)</string>
+    <string name="income">Receita</string>
+    <string name="expense">Despesa</string>
+    <string name="all">Todas</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Painel</string>
+    <string name="nav_transactions">Transações</string>
+    <string name="nav_accounts">Contas</string>
+    <string name="nav_reports">Relatórios</string>
+    <string name="nav_settings">Configurações</string>
+
+    <!-- Top bar navigation -->
+    <string name="topbar_previous">Anterior</string>
+    <string name="topbar_next">Próximo</string>
+
+    <!-- Account -->
+    <string name="account_new">Nova Conta</string>
+    <string name="account_edit">Editar Conta</string>
+    <string name="account_delete">Excluir Conta</string>
+    <string name="account_delete_confirm">Tem certeza que deseja excluir esta conta?</string>
+    <string name="account_empty_title">Nenhuma conta ainda</string>
+    <string name="account_empty_subtitle">Toque em + para adicionar sua primeira conta</string>
+    <string name="account_default_tooltip">Conta padrão</string>
+    <string name="account_set_default">Definir como padrão</string>
+    <string name="account_initial_balance">Saldo Inicial</string>
+    <string name="account_currency_label">Moeda</string>
+    <string name="account_color_placeholder">#4CAF50</string>
+    <string name="account_type_checking">Conta Corrente</string>
+    <string name="account_type_savings">Poupança</string>
+    <string name="account_type_cash">Dinheiro</string>
+    <string name="account_type_credit_card">Cartão de Crédito</string>
+    <string name="account_type_investments">Investimentos</string>
+
+    <!-- Category -->
+    <string name="categories_title">Categorias</string>
+    <string name="category_new">Nova Categoria</string>
+    <string name="category_edit">Editar Categoria</string>
+    <string name="category_delete">Excluir Categoria</string>
+    <string name="category_delete_confirm">Tem certeza que deseja excluir esta categoria?</string>
+    <string name="category_empty_title">Nenhuma categoria</string>
+    <string name="category_empty_subtitle">Toque em + para criar sua primeira categoria</string>
+    <string name="category_income">Receitas</string>
+    <string name="category_expenses">Despesas</string>
+    <string name="category_both">Receitas e Despesas</string>
+    <string name="category_both_short">Ambos</string>
+    <string name="category_archived">Arquivadas</string>
+    <string name="category_default">Padrão</string>
+    <string name="category_archive">Arquivar categoria</string>
+    <string name="category_parent_label">Categoria pai (opcional)</string>
+    <string name="category_no_parent">Sem categoria pai</string>
+    <string name="category_dre_classification">Classificação DRE</string>
+    <string name="category_color_placeholder">#9E9E9E</string>
+
+    <!-- Transaction -->
+    <string name="transaction_new">Nova Transação</string>
+    <string name="transaction_edit">Editar Transação</string>
+    <string name="transaction_delete">Excluir Transação</string>
+    <string name="transaction_delete_confirm">Tem certeza que deseja excluir esta transação?</string>
+    <string name="transaction_empty_title">Nenhuma transação ainda</string>
+    <string name="transaction_empty_subtitle">Toque em + para adicionar sua primeira transação</string>
+    <string name="transaction_transfer">Transferência</string>
+    <string name="transaction_source_account">Conta de Origem</string>
+    <string name="transaction_destination_account">Conta de Destino</string>
+    <string name="transaction_notes">Notas (opcional)</string>
+    <string name="transaction_date">Data: %1$s</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_month_balance">Saldo do Mês</string>
+    <string name="dashboard_account">Conta %1$s</string>
+    <string name="dashboard_income">Receitas</string>
+    <string name="dashboard_expenses">Despesas</string>
+    <string name="dashboard_last_6_months">Ultimos 6 meses</string>
+    <string name="dashboard_no_data_6_months">Sem dados nos últimos 6 meses</string>
+    <string name="dashboard_recent">Recentes</string>
+    <string name="dashboard_see_all">Ver tudo</string>
+    <string name="dashboard_no_transactions_month">Nenhuma transação neste mês</string>
+    <string name="dashboard_income_chart">Receita</string>
+    <string name="dashboard_expense_chart">Despesa</string>
+
+    <!-- Report -->
+    <string name="report_by_period">Por Período</string>
+    <string name="report_by_category">Por Categoria</string>
+    <string name="report_dre">DRE</string>
+    <string name="report_no_transactions_period">Nenhuma transação no período selecionado</string>
+    <string name="report_expenses_by_category">Despesas por categoria</string>
+    <string name="report_income_by_category">Receitas por categoria</string>
+    <string name="report_dre_error">Erro ao carregar DRE</string>
+    <string name="report_dre_no_movements">Sem movimentações em %1$s %2$d</string>
+    <string name="report_income">Receita</string>
+    <string name="report_expenses">Despesas</string>
+    <string name="report_balance">Saldo</string>
+    <string name="report_avg_daily_expenses">Média diária de despesas</string>
+    <string name="report_top_expense_category">Maior categoria de despesa</string>
+    <string name="report_most_used_category">Categoria mais usada</string>
+    <string name="report_balance_evolution">Evolução do saldo</string>
+    <string name="report_accumulated_balance">Saldo acumulado</string>
+    <string name="report_month_to_month">Mês a mês</string>
+    <string name="report_no_transactions_category">Nenhuma transação nesta categoria</string>
+    <string name="report_prev_month">Mês anterior</string>
+    <string name="report_next_month">Próximo mês</string>
+    <string name="report_gross_revenue">Receita Bruta</string>
+    <string name="report_gross_revenue_sign">(+)</string>
+    <string name="report_deductions">(-) Deduções</string>
+    <string name="report_net_revenue">(=) Receita Líquida</string>
+    <string name="report_costs">(-) Custos</string>
+    <string name="report_gross_profit">(=) Lucro Bruto</string>
+    <string name="report_operational_expenses_sign">(-)</string>
+    <string name="report_operational_expenses">Despesas Operacionais</string>
+    <string name="report_profit_loss">(=) Lucro / Prejuízo</string>
+    <string name="report_period_this_month">Este mês</string>
+    <string name="report_period_last_month">Mês anterior</string>
+    <string name="report_period_last_3_months">Últimos 3 meses</string>
+    <string name="report_period_last_6_months">Últimos 6 meses</string>
+    <string name="report_period_this_year">Este ano</string>
+
+    <!-- Recurring rules -->
+    <string name="recurring_title">Transações Recorrentes</string>
+    <string name="recurring_new">Nova Regra Recorrente</string>
+    <string name="recurring_edit">Editar Regra Recorrente</string>
+    <string name="recurring_delete_title">Excluir Regra</string>
+    <string name="recurring_delete_confirm">Tem certeza que deseja excluir esta regra recorrente?</string>
+    <string name="recurring_empty_title">Nenhuma regra recorrente</string>
+    <string name="recurring_empty_subtitle">Toque em + para adicionar</string>
+    <string name="recurring_add">Adicionar regra</string>
+    <string name="recurring_active">Ativo</string>
+    <string name="recurring_paused">Pausado</string>
+    <string name="recurring_frequency_label">Frequência</string>
+    <string name="recurring_interval_label">Intervalo</string>
+    <string name="recurring_start_date">Início: %1$s</string>
+    <string name="recurring_end_date">Fim: %1$s</string>
+    <string name="recurring_select">Selecionar</string>
+    <string name="recurring_no_end_date">Sem data final</string>
+    <string name="recurring_next_date">Próximo: %1$s</string>
+    <string name="recurring_freq_daily">Diário</string>
+    <string name="recurring_freq_weekly">Semanal</string>
+    <string name="recurring_freq_monthly">Mensal</string>
+    <string name="recurring_freq_yearly">Anual</string>
+    <string name="recurring_frequency_format">%1$s · a cada %2$d %3$s</string>
+
+    <!-- DRE classifications -->
+    <string name="dre_gross_revenue">Receita Bruta</string>
+    <string name="dre_deductions">Deduções</string>
+    <string name="dre_costs">Custos</string>
+    <string name="dre_operational_expenses">Despesas Operacionais</string>
+    <string name="dre_unclassified">Não classificado</string>
+
+    <!-- Settings -->
+    <string name="settings_manage_categories">Gerenciar Categorias</string>
+    <string name="settings_manage_categories_desc">Criar, editar e arquivar categorias</string>
+    <string name="settings_recurring">Regras Recorrentes</string>
+    <string name="settings_recurring_desc">Gerenciar transações automáticas</string>
+    <string name="settings_about">Sobre o App</string>
+    <string name="settings_about_desc">Versão, informações e créditos</string>
+
+    <!-- About -->
+    <string name="about_title">Sobre</string>
+    <string name="about_app_initials">CF</string>
+    <string name="about_app_name">CashFlow</string>
+    <string name="about_version">Versão 1.0.0</string>
+    <string name="about_tagline">Gerenciamento pessoal de finanças</string>
+    <string name="about_made_with">Desenvolvido com ♥ usando Kotlin Multiplatform</string>
+
+    <!-- Plurals -->
+    <plurals name="days">
+        <item quantity="one">dia</item>
+        <item quantity="other">dias</item>
+    </plurals>
+    <plurals name="weeks">
+        <item quantity="one">semana</item>
+        <item quantity="other">semanas</item>
+    </plurals>
+    <plurals name="months">
+        <item quantity="one">mês</item>
+        <item quantity="other">meses</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">ano</item>
+        <item quantity="other">anos</item>
+    </plurals>
+    <plurals name="transaction_count">
+        <item quantity="one">%1$d transação</item>
+        <item quantity="other">%1$d transações</item>
+    </plurals>
+
+</resources>

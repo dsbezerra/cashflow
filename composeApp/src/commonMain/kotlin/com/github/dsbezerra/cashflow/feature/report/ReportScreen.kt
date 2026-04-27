@@ -51,6 +51,43 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.all
+import cashflow.composeapp.generated.resources.report_accumulated_balance
+import cashflow.composeapp.generated.resources.report_avg_daily_expenses
+import cashflow.composeapp.generated.resources.report_balance
+import cashflow.composeapp.generated.resources.report_balance_evolution
+import cashflow.composeapp.generated.resources.report_by_category
+import cashflow.composeapp.generated.resources.report_by_period
+import cashflow.composeapp.generated.resources.report_costs
+import cashflow.composeapp.generated.resources.report_deductions
+import cashflow.composeapp.generated.resources.report_dre
+import cashflow.composeapp.generated.resources.report_dre_error
+import cashflow.composeapp.generated.resources.report_dre_no_movements
+import cashflow.composeapp.generated.resources.report_expenses
+import cashflow.composeapp.generated.resources.report_expenses_by_category
+import cashflow.composeapp.generated.resources.report_gross_profit
+import cashflow.composeapp.generated.resources.report_gross_revenue
+import cashflow.composeapp.generated.resources.report_gross_revenue_sign
+import cashflow.composeapp.generated.resources.report_income
+import cashflow.composeapp.generated.resources.report_income_by_category
+import cashflow.composeapp.generated.resources.report_month_to_month
+import cashflow.composeapp.generated.resources.report_most_used_category
+import cashflow.composeapp.generated.resources.report_net_revenue
+import cashflow.composeapp.generated.resources.report_next_month
+import cashflow.composeapp.generated.resources.report_no_transactions_category
+import cashflow.composeapp.generated.resources.report_no_transactions_period
+import cashflow.composeapp.generated.resources.report_operational_expenses
+import cashflow.composeapp.generated.resources.report_operational_expenses_sign
+import cashflow.composeapp.generated.resources.report_period_last_3_months
+import cashflow.composeapp.generated.resources.report_period_last_6_months
+import cashflow.composeapp.generated.resources.report_period_last_month
+import cashflow.composeapp.generated.resources.report_period_this_month
+import cashflow.composeapp.generated.resources.report_period_this_year
+import cashflow.composeapp.generated.resources.report_prev_month
+import cashflow.composeapp.generated.resources.report_profit_loss
+import cashflow.composeapp.generated.resources.report_top_expense_category
+import cashflow.composeapp.generated.resources.transaction_count
 import com.github.dsbezerra.cashflow.core.designsystem.component.IconButtonWithTooltip
 import com.github.dsbezerra.cashflow.core.domain.model.Account
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryAmount
@@ -64,6 +101,8 @@ import com.github.dsbezerra.cashflow.core.domain.model.toDecimal
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
 import com.github.dsbezerra.cashflow.util.namePtBr
 import kotlinx.datetime.Month
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
@@ -132,7 +171,13 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                             ),
                             label = {
                                 Text(
-                                    text = period.labelPtBr,
+                                    text = when (period) {
+                                        ReportPeriod.THIS_MONTH -> stringResource(Res.string.report_period_this_month)
+                                        ReportPeriod.LAST_MONTH -> stringResource(Res.string.report_period_last_month)
+                                        ReportPeriod.LAST_3_MONTHS -> stringResource(Res.string.report_period_last_3_months)
+                                        ReportPeriod.LAST_6_MONTHS -> stringResource(Res.string.report_period_last_6_months)
+                                        ReportPeriod.THIS_YEAR -> stringResource(Res.string.report_period_this_year)
+                                    },
                                     style = MaterialTheme.typography.labelSmall,
                                 )
                             },
@@ -148,21 +193,21 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                         onClick = { onAction(
                             ReportAction.TabChanged(
                                 ReportTab.BY_PERIOD)) },
-                        text = { Text("Por Período") },
+                        text = { Text(stringResource(Res.string.report_by_period)) },
                     )
                     Tab(
                         selected = state.selectedTab == ReportTab.BY_CATEGORY,
                         onClick = { onAction(
                             ReportAction.TabChanged(
                                 ReportTab.BY_CATEGORY)) },
-                        text = { Text("Por Categoria") },
+                        text = { Text(stringResource(Res.string.report_by_category)) },
                     )
                     Tab(
                         selected = state.selectedTab == ReportTab.DRE,
                         onClick = { onAction(
                             ReportAction.TabChanged(
                                 ReportTab.DRE)) },
-                        text = { Text("DRE") },
+                        text = { Text(stringResource(Res.string.report_dre)) },
                     )
                 }
             }
@@ -176,7 +221,7 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                 if (data.totalIncome == 0.0 && data.totalExpenses == 0.0) {
                     item {
                         EmptyState(
-                            "Nenhuma transação no período selecionado"
+                            stringResource(Res.string.report_no_transactions_period)
                         )
                     }
                 } else {
@@ -203,7 +248,7 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
             } else if (state.selectedTab == ReportTab.BY_CATEGORY) {
                 item {
                     CategoryBreakdownSection(
-                        title = "Despesas por categoria",
+                        title = stringResource(Res.string.report_expenses_by_category),
                         items = data.expenseByCategory,
                         color = cashFlowColors.expense,
                     )
@@ -211,7 +256,7 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                 if (data.incomeByCategory.isNotEmpty()) {
                     item {
                         CategoryBreakdownSection(
-                            title = "Receitas por categoria",
+                            title = stringResource(Res.string.report_income_by_category),
                             items = data.incomeByCategory,
                             color = cashFlowColors.income,
                         )
@@ -220,7 +265,7 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                 if (data.expenseByCategory.isEmpty() && data.incomeByCategory.isEmpty()) {
                     item {
                         EmptyState(
-                            "Nenhuma transação no período selecionado"
+                            stringResource(Res.string.report_no_transactions_period)
                         )
                     }
                 }
@@ -244,7 +289,7 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                     if (dre == null) {
                         item {
                             EmptyState(
-                                "Erro ao carregar DRE"
+                                stringResource(Res.string.report_dre_error)
                             )
                         }
                     } else if (dre.grossRevenue.total == 0.0 &&
@@ -254,10 +299,11 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                     ) {
                         item {
                             EmptyState(
-                                "Sem movimentações em " +
-                                        Month(state.dreMonth).namePtBr()
-                                            .replaceFirstChar { it.uppercase() } +
-                                        " ${state.dreYear}"
+                                stringResource(
+                                    Res.string.report_dre_no_movements,
+                                    Month(state.dreMonth).namePtBr().replaceFirstChar { it.uppercase() },
+                                    state.dreYear,
+                                )
                             )
                         }
                     } else {
@@ -287,7 +333,7 @@ private fun AccountSelector(
             FilterChip(
                 selected = selectedAccountId == null,
                 onClick = { onAccountSelected(null) },
-                label = { Text("Todas") },
+                label = { Text(stringResource(Res.string.all)) },
             )
         }
         items(accounts) { account ->
@@ -308,19 +354,19 @@ private fun PeriodSummaryCards(data: ReportData) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         SummaryCard(
-            label = "Receita",
+            label = stringResource(Res.string.report_income),
             amount = data.totalIncome,
             color = cashFlowColors.income,
             modifier = Modifier.weight(1f),
         )
         SummaryCard(
-            label = "Despesas",
+            label = stringResource(Res.string.report_expenses),
             amount = data.totalExpenses,
             color = cashFlowColors.expense,
             modifier = Modifier.weight(1f),
         )
         SummaryCard(
-            label = "Saldo",
+            label = stringResource(Res.string.report_balance),
             amount = data.netBalance,
             color = if (data.netBalance >= 0) cashFlowColors.income else cashFlowColors.expense,
             modifier = Modifier.weight(1f),
@@ -363,18 +409,18 @@ private fun PeriodExtraStats(data: ReportData) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             StatRow(
-                label = "Média diária de despesas",
+                label = stringResource(Res.string.report_avg_daily_expenses),
                 value = data.averageDailyExpense.toDecimal().toCurrency(),
             )
             if (data.highestExpenseCategory != null) {
                 StatRow(
-                    label = "Maior categoria de despesa",
+                    label = stringResource(Res.string.report_top_expense_category),
                     value = data.highestExpenseCategory.name,
                 )
             }
             if (data.mostUsedCategory != null) {
                 StatRow(
-                    label = "Categoria mais usada",
+                    label = stringResource(Res.string.report_most_used_category),
                     value = data.mostUsedCategory.name,
                 )
             }
@@ -406,7 +452,7 @@ private fun StatRow(label: String, value: String) {
 private fun DailyCumulativeLineChart(data: List<DailyAmount>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Evolução do saldo",
+            text = stringResource(Res.string.report_balance_evolution),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp),
@@ -417,7 +463,7 @@ private fun DailyCumulativeLineChart(data: List<DailyAmount>) {
         LineChart(
             data = listOf(
                 Line(
-                    label = "Saldo acumulado",
+                    label = stringResource(Res.string.report_accumulated_balance),
                     values = data.map { it.cumulativeNet },
                     color = SolidColor(MaterialTheme.colorScheme.primary),
                 ),
@@ -449,7 +495,7 @@ private fun MonthlyBarChart(data: List<MonthlyAmount>) {
     val cashFlowColors = AppColors.colors
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Mês a mês",
+            text = stringResource(Res.string.report_month_to_month),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp),
@@ -516,7 +562,7 @@ private fun CategoryBreakdownSection(
 @Composable
 private fun CategoryBreakdownList(items: List<CategoryAmount>, color: Color) {
     if (items.isEmpty()) {
-        EmptyState("Nenhuma transação nesta categoria")
+        EmptyState(stringResource(Res.string.report_no_transactions_category))
         return
     }
 
@@ -574,7 +620,7 @@ private fun CategoryAmountRow(
                     color = color,
                 )
                 Text(
-                    text = "${item.count} transaç${if (item.count == 1) "ão" else "ões"}",
+                    text = pluralStringResource(Res.plurals.transaction_count, item.count, item.count),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -619,9 +665,9 @@ private fun DreMonthSelector(year: Int, month: Int, onAction: (ReportAction) -> 
                 val prev = if (month == 1) Pair(year - 1, 12) else Pair(year, month - 1)
                 onAction(ReportAction.DreMonthChanged(prev.first, prev.second))
             },
-            tooltip = "Mês anterior",
+            tooltip = stringResource(Res.string.report_prev_month),
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Mês anterior")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.report_prev_month))
         }
         Text(
             text = "$monthName $year",
@@ -634,9 +680,9 @@ private fun DreMonthSelector(year: Int, month: Int, onAction: (ReportAction) -> 
                 val next = if (month == 12) Pair(year + 1, 1) else Pair(year, month + 1)
                 onAction(ReportAction.DreMonthChanged(next.first, next.second))
             },
-            tooltip = "Próximo mês",
+            tooltip = stringResource(Res.string.report_next_month),
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Próximo mês")
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = stringResource(Res.string.report_next_month))
         }
     }
 }
@@ -649,40 +695,40 @@ private fun DreStatement(dre: DreReport) {
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         DreSection(
-            sign = "(+)",
-            label = "Receita Bruta",
+            sign = stringResource(Res.string.report_gross_revenue_sign),
+            label = stringResource(Res.string.report_gross_revenue),
             item = dre.grossRevenue,
             color = cashFlowColors.income,
         )
         DreResultRow(
-            label = "(-) Deduções",
+            label = stringResource(Res.string.report_deductions),
             item = dre.deductions,
             color = cashFlowColors.expense
         )
         DreTotalRow(
-            label = "(=) Receita Líquida",
+            label = stringResource(Res.string.report_net_revenue),
             amount = dre.netRevenue
         )
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         DreResultRow(
-            label = "(-) Custos",
+            label = stringResource(Res.string.report_costs),
             item = dre.costs,
             color = cashFlowColors.expense
         )
         DreTotalRow(
-            label = "(=) Lucro Bruto",
+            label = stringResource(Res.string.report_gross_profit),
             amount = dre.grossProfit
         )
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         DreSection(
-            sign = "(-)",
-            label = "Despesas Operacionais",
+            sign = stringResource(Res.string.report_operational_expenses_sign),
+            label = stringResource(Res.string.report_operational_expenses),
             item = dre.operationalExpenses,
             color = cashFlowColors.expense,
         )
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         DreTotalRow(
-            label = "(=) Lucro / Prejuízo",
+            label = stringResource(Res.string.report_profit_loss),
             amount = dre.netResult,
             highlight = true,
         )

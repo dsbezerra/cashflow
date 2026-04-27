@@ -48,6 +48,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.account_label
+import cashflow.composeapp.generated.resources.amount_label
+import cashflow.composeapp.generated.resources.back
+import cashflow.composeapp.generated.resources.cancel
+import cashflow.composeapp.generated.resources.category_label
+import cashflow.composeapp.generated.resources.delete
+import cashflow.composeapp.generated.resources.description_label
+import cashflow.composeapp.generated.resources.expense
+import cashflow.composeapp.generated.resources.income
+import cashflow.composeapp.generated.resources.ok
+import cashflow.composeapp.generated.resources.save
+import cashflow.composeapp.generated.resources.saving
+import cashflow.composeapp.generated.resources.transaction_date
+import cashflow.composeapp.generated.resources.transaction_delete
+import cashflow.composeapp.generated.resources.transaction_delete_confirm
+import cashflow.composeapp.generated.resources.transaction_destination_account
+import cashflow.composeapp.generated.resources.transaction_edit
+import cashflow.composeapp.generated.resources.transaction_new
+import cashflow.composeapp.generated.resources.transaction_notes
+import cashflow.composeapp.generated.resources.transaction_source_account
+import cashflow.composeapp.generated.resources.transaction_transfer
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.util.formatPtBr
@@ -55,6 +77,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,10 +108,10 @@ fun TransactionDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (state.isEditMode) "Editar Transação" else "Nova Transação") },
+                title = { Text(if (state.isEditMode) stringResource(Res.string.transaction_edit) else stringResource(Res.string.transaction_new)) },
                 navigationIcon = {
-                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = "Voltar") {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = stringResource(Res.string.back)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
             )
@@ -165,9 +188,9 @@ fun TransactionFormBody(
                         label = {
                             Text(
                                 when (type) {
-                                    TransactionType.INCOME -> "Receita"
-                                    TransactionType.EXPENSE -> "Despesa"
-                                    TransactionType.TRANSFER -> "Transferência"
+                                    TransactionType.INCOME -> stringResource(Res.string.income)
+                                    TransactionType.EXPENSE -> stringResource(Res.string.expense)
+                                    TransactionType.TRANSFER -> stringResource(Res.string.transaction_transfer)
                                 }
                             )
                         },
@@ -179,7 +202,7 @@ fun TransactionFormBody(
             CurrencyTextField(
                 value = state.amountInCents,
                 onValueChange = { onAction(TransactionDetailAction.AmountChanged(it)) },
-                label = "Valor",
+                label = stringResource(Res.string.amount_label),
                 isError = state.amountError != null,
                 supportingText = state.amountError?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
@@ -189,7 +212,7 @@ fun TransactionFormBody(
             OutlinedTextField(
                 value = state.description,
                 onValueChange = { onAction(TransactionDetailAction.DescriptionChanged(it)) },
-                label = { Text("Descrição") },
+                label = { Text(stringResource(Res.string.description_label)) },
                 isError = state.descriptionError != null,
                 supportingText = state.descriptionError?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
@@ -202,7 +225,7 @@ fun TransactionFormBody(
                 onClick = { showDatePicker = true },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Data: ${localDate.formatPtBr()}")
+                Text(stringResource(Res.string.transaction_date, localDate.formatPtBr()))
             }
 
             // Category (hidden for TRANSFER)
@@ -215,7 +238,7 @@ fun TransactionFormBody(
                     }
                 }
                 ChipSelector(
-                    label = "Categoria",
+                    label = stringResource(Res.string.category_label),
                     selectedId = state.selectedCategoryId,
                     items = filteredCategories.map { it.id to it.name },
                     isError = state.categoryError != null,
@@ -226,7 +249,7 @@ fun TransactionFormBody(
 
             // Account
             ChipSelector(
-                label = if (state.type == TransactionType.TRANSFER) "Conta de Origem" else "Conta",
+                label = if (state.type == TransactionType.TRANSFER) stringResource(Res.string.transaction_source_account) else stringResource(Res.string.account_label),
                 selectedId = state.selectedAccountId,
                 items = state.accounts.map { it.id to it.name },
                 isError = state.accountError != null,
@@ -237,7 +260,7 @@ fun TransactionFormBody(
             // To Account (TRANSFER only)
             if (state.type == TransactionType.TRANSFER) {
                 ChipSelector(
-                    label = "Conta de Destino",
+                    label = stringResource(Res.string.transaction_destination_account),
                     selectedId = state.selectedToAccountId,
                     items = state.accounts.map { it.id to it.name },
                     onSelect = { onAction(TransactionDetailAction.ToAccountSelected(it)) },
@@ -248,7 +271,7 @@ fun TransactionFormBody(
             OutlinedTextField(
                 value = state.notes,
                 onValueChange = { onAction(TransactionDetailAction.NotesChanged(it)) },
-                label = { Text("Notas (opcional)") },
+                label = { Text(stringResource(Res.string.transaction_notes)) },
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -260,7 +283,7 @@ fun TransactionFormBody(
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(if (state.isSaving) "Salvando..." else "Salvar")
+                Text(if (state.isSaving) stringResource(Res.string.saving) else stringResource(Res.string.save))
             }
 
             if (state.isEditMode) {
@@ -272,7 +295,7 @@ fun TransactionFormBody(
                     ),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Excluir Transação")
+                    Text(stringResource(Res.string.transaction_delete))
                 }
             }
 
@@ -291,10 +314,10 @@ fun TransactionFormBody(
                         onAction(TransactionDetailAction.DateChanged(it))
                     }
                     showDatePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(Res.string.ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
+                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(Res.string.cancel)) }
             },
         ) {
             DatePicker(state = datePickerState)
@@ -304,16 +327,16 @@ fun TransactionFormBody(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Excluir Transação") },
-            text = { Text("Tem certeza que deseja excluir esta transação?") },
+            title = { Text(stringResource(Res.string.transaction_delete)) },
+            text = { Text(stringResource(Res.string.transaction_delete_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     onAction(TransactionDetailAction.ConfirmDelete)
-                }) { Text("Excluir") }
+                }) { Text(stringResource(Res.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar") }
+                TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(Res.string.cancel)) }
             },
         )
     }

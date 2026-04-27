@@ -52,12 +52,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import cashflow.composeapp.generated.resources.Res
+import cashflow.composeapp.generated.resources.account_label
+import cashflow.composeapp.generated.resources.amount_label
+import cashflow.composeapp.generated.resources.back
+import cashflow.composeapp.generated.resources.cancel
+import cashflow.composeapp.generated.resources.category_label
+import cashflow.composeapp.generated.resources.delete
+import cashflow.composeapp.generated.resources.description_label
+import cashflow.composeapp.generated.resources.expense
+import cashflow.composeapp.generated.resources.income
+import cashflow.composeapp.generated.resources.ok
+import cashflow.composeapp.generated.resources.recurring_active
+import cashflow.composeapp.generated.resources.recurring_delete_confirm
+import cashflow.composeapp.generated.resources.recurring_delete_title
+import cashflow.composeapp.generated.resources.recurring_edit
+import cashflow.composeapp.generated.resources.recurring_end_date
+import cashflow.composeapp.generated.resources.recurring_freq_daily
+import cashflow.composeapp.generated.resources.recurring_freq_monthly
+import cashflow.composeapp.generated.resources.recurring_freq_weekly
+import cashflow.composeapp.generated.resources.recurring_freq_yearly
+import cashflow.composeapp.generated.resources.recurring_frequency_label
+import cashflow.composeapp.generated.resources.recurring_interval_label
+import cashflow.composeapp.generated.resources.recurring_new
+import cashflow.composeapp.generated.resources.recurring_no_end_date
+import cashflow.composeapp.generated.resources.recurring_select
+import cashflow.composeapp.generated.resources.recurring_start_date
+import cashflow.composeapp.generated.resources.save
+import cashflow.composeapp.generated.resources.saving
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.core.domain.model.Frequency
 import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
 import com.github.dsbezerra.cashflow.util.formatPtBr
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.stringResource
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -92,16 +121,16 @@ fun RecurringRuleFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (state.isEditMode) "Editar Regra Recorrente" else "Nova Regra Recorrente") },
+                title = { Text(if (state.isEditMode) stringResource(Res.string.recurring_edit) else stringResource(Res.string.recurring_new)) },
                 navigationIcon = {
-                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = "Voltar") {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    IconButtonWithTooltip(onClick = onNavigateBack, tooltip = stringResource(Res.string.back)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
                 actions = {
                     if (state.isEditMode) {
-                        IconButtonWithTooltip(onClick = { showDeleteConfirm = true }, tooltip = "Excluir") {
-                            Icon(Icons.Default.Delete, contentDescription = "Excluir")
+                        IconButtonWithTooltip(onClick = { showDeleteConfirm = true }, tooltip = stringResource(Res.string.delete)) {
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(Res.string.delete))
                         }
                     }
                 },
@@ -133,8 +162,8 @@ fun RecurringRuleFormScreen(
                             label = {
                                 Text(
                                     when (type) {
-                                        TransactionType.INCOME -> "Receita"
-                                        else -> "Despesa"
+                                        TransactionType.INCOME -> stringResource(Res.string.income)
+                                        else -> stringResource(Res.string.expense)
                                     }
                                 )
                             },
@@ -146,7 +175,7 @@ fun RecurringRuleFormScreen(
                 OutlinedTextField(
                     value = state.description,
                     onValueChange = { viewModel.onAction(RecurringRuleFormAction.DescriptionChanged(it)) },
-                    label = { Text("Descrição") },
+                    label = { Text(stringResource(Res.string.description_label)) },
                     isError = state.descriptionError != null,
                     supportingText = state.descriptionError?.let { { Text(it) } },
                     modifier = Modifier.fillMaxWidth(),
@@ -156,7 +185,7 @@ fun RecurringRuleFormScreen(
                 CurrencyTextField(
                     value = state.amountInCents,
                     onValueChange = { viewModel.onAction(RecurringRuleFormAction.AmountChanged(it)) },
-                    label = "Valor",
+                    label = stringResource(Res.string.amount_label),
                     isError = state.amountError != null,
                     supportingText = state.amountError?.let { { Text(it) } },
                     modifier = Modifier.fillMaxWidth(),
@@ -164,7 +193,7 @@ fun RecurringRuleFormScreen(
 
                 // Account
                 ChipSelector(
-                    label = "Conta",
+                    label = stringResource(Res.string.account_label),
                     selectedId = state.selectedAccountId,
                     items = state.availableAccounts.map { it.id to it.name },
                     isError = state.accountError != null,
@@ -181,7 +210,7 @@ fun RecurringRuleFormScreen(
                     }
                 }
                 ChipSelector(
-                    label = "Categoria",
+                    label = stringResource(Res.string.category_label),
                     selectedId = state.selectedCategoryId,
                     items = filteredCategories.map { it.id to it.name },
                     isError = state.categoryError != null,
@@ -190,9 +219,16 @@ fun RecurringRuleFormScreen(
                 )
 
                 ChipSelector(
-                    label = "Frequência",
+                    label = stringResource(Res.string.recurring_frequency_label),
                     selectedId = state.frequency.name,
-                    items = Frequency.entries.map { it.name to it.labelPtBr() },
+                    items = Frequency.entries.map { freq ->
+                        freq.name to when (freq) {
+                            Frequency.DAILY -> stringResource(Res.string.recurring_freq_daily)
+                            Frequency.WEEKLY -> stringResource(Res.string.recurring_freq_weekly)
+                            Frequency.MONTHLY -> stringResource(Res.string.recurring_freq_monthly)
+                            Frequency.YEARLY -> stringResource(Res.string.recurring_freq_yearly)
+                        }
+                    },
                     onSelect = { selected ->
                         val freq = Frequency.entries.first { it.name == selected }
                         viewModel.onAction(RecurringRuleFormAction.FrequencyChanged(freq))
@@ -205,7 +241,7 @@ fun RecurringRuleFormScreen(
                     onValueChange = { v ->
                         v.toIntOrNull()?.let { viewModel.onAction(RecurringRuleFormAction.IntervalChanged(it)) }
                     },
-                    label = { Text("Intervalo") },
+                    label = { Text(stringResource(Res.string.recurring_interval_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -220,7 +256,7 @@ fun RecurringRuleFormScreen(
                     onClick = { showStartDatePicker = true },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Início: ${startLocalDate?.formatPtBr() ?: "Selecionar"}")
+                    Text(stringResource(Res.string.recurring_start_date, startLocalDate?.formatPtBr() ?: stringResource(Res.string.recurring_select)))
                 }
 
                 // End date
@@ -233,7 +269,7 @@ fun RecurringRuleFormScreen(
                     onClick = { showEndDatePicker = true },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Fim: ${endLocalDate?.formatPtBr() ?: "Sem data final"}")
+                    Text(stringResource(Res.string.recurring_end_date, endLocalDate?.formatPtBr() ?: stringResource(Res.string.recurring_no_end_date)))
                 }
 
                 // Active toggle
@@ -242,7 +278,7 @@ fun RecurringRuleFormScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("Ativo", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(Res.string.recurring_active), style = MaterialTheme.typography.bodyLarge)
                     Switch(
                         checked = state.isActive,
                         onCheckedChange = { viewModel.onAction(RecurringRuleFormAction.ActiveChanged(it)) },
@@ -256,7 +292,7 @@ fun RecurringRuleFormScreen(
                     enabled = !state.isSaving,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(if (state.isSaving) "Salvando..." else "Salvar")
+                    Text(if (state.isSaving) stringResource(Res.string.saving) else stringResource(Res.string.save))
                 }
             }
             DesktopVerticalScrollbar(scrollState)
@@ -275,10 +311,10 @@ fun RecurringRuleFormScreen(
                         viewModel.onAction(RecurringRuleFormAction.StartDateChanged(it))
                     }
                     showStartDatePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(Res.string.ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showStartDatePicker = false }) { Text("Cancelar") }
+                TextButton(onClick = { showStartDatePicker = false }) { Text(stringResource(Res.string.cancel)) }
             },
         ) {
             DatePicker(state = datePickerState)
@@ -293,10 +329,10 @@ fun RecurringRuleFormScreen(
                 TextButton(onClick = {
                     viewModel.onAction(RecurringRuleFormAction.EndDateChanged(datePickerState.selectedDateMillis))
                     showEndDatePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(Res.string.ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showEndDatePicker = false }) { Text("Cancelar") }
+                TextButton(onClick = { showEndDatePicker = false }) { Text(stringResource(Res.string.cancel)) }
             },
         ) {
             DatePicker(state = datePickerState)
@@ -306,24 +342,17 @@ fun RecurringRuleFormScreen(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Excluir Regra") },
-            text = { Text("Tem certeza que deseja excluir esta regra recorrente?") },
+            title = { Text(stringResource(Res.string.recurring_delete_title)) },
+            text = { Text(stringResource(Res.string.recurring_delete_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteConfirm = false
                     viewModel.onAction(RecurringRuleFormAction.ConfirmDelete)
-                }) { Text("Excluir") }
+                }) { Text(stringResource(Res.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar") }
+                TextButton(onClick = { showDeleteConfirm = false }) { Text(stringResource(Res.string.cancel)) }
             },
         )
     }
-}
-
-private fun Frequency.labelPtBr(): String = when (this) {
-    Frequency.DAILY -> "Diário"
-    Frequency.WEEKLY -> "Semanal"
-    Frequency.MONTHLY -> "Mensal"
-    Frequency.YEARLY -> "Anual"
 }
