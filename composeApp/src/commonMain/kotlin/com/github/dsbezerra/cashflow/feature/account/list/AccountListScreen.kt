@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
+import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedListItem
+import com.github.dsbezerra.cashflow.core.designsystem.component.groupedItems
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import com.github.dsbezerra.cashflow.core.designsystem.component.IconButtonWithTooltip
 import androidx.compose.material3.MaterialTheme
@@ -78,13 +78,14 @@ fun AccountListScreen(
                 }
             } else {
                 LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                    items(state.accounts, key = { it.account.id }) { item ->
-                        AccountRow(
-                            item = item,
-                            onClick = { onNavigateToDetail(item.account.id) },
-                            onSetDefault = { viewModel.onAction(AccountListAction.SetDefault(item.account.id)) },
-                        )
-                        HorizontalDivider()
+                    groupedItems(state.accounts, key = { it.account.id }) { item, position ->
+                        GroupedListItem(position = position) {
+                            AccountRow(
+                                item = item,
+                                onClick = { onNavigateToDetail(item.account.id) },
+                                onSetDefault = { viewModel.onAction(AccountListAction.SetDefault(item.account.id)) },
+                            )
+                        }
                     }
                 }
                 DesktopVerticalScrollbar(listState)

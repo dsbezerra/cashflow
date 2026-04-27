@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
+import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedListItem
+import com.github.dsbezerra.cashflow.core.designsystem.component.groupedItems
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Archive
@@ -172,15 +174,12 @@ fun AccountDetailScreen(
                         }
                         grouped.forEach { (date, txs) ->
                             item(key = "header-$date") {
-                                TransactionDateHeader(
-                                    date
-                                )
+                                TransactionDateHeader(date)
                             }
-                            items(txs, key = { it.id }) { tx ->
-                                TransactionItem(
-                                    tx
-                                )
-                                HorizontalDivider()
+                            groupedItems(txs, key = { it.id }) { tx, position ->
+                                GroupedListItem(position = position) {
+                                    TransactionItem(tx)
+                                }
                             }
                         }
                     }

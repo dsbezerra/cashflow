@@ -1,7 +1,10 @@
 package com.github.dsbezerra.cashflow.core.designsystem.component
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipBox
@@ -32,9 +35,27 @@ fun IconButtonWithTooltip(
             tooltip = { PlainTooltip { Text(tooltip) } },
             state = rememberTooltipState(),
         ) {
-            IconButton(onClick = onClick, modifier = modifier, enabled = enabled, content = content)
+            FilledIconButton(
+                onClick = onClick,
+                modifier = modifier,
+                enabled = enabled,
+                content = content,
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            )
         }
     } else {
-        IconButton(onClick = onClick, modifier = modifier, enabled = enabled, content = content)
+        FilledIconButton(
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+            content = content
+        )
     }
 }

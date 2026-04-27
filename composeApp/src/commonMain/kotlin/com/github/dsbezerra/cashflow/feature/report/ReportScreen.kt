@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,10 +48,15 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.ui.text.style.TextOverflow
 import cashflow.composeapp.generated.resources.Res
 import cashflow.composeapp.generated.resources.all
 import cashflow.composeapp.generated.resources.report_accumulated_balance
@@ -144,7 +150,7 @@ fun ReportScreen(viewModel: ReportViewModel = koinViewModel()) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) {
     val data = state.data ?: return
@@ -160,9 +166,10 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
         ) {
             item {
                 // Period selector
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max)) {
                     ReportPeriod.entries.forEachIndexed { index, period ->
                         SegmentedButton(
+                            modifier = Modifier.fillMaxHeight(),
                             selected = state.selectedPeriod == period,
                             onClick = { onAction(ReportAction.PeriodChanged(period)) },
                             shape = SegmentedButtonDefaults.itemShape(
@@ -171,14 +178,8 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                             ),
                             label = {
                                 Text(
-                                    text = when (period) {
-                                        ReportPeriod.THIS_MONTH -> stringResource(Res.string.report_period_this_month)
-                                        ReportPeriod.LAST_MONTH -> stringResource(Res.string.report_period_last_month)
-                                        ReportPeriod.LAST_3_MONTHS -> stringResource(Res.string.report_period_last_3_months)
-                                        ReportPeriod.LAST_6_MONTHS -> stringResource(Res.string.report_period_last_6_months)
-                                        ReportPeriod.THIS_YEAR -> stringResource(Res.string.report_period_this_year)
-                                    },
-                                    style = MaterialTheme.typography.labelSmall,
+                                    text = stringResource(period.res),
+                                    style = MaterialTheme.typography.labelSmallEmphasized,
                                 )
                             },
                         )
@@ -190,23 +191,35 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                 TabRow(selectedTabIndex = state.selectedTab.ordinal) {
                     Tab(
                         selected = state.selectedTab == ReportTab.BY_PERIOD,
-                        onClick = { onAction(
-                            ReportAction.TabChanged(
-                                ReportTab.BY_PERIOD)) },
+                        onClick = {
+                            onAction(
+                                ReportAction.TabChanged(
+                                    ReportTab.BY_PERIOD
+                                )
+                            )
+                        },
                         text = { Text(stringResource(Res.string.report_by_period)) },
                     )
                     Tab(
                         selected = state.selectedTab == ReportTab.BY_CATEGORY,
-                        onClick = { onAction(
-                            ReportAction.TabChanged(
-                                ReportTab.BY_CATEGORY)) },
+                        onClick = {
+                            onAction(
+                                ReportAction.TabChanged(
+                                    ReportTab.BY_CATEGORY
+                                )
+                            )
+                        },
                         text = { Text(stringResource(Res.string.report_by_category)) },
                     )
                     Tab(
                         selected = state.selectedTab == ReportTab.DRE,
-                        onClick = { onAction(
-                            ReportAction.TabChanged(
-                                ReportTab.DRE)) },
+                        onClick = {
+                            onAction(
+                                ReportAction.TabChanged(
+                                    ReportTab.DRE
+                                )
+                            )
+                        },
                         text = { Text(stringResource(Res.string.report_dre)) },
                     )
                 }
@@ -280,7 +293,10 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                 }
                 if (state.isDreLoading) {
                     item {
-                        Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                        Box(
+                            Modifier.fillMaxWidth().padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
                             CircularProgressIndicator()
                         }
                     }
@@ -301,7 +317,8 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                             EmptyState(
                                 stringResource(
                                     Res.string.report_dre_no_movements,
-                                    Month(state.dreMonth).namePtBr().replaceFirstChar { it.uppercase() },
+                                    Month(state.dreMonth).namePtBr()
+                                        .replaceFirstChar { it.uppercase() },
                                     state.dreYear,
                                 )
                             )
@@ -448,97 +465,134 @@ private fun StatRow(label: String, value: String) {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun DailyCumulativeLineChart(data: List<DailyAmount>) {
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val outlineVariant = MaterialTheme.colorScheme.outlineVariant
+    val labelStyle = MaterialTheme.typography.labelSmall.copy(color = onSurface)
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(Res.string.report_balance_evolution),
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.titleMediumEmphasized,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp),
         )
-        val onSurface = MaterialTheme.colorScheme.onSurface
-        val outlineVariant = MaterialTheme.colorScheme.outlineVariant
-        val labelStyle = MaterialTheme.typography.labelSmall.copy(color = onSurface)
-        LineChart(
-            data = listOf(
-                Line(
-                    label = stringResource(Res.string.report_accumulated_balance),
-                    values = data.map { it.cumulativeNet },
-                    color = SolidColor(MaterialTheme.colorScheme.primary),
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+            shape = MaterialTheme.shapes.small
+        ) {
+            LineChart(
+                data = listOf(
+                    Line(
+                        label = stringResource(Res.string.report_accumulated_balance),
+                        values = data.map { it.cumulativeNet },
+                        color = SolidColor(MaterialTheme.colorScheme.primary),
+                    ),
                 ),
-            ),
-            labelProperties = LabelProperties(
-                enabled = true,
-                textStyle = labelStyle,
-            ),
-            indicatorProperties = HorizontalIndicatorProperties(
-                textStyle = labelStyle,
-            ),
-            gridProperties = GridProperties(
-                xAxisProperties = GridProperties.AxisProperties(color = SolidColor(outlineVariant)),
-                yAxisProperties = GridProperties.AxisProperties(color = SolidColor(outlineVariant)),
-            ),
-            dividerProperties = DividerProperties(
-                xAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
-                yAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-        )
+                labelProperties = LabelProperties(
+                    enabled = true,
+                    textStyle = labelStyle,
+                ),
+                indicatorProperties = HorizontalIndicatorProperties(
+                    textStyle = labelStyle,
+                ),
+                gridProperties = GridProperties(
+                    xAxisProperties = GridProperties.AxisProperties(
+                        color = SolidColor(
+                            outlineVariant
+                        )
+                    ),
+                    yAxisProperties = GridProperties.AxisProperties(
+                        color = SolidColor(
+                            outlineVariant
+                        )
+                    ),
+                ),
+                dividerProperties = DividerProperties(
+                    xAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
+                    yAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(16.dp),
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MonthlyBarChart(data: List<MonthlyAmount>) {
     val cashFlowColors = AppColors.colors
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(Res.string.report_month_to_month),
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.titleMediumEmphasized,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp),
         )
         val onSurface = MaterialTheme.colorScheme.onSurface
         val outlineVariant = MaterialTheme.colorScheme.outlineVariant
         val labelStyle = MaterialTheme.typography.labelSmall.copy(color = onSurface)
-        ColumnChart(
-            data = data.map { month ->
-                Bars(
-                    label = month.month.namePtBr().take(3).replaceFirstChar { it.uppercase() },
-                    values = listOf(
-                        Bars.Data(value = month.income, color = SolidColor(cashFlowColors.income)),
-                        Bars.Data(value = month.expenses, color = SolidColor(cashFlowColors.expense)),
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+            shape = MaterialTheme.shapes.small
+        ) {
+            ColumnChart(
+                data = data.map { month ->
+                    Bars(
+                        label = month.month.namePtBr().take(3).replaceFirstChar { it.uppercase() },
+                        values = listOf(
+                            Bars.Data(
+                                value = month.income,
+                                color = SolidColor(cashFlowColors.income)
+                            ),
+                            Bars.Data(
+                                value = month.expenses,
+                                color = SolidColor(cashFlowColors.expense)
+                            ),
+                        ),
+                    )
+                },
+                barProperties = BarProperties(
+                    thickness = 16.dp,
+                    spacing = 4.dp,
+                ),
+                labelProperties = LabelProperties(
+                    enabled = true,
+                    textStyle = labelStyle,
+                ),
+                indicatorProperties = HorizontalIndicatorProperties(
+                    textStyle = labelStyle,
+                ),
+                gridProperties = GridProperties(
+                    xAxisProperties = GridProperties.AxisProperties(
+                        color = SolidColor(
+                            outlineVariant
+                        )
                     ),
-                )
-            },
-            barProperties = BarProperties(
-                thickness = 16.dp,
-                spacing = 4.dp,
-            ),
-            labelProperties = LabelProperties(
-                enabled = true,
-                textStyle = labelStyle,
-            ),
-            indicatorProperties = HorizontalIndicatorProperties(
-                textStyle = labelStyle,
-            ),
-            gridProperties = GridProperties(
-                xAxisProperties = GridProperties.AxisProperties(color = SolidColor(outlineVariant)),
-                yAxisProperties = GridProperties.AxisProperties(color = SolidColor(outlineVariant)),
-            ),
-            dividerProperties = DividerProperties(
-                xAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
-                yAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-        )
+                    yAxisProperties = GridProperties.AxisProperties(
+                        color = SolidColor(
+                            outlineVariant
+                        )
+                    ),
+                ),
+                dividerProperties = DividerProperties(
+                    xAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
+                    yAxisProperties = LineProperties(color = SolidColor(outlineVariant)),
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(16.dp),
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun CategoryBreakdownSection(
     title: String,
@@ -548,7 +602,7 @@ private fun CategoryBreakdownSection(
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.titleMediumEmphasized,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp),
         )
@@ -567,15 +621,23 @@ private fun CategoryBreakdownList(items: List<CategoryAmount>, color: Color) {
     }
 
     val maxAmount = items.maxOf { it.amount }
-
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        items.forEach { item ->
-            CategoryAmountRow(
-                item = item,
-                maxAmount = maxAmount,
-                color = color
-            )
-            HorizontalDivider()
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = MaterialTheme.shapes.small
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items.forEachIndexed { index, item ->
+                CategoryAmountRow(
+                    item = item,
+                    maxAmount = maxAmount,
+                    color = color
+                )
+                if (index != items.lastIndex) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.surface,
+                    )
+                }
+            }
         }
     }
 }
@@ -589,7 +651,7 @@ private fun CategoryAmountRow(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(
@@ -620,7 +682,11 @@ private fun CategoryAmountRow(
                     color = color,
                 )
                 Text(
-                    text = pluralStringResource(Res.plurals.transaction_count, item.count, item.count),
+                    text = pluralStringResource(
+                        Res.plurals.transaction_count,
+                        item.count,
+                        item.count
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -667,7 +733,10 @@ private fun DreMonthSelector(year: Int, month: Int, onAction: (ReportAction) -> 
             },
             tooltip = stringResource(Res.string.report_prev_month),
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.report_prev_month))
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(Res.string.report_prev_month)
+            )
         }
         Text(
             text = "$monthName $year",
@@ -682,7 +751,10 @@ private fun DreMonthSelector(year: Int, month: Int, onAction: (ReportAction) -> 
             },
             tooltip = stringResource(Res.string.report_next_month),
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = stringResource(Res.string.report_next_month))
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = stringResource(Res.string.report_next_month)
+            )
         }
     }
 }
@@ -690,48 +762,54 @@ private fun DreMonthSelector(year: Int, month: Int, onAction: (ReportAction) -> 
 @Composable
 private fun DreStatement(dre: DreReport) {
     val cashFlowColors = AppColors.colors
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = MaterialTheme.shapes.small
     ) {
-        DreSection(
-            sign = stringResource(Res.string.report_gross_revenue_sign),
-            label = stringResource(Res.string.report_gross_revenue),
-            item = dre.grossRevenue,
-            color = cashFlowColors.income,
-        )
-        DreResultRow(
-            label = stringResource(Res.string.report_deductions),
-            item = dre.deductions,
-            color = cashFlowColors.expense
-        )
-        DreTotalRow(
-            label = stringResource(Res.string.report_net_revenue),
-            amount = dre.netRevenue
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-        DreResultRow(
-            label = stringResource(Res.string.report_costs),
-            item = dre.costs,
-            color = cashFlowColors.expense
-        )
-        DreTotalRow(
-            label = stringResource(Res.string.report_gross_profit),
-            amount = dre.grossProfit
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-        DreSection(
-            sign = stringResource(Res.string.report_operational_expenses_sign),
-            label = stringResource(Res.string.report_operational_expenses),
-            item = dre.operationalExpenses,
-            color = cashFlowColors.expense,
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-        DreTotalRow(
-            label = stringResource(Res.string.report_profit_loss),
-            amount = dre.netResult,
-            highlight = true,
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            DreSection(
+                sign = stringResource(Res.string.report_gross_revenue_sign),
+                label = stringResource(Res.string.report_gross_revenue),
+                item = dre.grossRevenue,
+                color = cashFlowColors.income,
+            )
+            DreResultRow(
+                label = stringResource(Res.string.report_deductions),
+                item = dre.deductions,
+                color = cashFlowColors.expense
+            )
+            DreTotalRow(
+                label = stringResource(Res.string.report_net_revenue),
+                amount = dre.netRevenue
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
+            DreResultRow(
+                label = stringResource(Res.string.report_costs),
+                item = dre.costs,
+                color = cashFlowColors.expense
+            )
+            DreTotalRow(
+                label = stringResource(Res.string.report_gross_profit),
+                amount = dre.grossProfit
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
+            DreSection(
+                sign = stringResource(Res.string.report_operational_expenses_sign),
+                label = stringResource(Res.string.report_operational_expenses),
+                item = dre.operationalExpenses,
+                color = cashFlowColors.expense,
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
+            DreTotalRow(
+                label = stringResource(Res.string.report_profit_loss),
+                amount = dre.netResult,
+                highlight = true,
+            )
+        }
     }
 }
 
@@ -743,7 +821,7 @@ private fun DreSection(sign: String, label: String, item: DreLineItem, color: Co
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -771,13 +849,13 @@ private fun DreSection(sign: String, label: String, item: DreLineItem, color: Co
                     Text(
                         text = line.category.name,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
                         modifier = Modifier.weight(1f),
                     )
                     Text(
                         text = line.amount.toDecimal().toCurrency(),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -790,7 +868,7 @@ private fun DreResultRow(label: String, item: DreLineItem, color: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = 6.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
@@ -814,7 +892,7 @@ private fun DreTotalRow(label: String, amount: Double, highlight: Boolean = fals
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -60,6 +60,8 @@ import com.github.dsbezerra.cashflow.core.domain.model.Frequency
 import com.github.dsbezerra.cashflow.core.domain.model.RecurringRule
 import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
+import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedListItem
+import com.github.dsbezerra.cashflow.core.designsystem.component.groupedItems
 import com.github.dsbezerra.cashflow.util.formatFullPtBr
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.pluralStringResource
@@ -129,20 +131,21 @@ fun RecurringRuleListScreen(
 
                 else -> {
                     LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                        items(state.rules, key = { it.id }) { rule ->
-                            RecurringRuleRow(
-                                rule = rule,
-                                onClick = { onNavigateToForm(rule.id) },
-                                onToggleActive = { isActive ->
-                                    viewModel.onAction(
-                                        RecurringRuleListAction.ToggleActive(
-                                            rule.id,
-                                            isActive
+                        groupedItems(state.rules, key = { it.id }) { rule, position ->
+                            GroupedListItem(position = position) {
+                                RecurringRuleRow(
+                                    rule = rule,
+                                    onClick = { onNavigateToForm(rule.id) },
+                                    onToggleActive = { isActive ->
+                                        viewModel.onAction(
+                                            RecurringRuleListAction.ToggleActive(
+                                                rule.id,
+                                                isActive
+                                            )
                                         )
-                                    )
-                                },
-                            )
-                            HorizontalDivider()
+                                    },
+                                )
+                            }
                         }
                     }
                     DesktopVerticalScrollbar(listState)

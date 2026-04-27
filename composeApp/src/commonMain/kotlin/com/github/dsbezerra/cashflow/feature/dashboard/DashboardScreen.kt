@@ -70,6 +70,8 @@ import com.github.dsbezerra.cashflow.core.domain.model.DashboardSummary
 import com.github.dsbezerra.cashflow.core.domain.model.Decimal
 import com.github.dsbezerra.cashflow.core.domain.model.MonthlyAmount
 import com.github.dsbezerra.cashflow.core.designsystem.component.AmountText
+import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedListItem
+import com.github.dsbezerra.cashflow.core.designsystem.component.groupedItemPosition
 import com.github.dsbezerra.cashflow.core.designsystem.component.TopBarWithNavigation
 import com.github.dsbezerra.cashflow.util.namePtBr
 import ir.ehsannarmani.compose_charts.ColumnChart
@@ -323,7 +325,7 @@ private fun IncomeExpenseBarChart(breakdown: List<MonthlyAmount>) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.small,
-            color = MaterialTheme.colorScheme.surfaceVariant,
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
         ) {
             Column(
                 Modifier.padding(16.dp)
@@ -438,19 +440,13 @@ private fun RecentTransactions(
                 modifier = Modifier.padding(vertical = 8.dp),
             )
         } else {
-            Surface(
-                shape = MaterialTheme.shapes.small,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-            ) {
-                Column {
-                    transactions.forEachIndexed { index, transaction ->
+            Column {
+                transactions.forEachIndexed { index, transaction ->
+                    GroupedListItem(position = groupedItemPosition(index, transactions.size)) {
                         TransactionRow(
                             transaction = transaction,
                             onTransactionClick = onTransactionClick,
                         )
-                        if (index != transactions.lastIndex) {
-                            HorizontalDivider(color = MaterialTheme.colorScheme.surface)
-                        }
                     }
                 }
             }

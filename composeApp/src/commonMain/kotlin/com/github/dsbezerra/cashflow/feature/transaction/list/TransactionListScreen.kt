@@ -11,29 +11,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
+import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedItemPosition
+import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedListItem
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import cashflow.composeapp.generated.resources.Res
 import cashflow.composeapp.generated.resources.transaction_empty_subtitle
@@ -107,26 +103,22 @@ fun TransactionListScreen(
                             when (val item = lazyPagingItems[index]) {
                                 is TransactionListItem.Header -> DateHeader(item.date)
                                 is TransactionListItem.Entry -> {
-                                    val previous = lazyPagingItems[index - 1]
-                                    val isFirst = previous is TransactionListItem.Header
-                                    val isLast = if (index == lazyPagingItems.itemSnapshotList.lastIndex) {
-                                        true
-                                    } else {
-                                        val next = lazyPagingItems[index + 1]
-                                        next is TransactionListItem.Header
+                                    val prevIsHeader = index == 0 || lazyPagingItems[index - 1] is TransactionListItem.Header
+                                    val nextIsHeader = index == lazyPagingItems.itemCount - 1
+                                        || lazyPagingItems[index + 1] is TransactionListItem.Header
+                                        || lazyPagingItems[index + 1] == null
+                                    val position = when {
+                                        prevIsHeader && nextIsHeader -> GroupedItemPosition.Single
+                                        prevIsHeader -> GroupedItemPosition.Top
+                                        nextIsHeader -> GroupedItemPosition.Bottom
+                                        else -> GroupedItemPosition.Middle
                                     }
-                                    val shape = when {
-                                        isFirst && isLast -> MaterialTheme.shapes.small
-                                        isFirst -> FirstTransactionShape
-                                        isLast -> LastTransactionShape
-                                        else -> RectangleShape
+                                    GroupedListItem(position = position) {
+                                        TransactionRow(
+                                            transaction = item.transaction,
+                                            onClick = { onNavigateToDetail(item.transaction.id) },
+                                        )
                                     }
-                                    TransactionRow(
-                                        transaction = item.transaction,
-                                        shape = shape,
-                                        onClick = { onNavigateToDetail(item.transaction.id) },
-                                    )
-                                    HorizontalDivider(color = MaterialTheme.colorScheme.surface)
                                 }
 
                                 null -> {}
@@ -151,9 +143,6 @@ fun TransactionListScreen(
     }
 }
 
-private val FirstTransactionShape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
-private val LastTransactionShape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun DateHeader(date: LocalDate) {
@@ -171,33 +160,27 @@ private fun DateHeader(date: LocalDate) {
 @Composable
 private fun TransactionRow(
     transaction: Transaction,
-    shape: Shape,
     onClick: () -> Unit,
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = shape,
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column {
-                Text(
-                    text = transaction.description,
-                    style = MaterialTheme.typography.bodyLargeEmphasized,
-                )
-                Text(
-                    text = transaction.categoryId,
-                    style = MaterialTheme.typography.bodySmallEmphasized,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            AmountText(amount = transaction.amount.toCurrency(), type = transaction.type)
+        Column {
+            Text(
+                text = transaction.description,
+                style = MaterialTheme.typography.bodyLargeEmphasized,
+            )
+            Text(
+                text = transaction.categoryId,
+                style = MaterialTheme.typography.bodySmallEmphasized,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
+        AmountText(amount = transaction.amount.toCurrency(), type = transaction.type)
     }
 }

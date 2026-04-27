@@ -3,6 +3,7 @@ package com.github.dsbezerra.cashflow.core.navigation
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -146,7 +147,7 @@ fun AppShell(
             },
             floatingActionButton = floatingActionButton,
         ) { innerPadding ->
-            content(Modifier.padding(innerPadding))
+            content(Modifier.padding(innerPadding).consumeWindowInsets(innerPadding))
         }
     }
 }

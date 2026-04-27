@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
+import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedListItem
+import com.github.dsbezerra.cashflow.core.designsystem.component.groupedItems
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -134,31 +136,29 @@ fun CategoryListScreen(
                     typeOrder.forEach { type ->
                         val items = grouped[type] ?: return@forEach
                         item(key = "header-${type.name}") {
-                            TypeSectionHeader(
-                                type
-                            )
+                            TypeSectionHeader(type)
                         }
-                        items(items, key = { it.id }) { category ->
-                            CategoryRow(
-                                category = category,
-                                onClick = { onNavigateToForm(category.id) },
-                            )
-                            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+                        groupedItems(items, key = { it.id }) { category, position ->
+                            GroupedListItem(position = position) {
+                                CategoryRow(
+                                    category = category,
+                                    onClick = { onNavigateToForm(category.id) },
+                                )
+                            }
                         }
                     }
 
                     if (state.archived.isNotEmpty()) {
                         item(key = "header-archived") {
-                            TypeSectionHeader(
-                                null
-                            )
+                            TypeSectionHeader(null)
                         }
-                        items(state.archived, key = { "archived-${it.id}" }) { category ->
-                            CategoryRow(
-                                category = category,
-                                onClick = { onNavigateToForm(category.id) },
-                            )
-                            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+                        groupedItems(state.archived, key = { "archived-${it.id}" }) { category, position ->
+                            GroupedListItem(position = position) {
+                                CategoryRow(
+                                    category = category,
+                                    onClick = { onNavigateToForm(category.id) },
+                                )
+                            }
                         }
                     }
                 }
