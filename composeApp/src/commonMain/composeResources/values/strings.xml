@@ -51,9 +51,9 @@
 
     <!-- Category -->
     <string name="categories_title">Categorias</string>
-    <string name="category_new">Nova Categoria</string>
-    <string name="category_edit">Editar Categoria</string>
-    <string name="category_delete">Excluir Categoria</string>
+    <string name="category_new">Nova categoria</string>
+    <string name="category_edit">Editar categoria</string>
+    <string name="category_delete">Excluir categoria</string>
     <string name="category_delete_confirm">Tem certeza que deseja excluir esta categoria?</string>
     <string name="category_empty_title">Nenhuma categoria</string>
     <string name="category_empty_subtitle">Toque em + para criar sua primeira categoria</string>

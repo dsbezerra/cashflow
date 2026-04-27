@@ -60,9 +60,26 @@ class CategoryFormViewModel(
 
     fun onAction(action: CategoryFormAction) {
         when (action) {
-            is CategoryFormAction.NameChanged -> _state.update { it.copy(name = action.name, nameError = null) }
-            is CategoryFormAction.TypeChanged -> _state.update { it.copy(type = action.type, parentId = null) }
-            is CategoryFormAction.DreClassificationChanged -> _state.update { it.copy(dreClassification = action.dreClassification) }
+            is CategoryFormAction.NameChanged -> _state.update {
+                it.copy(
+                    name = action.name,
+                    nameError = null
+                )
+            }
+
+            is CategoryFormAction.TypeChanged -> _state.update {
+                it.copy(
+                    type = action.type,
+                    parentId = null
+                )
+            }
+
+            is CategoryFormAction.DreClassificationChanged -> _state.update {
+                it.copy(
+                    dreClassification = action.dreClassification
+                )
+            }
+
             is CategoryFormAction.IconChanged -> _state.update { it.copy(icon = action.icon) }
             is CategoryFormAction.ColorChanged -> _state.update { it.copy(color = action.color) }
             is CategoryFormAction.ParentChanged -> _state.update { it.copy(parentId = action.parentId) }
@@ -112,6 +129,7 @@ class CategoryFormViewModel(
                     )
                 }
             }.onSuccess {
+                _state.update { CategoryFormState() }
                 _events.send(CategoryFormEvent.NavigateBack)
             }.onFailure {
                 _state.update { st -> st.copy(isSaving = false) }

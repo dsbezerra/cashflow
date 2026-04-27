@@ -157,74 +157,57 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
     val cashFlowColors = AppColors.colors
     val listState = rememberLazyListState()
 
-    Box(Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize(),
+    Column(Modifier.fillMaxSize()) {
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Max)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            item {
-                // Period selector
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max)) {
-                    ReportPeriod.entries.forEachIndexed { index, period ->
-                        SegmentedButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            selected = state.selectedPeriod == period,
-                            onClick = { onAction(ReportAction.PeriodChanged(period)) },
-                            shape = SegmentedButtonDefaults.itemShape(
-                                index = index,
-                                count = ReportPeriod.entries.size,
-                            ),
-                            label = {
-                                Text(
-                                    text = stringResource(period.res),
-                                    style = MaterialTheme.typography.labelSmallEmphasized,
-                                )
-                            },
+            ReportPeriod.entries.forEachIndexed { index, period ->
+                SegmentedButton(
+                    modifier = Modifier.fillMaxHeight(),
+                    selected = state.selectedPeriod == period,
+                    onClick = { onAction(ReportAction.PeriodChanged(period)) },
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = ReportPeriod.entries.size,
+                    ),
+                    label = {
+                        Text(
+                            text = stringResource(period.res),
+                            style = MaterialTheme.typography.labelSmallEmphasized,
                         )
-                    }
-                }
+                    },
+                )
             }
+        }
 
-            item {
-                TabRow(selectedTabIndex = state.selectedTab.ordinal) {
-                    Tab(
-                        selected = state.selectedTab == ReportTab.BY_PERIOD,
-                        onClick = {
-                            onAction(
-                                ReportAction.TabChanged(
-                                    ReportTab.BY_PERIOD
-                                )
-                            )
-                        },
-                        text = { Text(stringResource(Res.string.report_by_period)) },
-                    )
-                    Tab(
-                        selected = state.selectedTab == ReportTab.BY_CATEGORY,
-                        onClick = {
-                            onAction(
-                                ReportAction.TabChanged(
-                                    ReportTab.BY_CATEGORY
-                                )
-                            )
-                        },
-                        text = { Text(stringResource(Res.string.report_by_category)) },
-                    )
-                    Tab(
-                        selected = state.selectedTab == ReportTab.DRE,
-                        onClick = {
-                            onAction(
-                                ReportAction.TabChanged(
-                                    ReportTab.DRE
-                                )
-                            )
-                        },
-                        text = { Text(stringResource(Res.string.report_dre)) },
-                    )
-                }
-            }
+        TabRow(selectedTabIndex = state.selectedTab.ordinal) {
+            Tab(
+                selected = state.selectedTab == ReportTab.BY_PERIOD,
+                onClick = { onAction(ReportAction.TabChanged(ReportTab.BY_PERIOD)) },
+                text = { Text(stringResource(Res.string.report_by_period)) },
+            )
+            Tab(
+                selected = state.selectedTab == ReportTab.BY_CATEGORY,
+                onClick = { onAction(ReportAction.TabChanged(ReportTab.BY_CATEGORY)) },
+                text = { Text(stringResource(Res.string.report_by_category)) },
+            )
+            Tab(
+                selected = state.selectedTab == ReportTab.DRE,
+                onClick = { onAction(ReportAction.TabChanged(ReportTab.DRE)) },
+                text = { Text(stringResource(Res.string.report_dre)) },
+            )
+        }
 
+        Box(Modifier.weight(1f)) {
+            LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize(),
+            ) {
             if (state.selectedTab == ReportTab.BY_PERIOD) {
                 item {
                     PeriodSummaryCards(
@@ -334,6 +317,7 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
             }
         }
         DesktopVerticalScrollbar(listState)
+        }
     }
 }
 

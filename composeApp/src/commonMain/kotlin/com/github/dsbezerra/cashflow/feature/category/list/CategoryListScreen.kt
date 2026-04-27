@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -96,9 +97,15 @@ fun CategoryListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showCreateSheet = true }) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.category_new))
-            }
+            ExtendedFloatingActionButton(
+                text = {
+                    Text(stringResource(Res.string.category_new))
+                },
+                icon = {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.category_new))
+                },
+                onClick = { showCreateSheet = true }
+            )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
