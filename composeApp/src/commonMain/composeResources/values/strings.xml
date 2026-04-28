@@ -119,11 +119,14 @@
     <string name="report_gross_revenue_sign">(+)</string>
     <string name="report_deductions">(-) Deduções</string>
     <string name="report_net_revenue">(=) Receita Líquida</string>
-    <string name="report_costs">(-) Custos</string>
+    <string name="report_costs">(-) CMV</string>
     <string name="report_gross_profit">(=) Lucro Bruto</string>
     <string name="report_operational_expenses_sign">(-)</string>
     <string name="report_operational_expenses">Despesas Operacionais</string>
-    <string name="report_profit_loss">(=) Lucro / Prejuízo</string>
+    <string name="report_operational_result">(=) Resultado Operacional</string>
+    <string name="report_financial_expenses_sign">(-)</string>
+    <string name="report_financial_expenses">Despesas Financeiras</string>
+    <string name="report_profit_loss">(=) Lucro Líquido</string>
     <string name="report_period_this_month">Este mês</string>
     <string name="report_period_last_month">Mês anterior</string>
     <string name="report_period_last_3_months">Últimos 3 meses</string>
@@ -159,6 +162,7 @@
     <string name="dre_deductions">Deduções</string>
     <string name="dre_costs">Custos</string>
     <string name="dre_operational_expenses">Despesas Operacionais</string>
+    <string name="dre_financial_expenses">Despesas Financeiras</string>
     <string name="dre_unclassified">Não classificado</string>
 
     <!-- Settings -->

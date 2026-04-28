@@ -9,6 +9,8 @@ data class DreReport(
     val costs: DreLineItem,
     val grossProfit: Double,
     val operationalExpenses: DreLineItem,
+    val operationalResult: Double,
+    val financialExpenses: DreLineItem,
     val netResult: Double,
 )
 

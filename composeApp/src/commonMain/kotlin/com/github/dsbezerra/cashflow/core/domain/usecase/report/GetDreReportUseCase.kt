@@ -46,7 +46,9 @@ class GetDreReportUseCase(
             val costs = lineItem(DreClassification.COST)
             val grossProfit = netRevenue - costs.total
             val operationalExpenses = lineItem(DreClassification.EXPENSE)
-            val netResult = grossProfit - operationalExpenses.total
+            val operationalResult = grossProfit - operationalExpenses.total
+            val financialExpenses = lineItem(DreClassification.FINANCIAL_EXPENSE)
+            val netResult = operationalResult - financialExpenses.total
 
             DreReport(
                 year = year,
@@ -57,6 +59,8 @@ class GetDreReportUseCase(
                 costs = costs,
                 grossProfit = grossProfit,
                 operationalExpenses = operationalExpenses,
+                operationalResult = operationalResult,
+                financialExpenses = financialExpenses,
                 netResult = netResult,
             )
         }

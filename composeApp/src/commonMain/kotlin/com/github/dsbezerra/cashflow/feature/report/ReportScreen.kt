@@ -83,8 +83,11 @@ import cashflow.composeapp.generated.resources.report_net_revenue
 import cashflow.composeapp.generated.resources.report_next_month
 import cashflow.composeapp.generated.resources.report_no_transactions_category
 import cashflow.composeapp.generated.resources.report_no_transactions_period
+import cashflow.composeapp.generated.resources.report_financial_expenses
+import cashflow.composeapp.generated.resources.report_financial_expenses_sign
 import cashflow.composeapp.generated.resources.report_operational_expenses
 import cashflow.composeapp.generated.resources.report_operational_expenses_sign
+import cashflow.composeapp.generated.resources.report_operational_result
 import cashflow.composeapp.generated.resources.report_period_last_3_months
 import cashflow.composeapp.generated.resources.report_period_last_6_months
 import cashflow.composeapp.generated.resources.report_period_last_month
@@ -785,6 +788,18 @@ private fun DreStatement(dre: DreReport) {
                 sign = stringResource(Res.string.report_operational_expenses_sign),
                 label = stringResource(Res.string.report_operational_expenses),
                 item = dre.operationalExpenses,
+                color = cashFlowColors.expense,
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
+            DreTotalRow(
+                label = stringResource(Res.string.report_operational_result),
+                amount = dre.operationalResult,
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
+            DreSection(
+                sign = stringResource(Res.string.report_financial_expenses_sign),
+                label = stringResource(Res.string.report_financial_expenses),
+                item = dre.financialExpenses,
                 color = cashFlowColors.expense,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)

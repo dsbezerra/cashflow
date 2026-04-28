@@ -59,6 +59,7 @@ import cashflow.composeapp.generated.resources.category_parent_label
 import cashflow.composeapp.generated.resources.delete
 import cashflow.composeapp.generated.resources.dre_costs
 import cashflow.composeapp.generated.resources.dre_deductions
+import cashflow.composeapp.generated.resources.dre_financial_expenses
 import cashflow.composeapp.generated.resources.dre_gross_revenue
 import cashflow.composeapp.generated.resources.dre_operational_expenses
 import cashflow.composeapp.generated.resources.dre_unclassified
@@ -223,6 +224,7 @@ fun CategoryFormBody(
                     DreClassification.DEDUCTION -> stringResource(Res.string.dre_deductions)
                     DreClassification.COST -> stringResource(Res.string.dre_costs)
                     DreClassification.EXPENSE -> stringResource(Res.string.dre_operational_expenses)
+                    DreClassification.FINANCIAL_EXPENSE -> stringResource(Res.string.dre_financial_expenses)
                     DreClassification.NONE -> stringResource(Res.string.dre_unclassified)
                 }
             }
