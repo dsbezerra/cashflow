@@ -1,31 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <!-- Arrowhead for income (mint green) -->
-    <marker id="am" viewBox="0 0 12 12" refX="10" refY="6"
-            markerWidth="54" markerHeight="54" orient="auto"
-            markerUnits="userSpaceOnUse">
-      <polygon points="0 0, 12 6, 0 12" fill="#8EF8C3"/>
-    </marker>
-    <!-- Arrowhead for outflow (white) -->
-    <marker id="aw" viewBox="0 0 12 12" refX="10" refY="6"
-            markerWidth="54" markerHeight="54" orient="auto"
-            markerUnits="userSpaceOnUse">
-      <polygon points="0 0, 12 6, 0 12" fill="#FFFFFF"/>
-    </marker>
-  </defs>
-
-  <!-- Background: deep green rounded square -->
-  <rect width="512" height="512" rx="100" fill="#006C47"/>
-
-  <!-- Top arc: income — mint green, clockwise through top (φ 200°→340°, 140°) -->
-  <!-- Start (115,205) = φ200°, End (397,205) = φ340°, center (256,256), r=150 -->
-  <path d="M 115 205 A 150 150 0 0 1 397 205"
-        fill="none" stroke="#8EF8C3" stroke-width="36" stroke-linecap="round"
-        marker-end="url(#am)"/>
-
-  <!-- Bottom arc: outflow — white, clockwise through bottom (φ 20°→160°, 140°) -->
-  <!-- Start (397,307) = φ20°, End (115,307) = φ160°, center (256,256), r=150 -->
-  <path d="M 397 307 A 150 150 0 0 1 115 307"
-        fill="none" stroke="#FFFFFF" stroke-width="36" stroke-linecap="round"
-        marker-end="url(#aw)"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_20_2)">
+<path d="M412 0H100C44.7715 0 0 44.7715 0 100V412C0 467.228 44.7715 512 100 512H412C467.228 512 512 467.228 512 412V100C512 44.7715 467.228 0 412 0Z" fill="#006C47"/>
+<path d="M397 307C386.49 335.958 367.319 360.977 342.092 378.658C316.865 396.339 286.806 405.824 256 405.824C225.194 405.824 195.135 396.339 169.908 378.658C144.681 360.977 125.51 335.958 115 307" stroke="white" stroke-width="36" stroke-linecap="round"/>
+<path d="M92.9194 258.393L147.983 300.441L84.0363 327.104L92.9194 258.393Z" fill="white"/>
+<path d="M115 205C125.51 176.042 144.681 151.023 169.908 133.342C195.135 115.661 225.194 106.176 256 106.176C286.806 106.176 316.865 115.661 342.092 133.342C367.319 151.023 386.49 176.042 397 205" stroke="#8EF8C3" stroke-width="36" stroke-linecap="round"/>
+<path d="M414.117 245.356L358.041 204.668L421.315 176.449L414.117 245.356Z" fill="#8EF8C3"/>
+</g>
+<defs>
+<clipPath id="clip0_20_2">
+<rect width="512" height="512" fill="white"/>
+</clipPath>
+</defs>
 </svg>
