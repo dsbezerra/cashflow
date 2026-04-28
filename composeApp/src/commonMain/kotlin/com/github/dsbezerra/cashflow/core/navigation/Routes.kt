@@ -44,3 +44,6 @@ data class RecurringRuleForm(val ruleId: String? = null)
 
 @Serializable
 data object About
+
+@Serializable
+data object ScenarioCalculator

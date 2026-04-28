@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,12 +29,15 @@ import cashflow.composeapp.generated.resources.settings_manage_categories
 import cashflow.composeapp.generated.resources.settings_manage_categories_desc
 import cashflow.composeapp.generated.resources.settings_recurring
 import cashflow.composeapp.generated.resources.settings_recurring_desc
+import cashflow.composeapp.generated.resources.settings_scenario_calculator
+import cashflow.composeapp.generated.resources.settings_scenario_calculator_desc
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SettingsScreen(
     onNavigateToCategoryList: () -> Unit = {},
     onNavigateToRecurringList: () -> Unit = {},
+    onNavigateToScenarioCalculator: () -> Unit = {},
     onNavigateToAbout: () -> Unit = {},
 ) {
     Surface(
@@ -66,6 +70,19 @@ fun SettingsScreen(
                 title = stringResource(Res.string.settings_recurring),
                 subtitle = stringResource(Res.string.settings_recurring_desc),
                 onClick = onNavigateToRecurringList,
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.surface)
+            SettingsRow(
+                icon = {
+                    Icon(
+                        Icons.Default.TrendingUp,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
+                title = stringResource(Res.string.settings_scenario_calculator),
+                subtitle = stringResource(Res.string.settings_scenario_calculator_desc),
+                onClick = onNavigateToScenarioCalculator,
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.surface)
             SettingsRow(

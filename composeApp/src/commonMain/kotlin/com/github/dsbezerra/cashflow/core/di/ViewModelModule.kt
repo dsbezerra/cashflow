@@ -11,6 +11,7 @@ import com.github.dsbezerra.cashflow.feature.recurring.list.RecurringRuleListVie
 import com.github.dsbezerra.cashflow.feature.report.ReportViewModel
 import com.github.dsbezerra.cashflow.feature.transaction.detail.TransactionDetailViewModel
 import com.github.dsbezerra.cashflow.feature.transaction.list.TransactionListViewModel
+import com.github.dsbezerra.cashflow.feature.scenario.calculator.ScenarioCalculatorViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -63,4 +64,5 @@ val viewModelModule = module {
             get()
         )
     }
+    viewModel { ScenarioCalculatorViewModel(get(), get()) }
 }

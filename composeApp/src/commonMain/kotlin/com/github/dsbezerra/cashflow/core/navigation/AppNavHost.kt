@@ -13,6 +13,7 @@ import com.github.dsbezerra.cashflow.feature.category.form.CategoryFormScreen
 import com.github.dsbezerra.cashflow.feature.category.list.CategoryListScreen
 import com.github.dsbezerra.cashflow.feature.dashboard.DashboardScreen
 import com.github.dsbezerra.cashflow.feature.about.AboutScreen
+import com.github.dsbezerra.cashflow.feature.scenario.calculator.ScenarioCalculatorScreen
 import com.github.dsbezerra.cashflow.feature.recurring.form.RecurringRuleFormScreen
 import com.github.dsbezerra.cashflow.feature.recurring.list.RecurringRuleListScreen
 import com.github.dsbezerra.cashflow.feature.report.ReportScreen
@@ -100,6 +101,9 @@ fun AppNavHost(
                 onNavigateToRecurringList = {
                     navController.navigate(RecurringRuleList)
                 },
+                onNavigateToScenarioCalculator = {
+                    navController.navigate(ScenarioCalculator)
+                },
                 onNavigateToAbout = {
                     navController.navigate(About)
                 },
@@ -140,6 +144,9 @@ fun AppNavHost(
         }
         composable<About> {
             AboutScreen(onNavigateBack = { navController.popBackStack() })
+        }
+        composable<ScenarioCalculator> {
+            ScenarioCalculatorScreen(onNavigateBack = { navController.popBackStack() })
         }
     }
 }

@@ -172,8 +172,18 @@
     <string name="settings_manage_categories_desc">Criar, editar e arquivar categorias</string>
     <string name="settings_recurring">Regras Recorrentes</string>
     <string name="settings_recurring_desc">Gerenciar transações automáticas</string>
+    <string name="settings_scenario_calculator">Calculadora de Cenários</string>
+    <string name="settings_scenario_calculator_desc">Simular projeções financeiras</string>
     <string name="settings_about">Sobre o App</string>
     <string name="settings_about_desc">Versão, informações e créditos</string>
+
+    <!-- Scenario Calculator -->
+    <string name="calculator_title">Calculadora de Cenários</string>
+    <string name="calculator_amount_per_item">Valor por item</string>
+    <string name="calculator_quantity">Quantidade</string>
+    <string name="calculator_current_balance">Saldo atual</string>
+    <string name="calculator_projected_balance">Saldo projetado</string>
+    <string name="calculator_difference">Diferença</string>
 
     <!-- About -->
     <string name="about_title">Sobre</string>
