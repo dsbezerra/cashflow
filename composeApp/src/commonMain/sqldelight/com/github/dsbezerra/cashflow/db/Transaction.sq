@@ -55,3 +55,15 @@ SELECT COUNT(*) FROM CashTransaction;
 selectAllPaged:
 SELECT * FROM CashTransaction ORDER BY date DESC
 LIMIT :limit OFFSET :offset;
+
+countFiltered:
+SELECT COUNT(*) FROM CashTransaction
+WHERE (:type IS NULL OR type = :type)
+AND (:query IS NULL OR LOWER(description) LIKE '%' || LOWER(:query) || '%');
+
+selectFiltered:
+SELECT * FROM CashTransaction
+WHERE (:type IS NULL OR type = :type)
+AND (:query IS NULL OR LOWER(description) LIKE '%' || LOWER(:query) || '%')
+ORDER BY date DESC
+LIMIT :limit OFFSET :offset;

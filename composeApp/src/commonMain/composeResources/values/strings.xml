@@ -78,6 +78,8 @@
     <string name="transaction_destination_account">Conta de Destino</string>
     <string name="transaction_notes">Notas (opcional)</string>
     <string name="transaction_date">Data: %1$s</string>
+    <string name="transaction_filter_all">Todos</string>
+    <string name="transaction_search_hint">Buscar transações...</string>
 
     <!-- Dashboard -->
     <string name="dashboard_month_balance">Saldo do Mês</string>

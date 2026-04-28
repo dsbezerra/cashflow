@@ -11,6 +11,7 @@ import com.github.dsbezerra.cashflow.core.data.mapper.toDomain
 import com.github.dsbezerra.cashflow.core.data.mapper.toEntity
 import com.github.dsbezerra.cashflow.db.TransactionQueries
 import com.github.dsbezerra.cashflow.core.domain.model.Transaction
+import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.core.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -62,13 +63,17 @@ class SqlDelightTransactionRepository(
         }
     }
 
-    override fun getPagedTransactions(pageSize: Int): Flow<PagingData<Transaction>> =
+    override fun getPagedTransactions(
+        pageSize: Int,
+        type: TransactionType?,
+        query: String?,
+    ): Flow<PagingData<Transaction>> =
         Pager(PagingConfig(pageSize = pageSize, enablePlaceholders = false)) {
             QueryPagingSource(
-                countQuery = queries.countAll(),
+                countQuery = queries.countFiltered(type, query),
                 transacter = queries,
                 context = dispatcher,
-                queryProvider = queries::selectAllPaged,
+                queryProvider = { limit, offset -> queries.selectFiltered(type, query, limit, offset) },
             )
         }.flow.map { pagingData -> pagingData.map { it.toDomain() } }
 
