@@ -1,12 +1,16 @@
 package com.github.dsbezerra.cashflow.core.designsystem.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -26,7 +30,12 @@ fun CashFlowTheme(
             motionScheme = motionScheme,
             shapes = Shapes(),
             typography = CashFlowTypography,
-            content = content,
-        )
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background,
+                content = content,
+            )
+        }
     }
 }
