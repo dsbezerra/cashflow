@@ -9,10 +9,10 @@ import androidx.compose.ui.unit.dp
 
 val CashflowLogo: ImageVector
     get() {
-        if (_CashflowLogo != null) {
-            return _CashflowLogo!!
+        if (cashflowLogo != null) {
+            return cashflowLogo!!
         }
-        _CashflowLogo = ImageVector.Builder(
+        cashflowLogo = ImageVector.Builder(
             name = "CashflowLogo",
             defaultWidth = 512.dp,
             defaultHeight = 512.dp,
@@ -79,8 +79,7 @@ val CashflowLogo: ImageVector
             }
         }.build()
 
-        return _CashflowLogo!!
+        return cashflowLogo!!
     }
 
-@Suppress("ObjectPropertyName")
-private var _CashflowLogo: ImageVector? = null
+private var cashflowLogo: ImageVector? = null

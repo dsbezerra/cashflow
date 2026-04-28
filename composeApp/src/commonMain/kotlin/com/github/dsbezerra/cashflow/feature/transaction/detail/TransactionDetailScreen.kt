@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -64,6 +65,7 @@ import cashflow.composeapp.generated.resources.saving
 import cashflow.composeapp.generated.resources.transaction_date
 import cashflow.composeapp.generated.resources.transaction_delete
 import cashflow.composeapp.generated.resources.transaction_delete_confirm
+import cashflow.composeapp.generated.resources.transaction_duplicate
 import cashflow.composeapp.generated.resources.transaction_destination_account
 import cashflow.composeapp.generated.resources.transaction_edit
 import cashflow.composeapp.generated.resources.transaction_new
@@ -112,6 +114,16 @@ fun TransactionDetailScreen(
                 navigationIcon = {
                     IconButtonWithTooltip(onClick = onNavigateBack, tooltip = stringResource(Res.string.back)) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
+                    }
+                },
+                actions = {
+                    if (state.isEditMode) {
+                        IconButtonWithTooltip(
+                            onClick = { viewModel.onAction(TransactionDetailAction.Duplicate) },
+                            tooltip = stringResource(Res.string.transaction_duplicate),
+                        ) {
+                            Icon(Icons.Default.ContentCopy, contentDescription = stringResource(Res.string.transaction_duplicate))
+                        }
                     }
                 },
             )

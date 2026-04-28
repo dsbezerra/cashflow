@@ -35,6 +35,7 @@ class ReportViewModel(
 
     private var collectJob: Job? = null
     private var dreCollectJob: Job? = null
+    private var dreComparisonCollectJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -60,6 +61,10 @@ class ReportViewModel(
                 _state.update { it.copy(dreYear = action.year, dreMonth = action.month, isDreLoading = true) }
                 dreCollectJob?.cancel()
                 startDreCollecting()
+                if (_state.value.showDreComparison) {
+                    dreComparisonCollectJob?.cancel()
+                    startDreComparisonCollecting()
+                }
             }
             is ReportAction.AccountSelected -> {
                 _state.update { it.copy(selectedAccountId = action.accountId, isLoading = true, isDreLoading = true) }
@@ -67,6 +72,21 @@ class ReportViewModel(
                 dreCollectJob?.cancel()
                 startCollecting()
                 startDreCollecting()
+                if (_state.value.showDreComparison) {
+                    dreComparisonCollectJob?.cancel()
+                    startDreComparisonCollecting()
+                }
+            }
+            is ReportAction.ToggleDreComparison -> {
+                val showing = !_state.value.showDreComparison
+                _state.update { it.copy(showDreComparison = showing, isDreComparisonLoading = showing) }
+                if (showing) {
+                    dreComparisonCollectJob?.cancel()
+                    startDreComparisonCollecting()
+                } else {
+                    dreComparisonCollectJob?.cancel()
+                    _state.update { it.copy(comparisonDreReport = null) }
+                }
             }
         }
     }
@@ -93,6 +113,22 @@ class ReportViewModel(
                 }
             }.onFailure {
                 _events.send(ReportEvent.ShowError("Erro ao carregar DRE"))
+            }
+        }
+    }
+
+    private fun startDreComparisonCollecting() {
+        val s = _state.value
+        val prevMonth = if (s.dreMonth == 1) 12 else s.dreMonth - 1
+        val prevYear = if (s.dreMonth == 1) s.dreYear - 1 else s.dreYear
+        dreComparisonCollectJob = viewModelScope.launch {
+            safeRunCatching {
+                getDreReport(prevYear, prevMonth, s.selectedAccountId).collect { report ->
+                    _state.update { it.copy(isDreComparisonLoading = false, comparisonDreReport = report) }
+                }
+            }.onFailure {
+                _state.update { it.copy(isDreComparisonLoading = false) }
+                _events.send(ReportEvent.ShowError("Erro ao carregar comparação DRE"))
             }
         }
     }

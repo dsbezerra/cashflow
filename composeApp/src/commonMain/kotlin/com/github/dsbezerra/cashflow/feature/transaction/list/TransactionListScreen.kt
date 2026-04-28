@@ -23,7 +23,9 @@ import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedListItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +59,7 @@ import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TransactionListScreen(
     onNavigateToDetail: (String?) -> Unit,
@@ -84,84 +86,100 @@ fun TransactionListScreen(
                 selectedType = typeFilter,
                 searchQuery = searchQuery,
                 onTypeSelected = { viewModel.onAction(TransactionListAction.TypeFilterChanged(it)) },
-                onSearchQueryChanged = { viewModel.onAction(TransactionListAction.SearchQueryChanged(it)) },
+                onSearchQueryChanged = {
+                    viewModel.onAction(
+                        TransactionListAction.SearchQueryChanged(
+                            it
+                        )
+                    )
+                },
             )
-            Box(modifier = Modifier.fillMaxSize()) {
-            when {
-                lazyPagingItems.loadState.refresh is LoadState.Loading -> {
-                    DSFullscreenLoader()
-                }
-
-                lazyPagingItems.itemCount == 0 -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                stringResource(Res.string.transaction_empty_title),
-                                style = MaterialTheme.typography.titleMediumEmphasized,
-                            )
-                            Text(
-                                stringResource(Res.string.transaction_empty_subtitle),
-                                style = MaterialTheme.typography.bodyMediumEmphasized,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
+            val isRefreshing = lazyPagingItems.loadState.refresh is LoadState.Loading
+                    && lazyPagingItems.itemCount > 0
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { lazyPagingItems.refresh() },
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                when {
+                    lazyPagingItems.loadState.refresh is LoadState.Loading && lazyPagingItems.itemCount == 0 -> {
+                        DSFullscreenLoader()
                     }
-                }
 
-                else -> {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp)
-                    ) {
-                        items(
-                            count = lazyPagingItems.itemCount,
-                            key = lazyPagingItems.itemKey { item ->
-                                when (item) {
-                                    is TransactionListItem.Header -> "header-${item.date}"
-                                    is TransactionListItem.Entry -> item.transaction.id
-                                }
-                            },
-                        ) { index ->
-                            when (val item = lazyPagingItems[index]) {
-                                is TransactionListItem.Header -> DateHeader(item.date)
-                                is TransactionListItem.Entry -> {
-                                    val prevIsHeader = index == 0 || lazyPagingItems[index - 1] is TransactionListItem.Header
-                                    val nextIsHeader = index == lazyPagingItems.itemCount - 1
-                                        || lazyPagingItems[index + 1] is TransactionListItem.Header
-                                        || lazyPagingItems[index + 1] == null
-                                    val position = when {
-                                        prevIsHeader && nextIsHeader -> GroupedItemPosition.Single
-                                        prevIsHeader -> GroupedItemPosition.Top
-                                        nextIsHeader -> GroupedItemPosition.Bottom
-                                        else -> GroupedItemPosition.Middle
-                                    }
-                                    GroupedListItem(position = position) {
-                                        TransactionRow(
-                                            transaction = item.transaction,
-                                            onClick = { onNavigateToDetail(item.transaction.id) },
-                                        )
-                                    }
-                                }
-
-                                null -> {}
-                            }
-                        }
-
-                        if (lazyPagingItems.loadState.append is LoadState.Loading) {
-                            item {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    CircularProgressIndicator()
-                                }
+                    lazyPagingItems.itemCount == 0 -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    stringResource(Res.string.transaction_empty_title),
+                                    style = MaterialTheme.typography.titleMediumEmphasized,
+                                )
+                                Text(
+                                    stringResource(Res.string.transaction_empty_subtitle),
+                                    style = MaterialTheme.typography.bodyMediumEmphasized,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                             }
                         }
                     }
-                    DesktopVerticalScrollbar(listState)
+
+                    else -> {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp)
+                        ) {
+                            items(
+                                count = lazyPagingItems.itemCount,
+                                key = lazyPagingItems.itemKey { item ->
+                                    when (item) {
+                                        is TransactionListItem.Header -> "header-${item.date}"
+                                        is TransactionListItem.Entry -> item.transaction.id
+                                    }
+                                },
+                            ) { index ->
+                                when (val item = lazyPagingItems[index]) {
+                                    is TransactionListItem.Header -> DateHeader(item.date)
+                                    is TransactionListItem.Entry -> {
+                                        val prevIsHeader =
+                                            index == 0 || lazyPagingItems[index - 1] is TransactionListItem.Header
+                                        val nextIsHeader = index == lazyPagingItems.itemCount - 1
+                                                || lazyPagingItems[index + 1] is TransactionListItem.Header
+                                                || lazyPagingItems[index + 1] == null
+                                        val position = when {
+                                            prevIsHeader && nextIsHeader -> GroupedItemPosition.Single
+                                            prevIsHeader -> GroupedItemPosition.Top
+                                            nextIsHeader -> GroupedItemPosition.Bottom
+                                            else -> GroupedItemPosition.Middle
+                                        }
+                                        GroupedListItem(position = position) {
+                                            TransactionRow(
+                                                transaction = item.transaction,
+                                                onClick = { onNavigateToDetail(item.transaction.id) },
+                                            )
+                                        }
+                                    }
+
+                                    null -> {}
+                                }
+                            }
+
+                            if (lazyPagingItems.loadState.append is LoadState.Loading) {
+                                item {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
+                            }
+                        }
+                        DesktopVerticalScrollbar(listState)
+                    }
                 }
-            }
             }
         }
     }

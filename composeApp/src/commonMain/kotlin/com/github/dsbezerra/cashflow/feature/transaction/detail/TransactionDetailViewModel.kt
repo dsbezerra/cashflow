@@ -97,6 +97,7 @@ class TransactionDetailViewModel(
             is TransactionDetailAction.ToAccountSelected -> _state.update { it.copy(selectedToAccountId = action.accountId) }
             is TransactionDetailAction.NotesChanged -> _state.update { it.copy(notes = action.notes) }
             is TransactionDetailAction.Save -> save()
+            is TransactionDetailAction.Duplicate -> _state.update { it.copy(transactionId = null, isEditMode = false) }
             is TransactionDetailAction.Delete, is TransactionDetailAction.ConfirmDelete -> delete()
         }
     }

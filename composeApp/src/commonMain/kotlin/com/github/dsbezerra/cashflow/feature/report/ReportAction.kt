@@ -7,4 +7,5 @@ sealed interface ReportAction {
     data class TabChanged(val tab: ReportTab) : ReportAction
     data class DreMonthChanged(val year: Int, val month: Int) : ReportAction
     data class AccountSelected(val accountId: String?) : ReportAction
+    data object ToggleDreComparison : ReportAction
 }

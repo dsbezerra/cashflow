@@ -20,6 +20,7 @@ sealed interface TransactionDetailAction {
     data class NotesChanged(val notes: String) :
         TransactionDetailAction
     data object Save : TransactionDetailAction
+    data object Duplicate : TransactionDetailAction
     data object Delete :
         TransactionDetailAction
     data object ConfirmDelete :

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,11 +19,17 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -31,6 +38,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -47,16 +55,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
-import androidx.compose.ui.text.style.TextOverflow
 import cashflow.composeapp.generated.resources.Res
 import cashflow.composeapp.generated.resources.all
 import cashflow.composeapp.generated.resources.report_accumulated_balance
@@ -65,6 +63,7 @@ import cashflow.composeapp.generated.resources.report_balance
 import cashflow.composeapp.generated.resources.report_balance_evolution
 import cashflow.composeapp.generated.resources.report_by_category
 import cashflow.composeapp.generated.resources.report_by_period
+import cashflow.composeapp.generated.resources.report_compare_toggle
 import cashflow.composeapp.generated.resources.report_costs
 import cashflow.composeapp.generated.resources.report_deductions
 import cashflow.composeapp.generated.resources.report_dre
@@ -72,6 +71,8 @@ import cashflow.composeapp.generated.resources.report_dre_error
 import cashflow.composeapp.generated.resources.report_dre_no_movements
 import cashflow.composeapp.generated.resources.report_expenses
 import cashflow.composeapp.generated.resources.report_expenses_by_category
+import cashflow.composeapp.generated.resources.report_financial_expenses
+import cashflow.composeapp.generated.resources.report_financial_expenses_sign
 import cashflow.composeapp.generated.resources.report_gross_profit
 import cashflow.composeapp.generated.resources.report_gross_revenue
 import cashflow.composeapp.generated.resources.report_gross_revenue_sign
@@ -83,21 +84,16 @@ import cashflow.composeapp.generated.resources.report_net_revenue
 import cashflow.composeapp.generated.resources.report_next_month
 import cashflow.composeapp.generated.resources.report_no_transactions_category
 import cashflow.composeapp.generated.resources.report_no_transactions_period
-import cashflow.composeapp.generated.resources.report_financial_expenses
-import cashflow.composeapp.generated.resources.report_financial_expenses_sign
 import cashflow.composeapp.generated.resources.report_operational_expenses
 import cashflow.composeapp.generated.resources.report_operational_expenses_sign
 import cashflow.composeapp.generated.resources.report_operational_result
-import cashflow.composeapp.generated.resources.report_period_last_3_months
-import cashflow.composeapp.generated.resources.report_period_last_6_months
-import cashflow.composeapp.generated.resources.report_period_last_month
-import cashflow.composeapp.generated.resources.report_period_this_month
-import cashflow.composeapp.generated.resources.report_period_this_year
 import cashflow.composeapp.generated.resources.report_prev_month
 import cashflow.composeapp.generated.resources.report_profit_loss
 import cashflow.composeapp.generated.resources.report_top_expense_category
 import cashflow.composeapp.generated.resources.transaction_count
+import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
 import com.github.dsbezerra.cashflow.core.designsystem.component.IconButtonWithTooltip
+import com.github.dsbezerra.cashflow.core.designsystem.theme.AppColors
 import com.github.dsbezerra.cashflow.core.domain.model.Account
 import com.github.dsbezerra.cashflow.core.domain.model.CategoryAmount
 import com.github.dsbezerra.cashflow.core.domain.model.DailyAmount
@@ -107,11 +103,7 @@ import com.github.dsbezerra.cashflow.core.domain.model.MonthlyAmount
 import com.github.dsbezerra.cashflow.core.domain.model.ReportData
 import com.github.dsbezerra.cashflow.core.domain.model.ReportPeriod
 import com.github.dsbezerra.cashflow.core.domain.model.toDecimal
-import com.github.dsbezerra.cashflow.core.designsystem.component.DesktopVerticalScrollbar
 import com.github.dsbezerra.cashflow.util.namePtBr
-import kotlinx.datetime.Month
-import org.jetbrains.compose.resources.pluralStringResource
-import org.jetbrains.compose.resources.stringResource
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
@@ -122,8 +114,10 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.LineProperties
-import com.github.dsbezerra.cashflow.core.designsystem.theme.AppColors
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.datetime.Month
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -211,115 +205,118 @@ private fun ReportContent(state: ReportState, onAction: (ReportAction) -> Unit) 
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxSize(),
             ) {
-            if (state.selectedTab == ReportTab.BY_PERIOD) {
-                item {
-                    PeriodSummaryCards(
-                        data
-                    )
-                }
-                if (data.totalIncome == 0.0 && data.totalExpenses == 0.0) {
+                if (state.selectedTab == ReportTab.BY_PERIOD) {
                     item {
-                        EmptyState(
-                            stringResource(Res.string.report_no_transactions_period)
-                        )
-                    }
-                } else {
-                    item {
-                        PeriodExtraStats(
+                        PeriodSummaryCards(
                             data
                         )
                     }
-                    if (data.dailyCumulative.isNotEmpty()) {
-                        item {
-                            DailyCumulativeLineChart(
-                                data.dailyCumulative
-                            )
-                        }
-                    }
-                    if (data.monthlyBreakdown.isNotEmpty()) {
-                        item {
-                            MonthlyBarChart(
-                                data.monthlyBreakdown
-                            )
-                        }
-                    }
-                }
-            } else if (state.selectedTab == ReportTab.BY_CATEGORY) {
-                item {
-                    CategoryBreakdownSection(
-                        title = stringResource(Res.string.report_expenses_by_category),
-                        items = data.expenseByCategory,
-                        color = cashFlowColors.expense,
-                    )
-                }
-                if (data.incomeByCategory.isNotEmpty()) {
-                    item {
-                        CategoryBreakdownSection(
-                            title = stringResource(Res.string.report_income_by_category),
-                            items = data.incomeByCategory,
-                            color = cashFlowColors.income,
-                        )
-                    }
-                }
-                if (data.expenseByCategory.isEmpty() && data.incomeByCategory.isEmpty()) {
-                    item {
-                        EmptyState(
-                            stringResource(Res.string.report_no_transactions_period)
-                        )
-                    }
-                }
-            } else {
-                // DRE tab
-                item {
-                    DreMonthSelector(
-                        year = state.dreYear,
-                        month = state.dreMonth,
-                        onAction = onAction,
-                    )
-                }
-                if (state.isDreLoading) {
-                    item {
-                        Box(
-                            Modifier.fillMaxWidth().padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                } else {
-                    val dre = state.dreReport
-                    if (dre == null) {
+                    if (data.totalIncome == 0.0 && data.totalExpenses == 0.0) {
                         item {
                             EmptyState(
-                                stringResource(Res.string.report_dre_error)
-                            )
-                        }
-                    } else if (dre.grossRevenue.total == 0.0 &&
-                        dre.deductions.total == 0.0 &&
-                        dre.costs.total == 0.0 &&
-                        dre.operationalExpenses.total == 0.0
-                    ) {
-                        item {
-                            EmptyState(
-                                stringResource(
-                                    Res.string.report_dre_no_movements,
-                                    Month(state.dreMonth).namePtBr()
-                                        .replaceFirstChar { it.uppercase() },
-                                    state.dreYear,
-                                )
+                                stringResource(Res.string.report_no_transactions_period)
                             )
                         }
                     } else {
                         item {
-                            DreStatement(
-                                dre
+                            PeriodExtraStats(
+                                data
                             )
+                        }
+                        if (data.dailyCumulative.isNotEmpty()) {
+                            item {
+                                DailyCumulativeLineChart(
+                                    data.dailyCumulative
+                                )
+                            }
+                        }
+                        if (data.monthlyBreakdown.isNotEmpty()) {
+                            item {
+                                MonthlyBarChart(
+                                    data.monthlyBreakdown
+                                )
+                            }
+                        }
+                    }
+                } else if (state.selectedTab == ReportTab.BY_CATEGORY) {
+                    item {
+                        CategoryBreakdownSection(
+                            title = stringResource(Res.string.report_expenses_by_category),
+                            items = data.expenseByCategory,
+                            color = cashFlowColors.expense,
+                        )
+                    }
+                    if (data.incomeByCategory.isNotEmpty()) {
+                        item {
+                            CategoryBreakdownSection(
+                                title = stringResource(Res.string.report_income_by_category),
+                                items = data.incomeByCategory,
+                                color = cashFlowColors.income,
+                            )
+                        }
+                    }
+                    if (data.expenseByCategory.isEmpty() && data.incomeByCategory.isEmpty()) {
+                        item {
+                            EmptyState(
+                                stringResource(Res.string.report_no_transactions_period)
+                            )
+                        }
+                    }
+                } else {
+                    // DRE tab
+                    item {
+                        DreMonthSelector(
+                            year = state.dreYear,
+                            month = state.dreMonth,
+                            showComparison = state.showDreComparison,
+                            onAction = onAction,
+                            onToggleComparison = { onAction(ReportAction.ToggleDreComparison) },
+                        )
+                    }
+                    if (state.isDreLoading) {
+                        item {
+                            Box(
+                                Modifier.fillMaxWidth().padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    } else {
+                        val dre = state.dreReport
+                        if (dre == null) {
+                            item {
+                                EmptyState(
+                                    stringResource(Res.string.report_dre_error)
+                                )
+                            }
+                        } else if (dre.grossRevenue.total == 0.0 &&
+                            dre.deductions.total == 0.0 &&
+                            dre.costs.total == 0.0 &&
+                            dre.operationalExpenses.total == 0.0
+                        ) {
+                            item {
+                                EmptyState(
+                                    stringResource(
+                                        Res.string.report_dre_no_movements,
+                                        Month(state.dreMonth).namePtBr()
+                                            .replaceFirstChar { it.uppercase() },
+                                        state.dreYear,
+                                    )
+                                )
+                            }
+                        } else {
+                            item {
+                                DreStatement(
+                                    dre = dre,
+                                    comparisonDre = if (state.showDreComparison) state.comparisonDreReport else null,
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-        DesktopVerticalScrollbar(listState)
+            DesktopVerticalScrollbar(listState)
         }
     }
 }
@@ -705,7 +702,13 @@ private fun EmptyState(message: String) {
 }
 
 @Composable
-private fun DreMonthSelector(year: Int, month: Int, onAction: (ReportAction) -> Unit) {
+private fun DreMonthSelector(
+    year: Int,
+    month: Int,
+    showComparison: Boolean,
+    onAction: (ReportAction) -> Unit,
+    onToggleComparison: () -> Unit,
+) {
     val monthName = Month(month).namePtBr()
         .replaceFirstChar { it.uppercase() }
     Row(
@@ -743,11 +746,25 @@ private fun DreMonthSelector(year: Int, month: Int, onAction: (ReportAction) -> 
                 contentDescription = stringResource(Res.string.report_next_month)
             )
         }
+        IconButtonWithTooltip(
+            onClick = onToggleComparison,
+            tooltip = stringResource(Res.string.report_compare_toggle),
+        ) {
+            Icon(
+                Icons.Default.SwapHoriz,
+                contentDescription = stringResource(Res.string.report_compare_toggle),
+                tint = if (showComparison) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            )
+        }
     }
 }
 
 @Composable
-private fun DreStatement(dre: DreReport) {
+private fun DreStatement(dre: DreReport, comparisonDre: DreReport? = null) {
     val cashFlowColors = AppColors.colors
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -763,25 +780,30 @@ private fun DreStatement(dre: DreReport) {
                 label = stringResource(Res.string.report_gross_revenue),
                 item = dre.grossRevenue,
                 color = cashFlowColors.income,
+                comparisonAmount = comparisonDre?.grossRevenue?.total,
             )
             DreResultRow(
                 label = stringResource(Res.string.report_deductions),
                 item = dre.deductions,
-                color = cashFlowColors.expense
+                color = cashFlowColors.expense,
+                comparisonAmount = comparisonDre?.deductions?.total,
             )
             DreTotalRow(
                 label = stringResource(Res.string.report_net_revenue),
-                amount = dre.netRevenue
+                amount = dre.netRevenue,
+                comparisonAmount = comparisonDre?.netRevenue,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
             DreResultRow(
                 label = stringResource(Res.string.report_costs),
                 item = dre.costs,
-                color = cashFlowColors.expense
+                color = cashFlowColors.expense,
+                comparisonAmount = comparisonDre?.costs?.total,
             )
             DreTotalRow(
                 label = stringResource(Res.string.report_gross_profit),
-                amount = dre.grossProfit
+                amount = dre.grossProfit,
+                comparisonAmount = comparisonDre?.grossProfit,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
             DreSection(
@@ -789,11 +811,13 @@ private fun DreStatement(dre: DreReport) {
                 label = stringResource(Res.string.report_operational_expenses),
                 item = dre.operationalExpenses,
                 color = cashFlowColors.expense,
+                comparisonAmount = comparisonDre?.operationalExpenses?.total,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
             DreTotalRow(
                 label = stringResource(Res.string.report_operational_result),
                 amount = dre.operationalResult,
+                comparisonAmount = comparisonDre?.operationalResult,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
             DreSection(
@@ -801,19 +825,27 @@ private fun DreStatement(dre: DreReport) {
                 label = stringResource(Res.string.report_financial_expenses),
                 item = dre.financialExpenses,
                 color = cashFlowColors.expense,
+                comparisonAmount = comparisonDre?.financialExpenses?.total,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.surface)
             DreTotalRow(
                 label = stringResource(Res.string.report_profit_loss),
                 amount = dre.netResult,
                 highlight = true,
+                comparisonAmount = comparisonDre?.netResult,
             )
         }
     }
 }
 
 @Composable
-private fun DreSection(sign: String, label: String, item: DreLineItem, color: Color) {
+private fun DreSection(
+    sign: String,
+    label: String,
+    item: DreLineItem,
+    color: Color,
+    comparisonAmount: Double? = null,
+) {
     var expanded by remember { mutableStateOf(false) }
     Column {
         Row(
@@ -830,12 +862,21 @@ private fun DreSection(sign: String, label: String, item: DreLineItem, color: Co
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f),
             )
-            Text(
-                text = item.total.toDecimal().toCurrency(),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = color,
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = item.total.toDecimal().toCurrency(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = color,
+                )
+                if (comparisonAmount != null) {
+                    Text(
+                        text = comparisonAmount.toDecimal().toCurrency(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
         if (expanded) {
             item.categories.forEach { line ->
@@ -863,29 +904,49 @@ private fun DreSection(sign: String, label: String, item: DreLineItem, color: Co
 }
 
 @Composable
-private fun DreResultRow(label: String, item: DreLineItem, color: Color) {
+private fun DreResultRow(
+    label: String,
+    item: DreLineItem,
+    color: Color,
+    comparisonAmount: Double? = null,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f),
         )
-        Text(
-            text = item.total.toDecimal().toCurrency(),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = color,
-        )
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = item.total.toDecimal().toCurrency(),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = color,
+            )
+            if (comparisonAmount != null) {
+                Text(
+                    text = comparisonAmount.toDecimal().toCurrency(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }
 
 @Composable
-private fun DreTotalRow(label: String, amount: Double, highlight: Boolean = false) {
+private fun DreTotalRow(
+    label: String,
+    amount: Double,
+    highlight: Boolean = false,
+    comparisonAmount: Double? = null,
+) {
     val cashFlowColors = AppColors.colors
     val color = if (amount >= 0) cashFlowColors.income else cashFlowColors.expense
     Row(
@@ -901,11 +962,21 @@ private fun DreTotalRow(label: String, amount: Double, highlight: Boolean = fals
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f),
         )
-        Text(
-            text = amount.toDecimal().toCurrency(),
-            style = if (highlight) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            color = color,
-        )
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = amount.toDecimal().toCurrency(),
+                style = if (highlight) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = color,
+            )
+            if (comparisonAmount != null) {
+                val comparisonColor = if (comparisonAmount >= 0) cashFlowColors.income else cashFlowColors.expense
+                Text(
+                    text = comparisonAmount.toDecimal().toCurrency(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (highlight) comparisonColor else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }

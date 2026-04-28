@@ -15,6 +15,9 @@ data class ReportState(
     val dreMonth: Int = 0,
     val dreReport: DreReport? = null,
     val isDreLoading: Boolean = false,
+    val showDreComparison: Boolean = false,
+    val comparisonDreReport: DreReport? = null,
+    val isDreComparisonLoading: Boolean = false,
     // Account filter
     val accounts: List<Account> = emptyList(),
     val selectedAccountId: String? = null,

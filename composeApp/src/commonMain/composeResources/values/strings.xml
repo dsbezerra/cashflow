@@ -69,6 +69,7 @@
     <!-- Transaction -->
     <string name="transaction_new">Nova Transação</string>
     <string name="transaction_edit">Editar Transação</string>
+    <string name="transaction_duplicate">Duplicar Transação</string>
     <string name="transaction_delete">Excluir Transação</string>
     <string name="transaction_delete_confirm">Tem certeza que deseja excluir esta transação?</string>
     <string name="transaction_empty_title">Nenhuma transação ainda</string>
@@ -115,6 +116,7 @@
     <string name="report_no_transactions_category">Nenhuma transação nesta categoria</string>
     <string name="report_prev_month">Mês anterior</string>
     <string name="report_next_month">Próximo mês</string>
+    <string name="report_compare_toggle">Comparar com mês anterior</string>
     <string name="report_gross_revenue">Receita Bruta</string>
     <string name="report_gross_revenue_sign">(+)</string>
     <string name="report_deductions">(-) Deduções</string>
