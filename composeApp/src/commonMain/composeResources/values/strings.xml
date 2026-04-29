@@ -81,12 +81,26 @@
     <string name="transaction_date">Data: %1$s</string>
     <string name="transaction_filter_all">Todos</string>
     <string name="transaction_search_hint">Buscar transações...</string>
+    <string name="transaction_filter_this_week">Esta semana</string>
+    <string name="transaction_filter_this_month">Este mês</string>
+    <string name="transaction_filter_last_month">Mês passado</string>
+    <string name="transaction_filter_this_year">Este ano</string>
+    <string name="transaction_filter_all_categories">Todas as categorias</string>
+    <string name="transaction_filter_category">Categoria</string>
+    <string name="transaction_filter_apply">Aplicar</string>
+    <string name="transaction_filter_clear">Limpar filtros</string>
+    <string name="transaction_filter_type">Tipo</string>
+    <string name="transaction_filter_period">Período</string>
+    <string name="transaction_filter_button">Filtrar</string>
 
     <!-- Dashboard -->
     <string name="dashboard_month_balance">Saldo do Mês</string>
     <string name="dashboard_account">Conta %1$s</string>
     <string name="dashboard_income">Receitas</string>
     <string name="dashboard_expenses">Despesas</string>
+    <string name="dashboard_spending_by_category">Gastos por Categoria</string>
+    <string name="dashboard_others">Outros</string>
+    <string name="dashboard_no_expense_data">Sem gastos neste mês</string>
     <string name="dashboard_last_6_months">Últimos 6 meses</string>
     <string name="dashboard_no_data_6_months">Sem dados nos últimos 6 meses</string>
     <string name="dashboard_recent">Recentes</string>

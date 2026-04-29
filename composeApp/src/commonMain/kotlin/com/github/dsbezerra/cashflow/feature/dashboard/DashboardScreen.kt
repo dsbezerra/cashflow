@@ -1,5 +1,6 @@
 package com.github.dsbezerra.cashflow.feature.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,7 +42,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,6 +62,9 @@ import cashflow.composeapp.generated.resources.dashboard_expenses
 import cashflow.composeapp.generated.resources.dashboard_income
 import cashflow.composeapp.generated.resources.dashboard_income_chart
 import cashflow.composeapp.generated.resources.dashboard_last_6_months
+import cashflow.composeapp.generated.resources.dashboard_no_expense_data
+import cashflow.composeapp.generated.resources.dashboard_others
+import cashflow.composeapp.generated.resources.dashboard_spending_by_category
 import cashflow.composeapp.generated.resources.dashboard_month_balance
 import cashflow.composeapp.generated.resources.dashboard_no_data_6_months
 import cashflow.composeapp.generated.resources.dashboard_no_transactions_month
@@ -68,6 +74,7 @@ import cashflow.composeapp.generated.resources.transaction_count
 import com.github.dsbezerra.cashflow.core.domain.model.Account
 import com.github.dsbezerra.cashflow.core.domain.model.DashboardSummary
 import com.github.dsbezerra.cashflow.core.domain.model.Decimal
+import com.github.dsbezerra.cashflow.core.domain.model.toDecimal
 import com.github.dsbezerra.cashflow.core.domain.model.MonthlyAmount
 import com.github.dsbezerra.cashflow.core.designsystem.component.AmountText
 import com.github.dsbezerra.cashflow.core.designsystem.component.GroupedListItem
@@ -75,6 +82,7 @@ import com.github.dsbezerra.cashflow.core.designsystem.component.groupedItemPosi
 import com.github.dsbezerra.cashflow.core.designsystem.component.TopBarWithNavigation
 import com.github.dsbezerra.cashflow.util.namePtBr
 import ir.ehsannarmani.compose_charts.ColumnChart
+import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.Bars
 import ir.ehsannarmani.compose_charts.models.DividerProperties
@@ -82,6 +90,7 @@ import ir.ehsannarmani.compose_charts.models.GridProperties
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.LineProperties
+import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -168,6 +177,9 @@ private fun DashboardContent(
             }
             item {
                 SummaryCards(summary)
+            }
+            item {
+                SpendingDonutChart(state.topExpenseCategories)
             }
             item {
                 IncomeExpenseBarChart(summary.last6MonthsBreakdown)
@@ -452,6 +464,109 @@ private fun RecentTransactions(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun SpendingDonutChart(categories: List<CategoryExpense>) {
+    var selected by remember { mutableStateOf<Pie?>(null) }
+    Column {
+        Text(
+            text = stringResource(Res.string.dashboard_spending_by_category),
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
+        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+        ) {
+            if (categories.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = stringResource(Res.string.dashboard_no_expense_data),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            } else {
+                val pieData = remember(categories) {
+                    categories.map { cat ->
+                        Pie(
+                            label = cat.label,
+                            data = cat.amount,
+                            color = cat.colorHex.toComposeColor(),
+                            selectedColor = cat.colorHex.toComposeColor().copy(alpha = 0.75f),
+                            style = Pie.Style.Stroke(width = 28.dp),
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    PieChart(
+                        modifier = Modifier.size(160.dp),
+                        data = pieData,
+                        onPieClick = { pie ->
+                            selected = if (selected?.label == pie.label) null else pie
+                        },
+                        selectedScale = 1.08f,
+                        selectedPaddingDegree = 4f,
+                    )
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        categories.forEach { cat ->
+                            val isSelected = selected?.label == cat.label
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .then(
+                                            Modifier.background(
+                                                cat.colorHex.toComposeColor(),
+                                                shape = MaterialTheme.shapes.extraSmall,
+                                            )
+                                        ),
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = cat.label,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        maxLines = 1,
+                                    )
+                                    Text(
+                                        text = cat.amount.toDecimal().toCurrency(),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun String.toComposeColor(): Color {
+    val hex = trimStart('#').padStart(6, '0')
+    return Color(("FF$hex").toLong(16).toInt())
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

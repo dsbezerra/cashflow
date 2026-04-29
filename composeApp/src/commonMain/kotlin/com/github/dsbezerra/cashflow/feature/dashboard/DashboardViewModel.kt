@@ -21,6 +21,13 @@ import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+private val CHART_PALETTE = listOf(
+    "#4CAF50", "#2196F3", "#FFC107", "#E91E63",
+    "#9C27B0", "#00BCD4", "#FF5722", "#3F51B5",
+    "#009688", "#FF9800", "#795548", "#607D8B",
+    "#8BC34A", "#F44336",
+)
+
 class DashboardViewModel(
     private val getDashboardSummary: GetDashboardSummaryUseCase,
     private val categoryRepository: CategoryRepository,
@@ -90,11 +97,22 @@ class DashboardViewModel(
                     getDashboardSummary(s.selectedAccountId, s.selectedYear, s.selectedMonth),
                     categoryRepository.getAll(),
                 ) { summary, cats ->
+                    val sorted = summary.expensesByCategoryId.entries.sortedByDescending { it.value }
+                    val top5 = sorted.take(5).map { (id, amount) ->
+                        val cat = cats.find { it.id == id }
+                        val colorHex = CHART_PALETTE[kotlin.math.abs(id.hashCode()) % CHART_PALETTE.size]
+                        CategoryExpense(id, cat?.name ?: id, colorHex, amount)
+                    }
+                    val othersAmount = sorted.drop(5).sumOf { it.value }
+                    val topExpenseCategories = if (othersAmount > 0.0)
+                        top5 + CategoryExpense("others", "Outros", "#9E9E9E", othersAmount)
+                    else top5
                     _state.value.copy(
                         isLoading = false,
                         summary = summary.copy(
                             recentTransactions = summary.recentTransactions.mapCategories(cats)
                         ),
+                        topExpenseCategories = topExpenseCategories,
                     )
                 }.collect { _state.value = it }
             }.onFailure { e ->

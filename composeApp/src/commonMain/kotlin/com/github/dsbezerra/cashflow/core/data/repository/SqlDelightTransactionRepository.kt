@@ -67,13 +67,18 @@ class SqlDelightTransactionRepository(
         pageSize: Int,
         type: TransactionType?,
         query: String?,
+        categoryId: String?,
+        startDate: Long?,
+        endDate: Long?,
     ): Flow<PagingData<Transaction>> =
         Pager(PagingConfig(pageSize = pageSize, enablePlaceholders = false)) {
             QueryPagingSource(
-                countQuery = queries.countFiltered(type, query),
+                countQuery = queries.countFiltered(type, query, categoryId, startDate, endDate),
                 transacter = queries,
                 context = dispatcher,
-                queryProvider = { limit, offset -> queries.selectFiltered(type, query, limit, offset) },
+                queryProvider = { limit, offset ->
+                    queries.selectFiltered(type, query, categoryId, startDate, endDate, limit, offset)
+                },
             )
         }.flow.map { pagingData -> pagingData.map { it.toDomain() } }
 

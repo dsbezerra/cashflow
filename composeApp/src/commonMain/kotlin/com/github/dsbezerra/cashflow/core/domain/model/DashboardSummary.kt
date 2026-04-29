@@ -13,4 +13,5 @@ data class DashboardSummary(
     val netBalance: Decimal,
     val recentTransactions: List<RecentTransaction>,
     val last6MonthsBreakdown: List<MonthlyAmount>,
+    val expensesByCategoryId: Map<String, Double> = emptyMap(),
 )

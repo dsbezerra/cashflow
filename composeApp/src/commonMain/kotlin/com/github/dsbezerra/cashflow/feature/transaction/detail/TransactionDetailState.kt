@@ -21,7 +21,6 @@ data class TransactionDetailState(
     val isSaving: Boolean = false,
     val isEditMode: Boolean = false,
     val amountError: String? = null,
-    val descriptionError: String? = null,
     val categoryError: String? = null,
     val accountError: String? = null,
 )

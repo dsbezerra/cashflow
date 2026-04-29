@@ -12,6 +12,9 @@ interface TransactionRepository {
         pageSize: Int,
         type: TransactionType? = null,
         query: String? = null,
+        categoryId: String? = null,
+        startDate: Long? = null,
+        endDate: Long? = null,
     ): Flow<PagingData<Transaction>>
     suspend fun getById(id: String): Transaction?
     suspend fun insert(transaction: Transaction)

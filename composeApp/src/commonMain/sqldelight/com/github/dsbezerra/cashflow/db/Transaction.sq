@@ -59,11 +59,17 @@ LIMIT :limit OFFSET :offset;
 countFiltered:
 SELECT COUNT(*) FROM CashTransaction
 WHERE (:type IS NULL OR type = :type)
-AND (:query IS NULL OR LOWER(description) LIKE '%' || LOWER(:query) || '%');
+  AND (:query IS NULL OR LOWER(description) LIKE '%' || LOWER(:query) || '%')
+  AND (:categoryId IS NULL OR categoryId = :categoryId)
+  AND (:startDate IS NULL OR date >= :startDate)
+  AND (:endDate IS NULL OR date < :endDate);
 
 selectFiltered:
 SELECT * FROM CashTransaction
 WHERE (:type IS NULL OR type = :type)
-AND (:query IS NULL OR LOWER(description) LIKE '%' || LOWER(:query) || '%')
+  AND (:query IS NULL OR LOWER(description) LIKE '%' || LOWER(:query) || '%')
+  AND (:categoryId IS NULL OR categoryId = :categoryId)
+  AND (:startDate IS NULL OR date >= :startDate)
+  AND (:endDate IS NULL OR date < :endDate)
 ORDER BY date DESC
 LIMIT :limit OFFSET :offset;

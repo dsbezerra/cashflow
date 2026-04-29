@@ -12,5 +12,6 @@ data class DashboardState(
     val selectedAccountId: String? = null,
     val selectedYear: Int = 0,
     val selectedMonth: Int = 0,
+    val topExpenseCategories: List<CategoryExpense> = emptyList(),
     val error: String? = null,
 )

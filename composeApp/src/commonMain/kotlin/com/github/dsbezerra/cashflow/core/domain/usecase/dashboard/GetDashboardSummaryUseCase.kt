@@ -63,6 +63,11 @@ class GetDashboardSummaryUseCase(
                 .filter { it.type == TransactionType.EXPENSE }
                 .sumOf { it.amount.toDouble() }
 
+            val expensesByCategoryId = monthlyTxs
+                .filter { it.type == TransactionType.EXPENSE }
+                .groupBy { it.categoryId }
+                .mapValues { (_, txs) -> txs.sumOf { it.amount.toDouble() } }
+
             val recentTransactions = monthlyTxs
                 .sortedByDescending { it.date }
                 .take(10)
@@ -96,6 +101,7 @@ class GetDashboardSummaryUseCase(
                 netBalance = (monthlyIncome - monthlyExpenses).toDecimal(),
                 recentTransactions = recentTransactions.map { it.toRecentTransaction() },
                 last6MonthsBreakdown = last6MonthsBreakdown,
+                expensesByCategoryId = expensesByCategoryId,
             )
         }
 }

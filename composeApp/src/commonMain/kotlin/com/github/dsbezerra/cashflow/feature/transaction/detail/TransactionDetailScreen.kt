@@ -225,8 +225,6 @@ fun TransactionFormBody(
                 value = state.description,
                 onValueChange = { onAction(TransactionDetailAction.DescriptionChanged(it)) },
                 label = { Text(stringResource(Res.string.description_label)) },
-                isError = state.descriptionError != null,
-                supportingText = state.descriptionError?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
             )
 

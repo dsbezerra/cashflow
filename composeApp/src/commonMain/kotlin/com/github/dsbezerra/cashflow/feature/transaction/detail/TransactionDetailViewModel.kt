@@ -93,9 +93,18 @@ class TransactionDetailViewModel(
         when (action) {
             is TransactionDetailAction.TypeChanged -> _state.update { it.copy(type = action.type, selectedCategoryId = null) }
             is TransactionDetailAction.AmountChanged -> _state.update { it.copy(amountInCents = action.cents, amountError = null) }
-            is TransactionDetailAction.DescriptionChanged -> _state.update { it.copy(description = action.description, descriptionError = null) }
+            is TransactionDetailAction.DescriptionChanged -> _state.update { it.copy(description = action.description) }
             is TransactionDetailAction.DateChanged -> _state.update { it.copy(selectedDate = action.epochMillis) }
-            is TransactionDetailAction.CategorySelected -> _state.update { it.copy(selectedCategoryId = action.categoryId, categoryError = null) }
+            is TransactionDetailAction.CategorySelected -> {
+                val catName = _state.value.categories.find { it.id == action.categoryId }?.name ?: ""
+                _state.update {
+                    it.copy(
+                        selectedCategoryId = action.categoryId,
+                        categoryError = null,
+                        description = it.description.ifBlank { catName },
+                    )
+                }
+            }
             is TransactionDetailAction.AccountSelected -> _state.update { it.copy(selectedAccountId = action.accountId, accountError = null) }
             is TransactionDetailAction.ToAccountSelected -> _state.update { it.copy(selectedToAccountId = action.accountId) }
             is TransactionDetailAction.NotesChanged -> _state.update { it.copy(notes = action.notes) }
@@ -114,10 +123,6 @@ class TransactionDetailViewModel(
             hasError = true
         }
         val amount = s.amountInCents / 100.0
-        if (s.description.isBlank()) {
-            _state.update { it.copy(descriptionError = "Description is required") }
-            hasError = true
-        }
         if (s.selectedAccountId == null) {
             _state.update { it.copy(accountError = "Select an account") }
             hasError = true
