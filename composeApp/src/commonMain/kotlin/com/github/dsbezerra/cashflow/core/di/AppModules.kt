@@ -4,6 +4,7 @@ import org.koin.core.module.Module
 
 val appModules: List<Module>
     get() = listOf(
+        loggingModule,
         platformModule,
         databaseModule,
         repositoryModule,

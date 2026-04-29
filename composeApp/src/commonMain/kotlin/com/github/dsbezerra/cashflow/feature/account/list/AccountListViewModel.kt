@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.account.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.repository.AccountRepository
 import com.github.dsbezerra.cashflow.core.domain.usecase.account.GetAccountBalanceUseCase
 import kotlinx.coroutines.Job
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 class AccountListViewModel(
     private val accountRepository: AccountRepository,
     private val getAccountBalanceUseCase: GetAccountBalanceUseCase,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AccountListState())
@@ -38,7 +40,10 @@ class AccountListViewModel(
             }
             is AccountListAction.SetDefault -> viewModelScope.launch {
                 safeRunCatching { accountRepository.setDefault(action.accountId) }
-                    .onFailure { _events.send(AccountListEvent.ShowError("Falha ao definir conta padrão")) }
+                    .onFailure { e ->
+                        logger.e(e) { "Failed to set default account: id=${action.accountId}" }
+                        _events.send(AccountListEvent.ShowError("Falha ao definir conta padrão"))
+                    }
             }
         }
     }

@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.recurring.form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.model.RecurringRule
 import com.github.dsbezerra.cashflow.core.domain.model.toDecimal
 import com.github.dsbezerra.cashflow.core.domain.repository.AccountRepository
@@ -23,6 +24,7 @@ class RecurringRuleFormViewModel(
     private val recurringRuleRepository: RecurringRuleRepository,
     private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RecurringRuleFormState())
@@ -115,6 +117,7 @@ class RecurringRuleFormViewModel(
         if (hasError) return
 
         _state.update { it.copy(isSaving = true) }
+        logger.d { "Saving recurring rule: editMode=${s.isEditMode}" }
 
         viewModelScope.launch {
             safeRunCatching {
@@ -154,7 +157,8 @@ class RecurringRuleFormViewModel(
                 }
             }.onSuccess {
                 _events.send(RecurringRuleFormEvent.NavigateBack)
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to save recurring rule" }
                 _state.update { st -> st.copy(isSaving = false) }
                 _events.send(RecurringRuleFormEvent.ShowError("Erro ao salvar regra"))
             }
@@ -163,10 +167,14 @@ class RecurringRuleFormViewModel(
 
     private fun delete() {
         val id = _state.value.ruleId ?: return
+        logger.d { "Deleting recurring rule: id=$id" }
         viewModelScope.launch {
             safeRunCatching { recurringRuleRepository.delete(id) }
                 .onSuccess { _events.send(RecurringRuleFormEvent.NavigateBack) }
-                .onFailure { _events.send(RecurringRuleFormEvent.ShowError("Erro ao excluir regra")) }
+                .onFailure { e ->
+                    logger.e(e) { "Failed to delete recurring rule: id=$id" }
+                    _events.send(RecurringRuleFormEvent.ShowError("Erro ao excluir regra"))
+                }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.account.form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.model.Account
 import com.github.dsbezerra.cashflow.core.domain.model.toDecimal
 import com.github.dsbezerra.cashflow.core.domain.repository.AccountRepository
@@ -18,6 +19,7 @@ import kotlin.time.Clock
 
 class AccountFormViewModel(
     private val accountRepository: AccountRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AccountFormState())
@@ -69,6 +71,7 @@ class AccountFormViewModel(
         if (hasError) return
 
         _state.update { it.copy(isSaving = true) }
+        logger.d { "Saving account: editMode=${s.isEditMode}" }
 
         viewModelScope.launch {
             safeRunCatching {
@@ -101,7 +104,8 @@ class AccountFormViewModel(
                 }
             }.onSuccess {
                 _events.send(AccountFormEvent.NavigateBack)
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to save account" }
                 _state.update { st -> st.copy(isSaving = false) }
                 _events.send(AccountFormEvent.ShowError("Falha ao salvar conta"))
             }
@@ -110,10 +114,14 @@ class AccountFormViewModel(
 
     private fun delete() {
         val id = _state.value.accountId ?: return
+        logger.d { "Deleting account: id=$id" }
         viewModelScope.launch {
             safeRunCatching { accountRepository.delete(id) }
                 .onSuccess { _events.send(AccountFormEvent.NavigateBack) }
-                .onFailure { _events.send(AccountFormEvent.ShowError("Falha ao excluir conta")) }
+                .onFailure { e ->
+                    logger.e(e) { "Failed to delete account: id=$id" }
+                    _events.send(AccountFormEvent.ShowError("Falha ao excluir conta"))
+                }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.recurring.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.repository.RecurringRuleRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class RecurringRuleListViewModel(
     private val recurringRuleRepository: RecurringRuleRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RecurringRuleListState())
@@ -41,16 +43,21 @@ class RecurringRuleListViewModel(
             safeRunCatching {
                 val rule = recurringRuleRepository.getById(id) ?: return@safeRunCatching
                 recurringRuleRepository.update(rule.copy(isActive = isActive))
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to toggle recurring rule: id=$id isActive=$isActive" }
                 _events.send(RecurringRuleListEvent.ShowError("Erro ao atualizar regra"))
             }
         }
     }
 
     private fun delete(id: String) {
+        logger.d { "Deleting recurring rule: id=$id" }
         viewModelScope.launch {
             safeRunCatching { recurringRuleRepository.delete(id) }
-                .onFailure { _events.send(RecurringRuleListEvent.ShowError("Erro ao excluir regra")) }
+                .onFailure { e ->
+                    logger.e(e) { "Failed to delete recurring rule: id=$id" }
+                    _events.send(RecurringRuleListEvent.ShowError("Erro ao excluir regra"))
+                }
         }
     }
 }

@@ -20,11 +20,13 @@ val viewModelModule = module {
         DashboardViewModel(
             get(),
             get(),
+            get(),
             get()
         )
     }
     viewModel {
         TransactionListViewModel(
+            get(),
             get(),
             get(),
             get()
@@ -37,11 +39,13 @@ val viewModelModule = module {
             get(),
             get(),
             get(),
+            get(),
             get()
         )
     }
     viewModel {
         AccountListViewModel(
+            get(),
             get(),
             get()
         )
@@ -49,20 +53,22 @@ val viewModelModule = module {
     viewModel {
         AccountDetailViewModel(
             get(),
+            get(),
             get()
         )
     }
-    viewModel { AccountFormViewModel(get()) }
-    viewModel { CategoryListViewModel(get()) }
-    viewModel { CategoryFormViewModel(get()) }
-    viewModel { ReportViewModel(get(), get(), get()) }
-    viewModel { RecurringRuleListViewModel(get()) }
+    viewModel { AccountFormViewModel(get(), get()) }
+    viewModel { CategoryListViewModel(get(), get()) }
+    viewModel { CategoryFormViewModel(get(), get()) }
+    viewModel { ReportViewModel(get(), get(), get(), get()) }
+    viewModel { RecurringRuleListViewModel(get(), get()) }
     viewModel {
         RecurringRuleFormViewModel(
             get(),
             get(),
+            get(),
             get()
         )
     }
-    viewModel { ScenarioCalculatorViewModel(get(), get()) }
+    viewModel { ScenarioCalculatorViewModel(get(), get(), get()) }
 }

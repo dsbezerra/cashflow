@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.transaction.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.model.Transaction
 import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.core.domain.model.toDecimal
@@ -30,6 +31,7 @@ class TransactionDetailViewModel(
     private val createTransactionUseCase: CreateTransactionUseCase,
     private val createTransferUseCase: CreateTransferUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionDetailState())
@@ -43,6 +45,7 @@ class TransactionDetailViewModel(
         defaultAccountId: String? = null,
         defaultType: String? = null,
     ) {
+        logger.d { "Initializing transaction detail: id=$transactionId" }
         viewModelScope.launch {
             val accounts = accountRepository.getAll().first()
             val categories = categoryRepository.getAll().first()
@@ -126,6 +129,7 @@ class TransactionDetailViewModel(
         if (hasError) return
 
         _state.update { it.copy(isSaving = true) }
+        logger.d { "Saving transaction: editMode=${_state.value.isEditMode}" }
 
         viewModelScope.launch {
             safeRunCatching {
@@ -178,9 +182,11 @@ class TransactionDetailViewModel(
                     }
                 }
             }.onSuccess {
+                logger.d { "Transaction saved successfully" }
                 _state.update { TransactionDetailState() }
                 _events.send(TransactionDetailEvent.NavigateBack)
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to save transaction" }
                 _state.update { st -> st.copy(isSaving = false) }
                 _events.send(TransactionDetailEvent.ShowError("Failed to save transaction"))
             }
@@ -189,10 +195,14 @@ class TransactionDetailViewModel(
 
     private fun delete() {
         val id = _state.value.transactionId ?: return
+        logger.d { "Deleting transaction: id=$id" }
         viewModelScope.launch {
             safeRunCatching { deleteTransactionUseCase(id) }
                 .onSuccess { _events.send(TransactionDetailEvent.NavigateBack) }
-                .onFailure { _events.send(TransactionDetailEvent.ShowError("Failed to delete transaction")) }
+                .onFailure { e ->
+                    logger.e(e) { "Failed to delete transaction: id=$id" }
+                    _events.send(TransactionDetailEvent.ShowError("Failed to delete transaction"))
+                }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.category.form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.model.Category
 import com.github.dsbezerra.cashflow.core.domain.repository.CategoryRepository
 import com.github.dsbezerra.cashflow.util.generateId
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 
 class CategoryFormViewModel(
     private val categoryRepository: CategoryRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CategoryFormState())
@@ -94,6 +96,7 @@ class CategoryFormViewModel(
         }
 
         _state.update { it.copy(isSaving = true) }
+        logger.d { "Saving category: editMode=${s.isEditMode}" }
 
         viewModelScope.launch {
             safeRunCatching {
@@ -126,7 +129,8 @@ class CategoryFormViewModel(
             }.onSuccess {
                 _state.update { CategoryFormState() }
                 _events.send(CategoryFormEvent.NavigateBack)
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to save category" }
                 _state.update { st -> st.copy(isSaving = false) }
                 _events.send(CategoryFormEvent.ShowError("Falha ao salvar categoria"))
             }
@@ -135,10 +139,14 @@ class CategoryFormViewModel(
 
     private fun delete() {
         val id = _state.value.categoryId ?: return
+        logger.d { "Deleting category: id=$id" }
         viewModelScope.launch {
             safeRunCatching { categoryRepository.delete(id) }
                 .onSuccess { _events.send(CategoryFormEvent.NavigateBack) }
-                .onFailure { _events.send(CategoryFormEvent.ShowError("Falha ao excluir categoria")) }
+                .onFailure { e ->
+                    logger.e(e) { "Failed to delete category: id=$id" }
+                    _events.send(CategoryFormEvent.ShowError("Falha ao excluir categoria"))
+                }
         }
     }
 }

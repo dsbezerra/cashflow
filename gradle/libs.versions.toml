@@ -23,6 +23,7 @@ material3 = "1.10.0-alpha05"
 sqldelight = "2.3.2"
 androidx-paging = "3.3.0"
 compose-charts = "0.2.5"
+kermit = "2.0.5"
 spotless = "6.25.0"
 
 [libraries]
@@ -61,6 +62,7 @@ sqldelight-paging = { module = "app.cash.sqldelight:androidx-paging3-extensions"
 androidx-paging-common = { module = "androidx.paging:paging-common", version.ref = "androidx-paging" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging" }
 compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "compose-charts" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

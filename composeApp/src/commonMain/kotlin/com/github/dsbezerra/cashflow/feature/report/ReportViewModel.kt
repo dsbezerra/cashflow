@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.report
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.repository.AccountRepository
 import com.github.dsbezerra.cashflow.core.domain.usecase.report.GetDreReportUseCase
 import com.github.dsbezerra.cashflow.core.domain.usecase.report.GetReportUseCase
@@ -22,6 +23,7 @@ class ReportViewModel(
     private val getReport: GetReportUseCase,
     private val getDreReport: GetDreReportUseCase,
     private val accountRepository: AccountRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(run {
@@ -93,12 +95,14 @@ class ReportViewModel(
 
     private fun startCollecting() {
         val s = _state.value
+        logger.d { "Loading report: period=${s.selectedPeriod} account=${s.selectedAccountId}" }
         collectJob = viewModelScope.launch {
             safeRunCatching {
                 getReport(s.selectedPeriod, s.selectedAccountId).collect { data ->
                     _state.update { it.copy(isLoading = false, data = data) }
                 }
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to load report" }
                 _events.send(ReportEvent.ShowError("Erro ao carregar relatório"))
             }
         }
@@ -106,12 +110,14 @@ class ReportViewModel(
 
     private fun startDreCollecting() {
         val s = _state.value
+        logger.d { "Loading DRE: year=${s.dreYear} month=${s.dreMonth} account=${s.selectedAccountId}" }
         dreCollectJob = viewModelScope.launch {
             safeRunCatching {
                 getDreReport(s.dreYear, s.dreMonth, s.selectedAccountId).collect { report ->
                     _state.update { it.copy(isDreLoading = false, dreReport = report) }
                 }
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to load DRE report" }
                 _events.send(ReportEvent.ShowError("Erro ao carregar DRE"))
             }
         }
@@ -121,12 +127,14 @@ class ReportViewModel(
         val s = _state.value
         val prevMonth = if (s.dreMonth == 1) 12 else s.dreMonth - 1
         val prevYear = if (s.dreMonth == 1) s.dreYear - 1 else s.dreYear
+        logger.d { "Loading DRE comparison: year=$prevYear month=$prevMonth account=${s.selectedAccountId}" }
         dreComparisonCollectJob = viewModelScope.launch {
             safeRunCatching {
                 getDreReport(prevYear, prevMonth, s.selectedAccountId).collect { report ->
                     _state.update { it.copy(isDreComparisonLoading = false, comparisonDreReport = report) }
                 }
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to load DRE comparison report" }
                 _state.update { it.copy(isDreComparisonLoading = false) }
                 _events.send(ReportEvent.ShowError("Erro ao carregar comparação DRE"))
             }

@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.repository.AccountRepository
 import com.github.dsbezerra.cashflow.core.domain.repository.CategoryRepository
 import com.github.dsbezerra.cashflow.core.domain.usecase.dashboard.GetDashboardSummaryUseCase
@@ -24,6 +25,7 @@ class DashboardViewModel(
     private val getDashboardSummary: GetDashboardSummaryUseCase,
     private val categoryRepository: CategoryRepository,
     private val accountRepository: AccountRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(run {
@@ -81,6 +83,7 @@ class DashboardViewModel(
 
     private fun startCollecting() {
         val s = _state.value
+        logger.d { "Loading dashboard: year=${s.selectedYear} month=${s.selectedMonth} account=${s.selectedAccountId}" }
         collectJob = viewModelScope.launch {
             safeRunCatching {
                 combine(
@@ -95,6 +98,7 @@ class DashboardViewModel(
                     )
                 }.collect { _state.value = it }
             }.onFailure { e ->
+                logger.e(e) { "Failed to load dashboard" }
                 _state.update { it.copy(isLoading = false) }
                 _events.send(DashboardEvent.ShowError("Erro ao carregar painel"))
             }

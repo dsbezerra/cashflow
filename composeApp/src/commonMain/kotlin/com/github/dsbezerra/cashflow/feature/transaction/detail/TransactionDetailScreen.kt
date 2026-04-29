@@ -76,11 +76,15 @@ import com.github.dsbezerra.cashflow.core.domain.model.CategoryType
 import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.util.formatPtBr
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.FormatStringsInDatetimeFormats
+import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -171,7 +175,7 @@ fun TransactionFormSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, FormatStringsInDatetimeFormats::class)
 @Composable
 fun TransactionFormBody(
     state: TransactionDetailState,
@@ -231,13 +235,15 @@ fun TransactionFormBody(
             )
 
             // Date
-            val localDate = Instant.fromEpochMilliseconds(state.selectedDate)
-                .toLocalDateTime(TimeZone.currentSystemDefault()).date
+            val dateFormatted = Instant.fromEpochMilliseconds(state.selectedDate)
+                .format(DateTimeComponents.Format {
+                    byUnicodePattern("dd 'de' MM 'de' YYYY")
+                })
             OutlinedButton(
                 onClick = { showDatePicker = true },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(stringResource(Res.string.transaction_date, localDate.formatPtBr()))
+                Text(stringResource(Res.string.transaction_date, dateFormatted))
             }
 
             // Category (hidden for TRANSFER)

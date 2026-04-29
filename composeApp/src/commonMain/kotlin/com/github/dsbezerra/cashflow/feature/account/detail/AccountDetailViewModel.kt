@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.account.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.core.domain.repository.AccountRepository
 import com.github.dsbezerra.cashflow.core.domain.repository.TransactionRepository
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 class AccountDetailViewModel(
     private val accountRepository: AccountRepository,
     private val transactionRepository: TransactionRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AccountDetailState())
@@ -69,19 +71,27 @@ class AccountDetailViewModel(
 
     private fun delete() {
         val id = _state.value.account?.id ?: return
+        logger.d { "Deleting account: id=$id" }
         viewModelScope.launch {
             safeRunCatching { accountRepository.delete(id) }
                 .onSuccess { _events.send(AccountDetailEvent.NavigateBack) }
-                .onFailure { _events.send(AccountDetailEvent.ShowError("Falha ao excluir conta")) }
+                .onFailure { e ->
+                    logger.e(e) { "Failed to delete account: id=$id" }
+                    _events.send(AccountDetailEvent.ShowError("Falha ao excluir conta"))
+                }
         }
     }
 
     private fun archive() {
         val account = _state.value.account ?: return
+        logger.d { "Archiving account: id=${account.id}" }
         viewModelScope.launch {
             safeRunCatching { accountRepository.update(account.copy(isArchived = true)) }
                 .onSuccess { _events.send(AccountDetailEvent.NavigateBack) }
-                .onFailure { _events.send(AccountDetailEvent.ShowError("Falha ao arquivar conta")) }
+                .onFailure { e ->
+                    logger.e(e) { "Failed to archive account: id=${account.id}" }
+                    _events.send(AccountDetailEvent.ShowError("Falha ao arquivar conta"))
+                }
         }
     }
 }

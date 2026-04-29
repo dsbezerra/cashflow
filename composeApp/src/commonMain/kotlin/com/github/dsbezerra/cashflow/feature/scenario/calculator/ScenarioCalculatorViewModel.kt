@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.scenario.calculator
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.model.TransactionType
 import com.github.dsbezerra.cashflow.core.domain.repository.AccountRepository
 import com.github.dsbezerra.cashflow.core.domain.usecase.account.GetAccountBalanceUseCase
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class ScenarioCalculatorViewModel(
     private val accountRepository: AccountRepository,
     private val getAccountBalance: GetAccountBalanceUseCase,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScenarioCalculatorState())
@@ -26,6 +28,7 @@ class ScenarioCalculatorViewModel(
     val events = _events.receiveAsFlow()
 
     init {
+        logger.d { "Loading scenario calculator accounts" }
         viewModelScope.launch {
             safeRunCatching {
                 val accounts = accountRepository.getAll().first()
@@ -40,7 +43,8 @@ class ScenarioCalculatorViewModel(
                 if (default != null) {
                     loadBalance(default.id)
                 }
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to load accounts for scenario calculator" }
                 _state.update { it.copy(isLoading = false) }
                 _events.send(ScenarioCalculatorEvent.ShowError("Erro ao carregar contas"))
             }
@@ -69,13 +73,15 @@ class ScenarioCalculatorViewModel(
     }
 
     private fun loadBalance(accountId: String) {
+        logger.d { "Loading balance for account: id=$accountId" }
         viewModelScope.launch {
             safeRunCatching {
                 val account = accountRepository.getById(accountId) ?: return@safeRunCatching
                 val balance = getAccountBalance(account).toDouble()
                 _state.update { it.copy(currentBalance = balance) }
                 recalculate()
-            }.onFailure {
+            }.onFailure { e ->
+                logger.e(e) { "Failed to load balance for account: id=$accountId" }
                 _events.send(ScenarioCalculatorEvent.ShowError("Erro ao carregar saldo"))
             }
         }

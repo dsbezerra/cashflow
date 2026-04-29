@@ -2,6 +2,7 @@ package com.github.dsbezerra.cashflow.feature.category.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.github.dsbezerra.cashflow.core.domain.repository.CategoryRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class CategoryListViewModel(
     private val categoryRepository: CategoryRepository,
+    private val logger: Logger,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CategoryListState())
